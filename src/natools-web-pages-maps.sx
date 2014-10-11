@@ -1,0 +1,13 @@
+(Natools.Static_Maps.Web.Pages
+   pure
+   (test-function T)
+   (extra-decl "\
+   type Component is
+     (Error,
+      Elements);")
+   (Component
+      (hash-package Natools.Static_Maps.Web.Pages.Components)
+      (function To_Component)
+      (not-found Error)
+      (nodes
+         (Elements  elements layout))))
