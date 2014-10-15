@@ -1,4 +1,5 @@
 with "../natools/natools";
+with "aws";
 
 project Webtools is
    type Build_Type is ("Release", "Coverage");
