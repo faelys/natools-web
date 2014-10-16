@@ -137,6 +137,9 @@ package body Natools.Web.Sites is
             Log (Severities.Error, "Unknown site command """
               & S_Expressions.To_String (Name) & '"');
 
+         when Commands.Set_Default_Template =>
+            Set_If_Possible (Builder.Default_Template, Arguments);
+
          when Commands.Set_File_Prefix =>
             Set_If_Possible (Builder.File_Prefix, Arguments);
 
@@ -148,6 +151,20 @@ package body Natools.Web.Sites is
 
          when Commands.Set_Path_Suffix =>
             Set_If_Possible (Builder.Path_Suffix, Arguments);
+
+         when Commands.Set_Template_File =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               declare
+                  Reader : S_Expressions.File_Readers.S_Reader
+                    := S_Expressions.File_Readers.Reader
+                       (S_Expressions.To_String (Arguments.Current_Atom));
+               begin
+                  Containers.Set_Expressions (Builder.Templates, Reader);
+               end;
+            end if;
+
+         when Commands.Set_Templates =>
+            Containers.Set_Expressions (Builder.Templates, Arguments);
 
          when Commands.Site_Map =>
             Add_Pages (Arguments, Builder, Meaningless_Value);
@@ -176,7 +193,7 @@ package body Natools.Web.Sites is
       Result : Site
         := (File_Name => S_Expressions.Atom_Ref_Constructors.Create
                            (S_Expressions.To_Atom (File_Name)),
-            Pages => <>);
+            others => <>);
    begin
       Reload (Result);
       return Result;
@@ -191,8 +208,35 @@ package body Natools.Web.Sites is
    begin
       Update (Builder, Reader);
       Object :=
-        (File_Name => Object.File_Name,
-         Pages => Page_Maps.Raw_Maps.Create (Builder.Pages));
+        (Default_Template => Builder.Default_Template,
+         File_Name => Object.File_Name,
+         Pages => Page_Maps.Raw_Maps.Create (Builder.Pages),
+         Templates => Builder.Templates);
+
+      if Object.Default_Template.Is_Empty then
+         Object.Default_Template := S_Expressions.Atom_Ref_Constructors.Create
+           (S_Expressions.To_Atom ("html"));
+      end if;
    end Reload;
+
+
+
+   -------------------------
+   -- Site Data Accessors --
+   -------------------------
+
+   function Default_Template (Object : Site) return S_Expressions.Atom is
+   begin
+      return Object.Default_Template.Query.Data.all;
+   end Default_Template;
+
+
+   function Template
+     (Object : Site;
+      Name : S_Expressions.Atom)
+     return S_Expressions.Caches.Cursor is
+   begin
+      return Containers.Get_Expression (Object.Templates, Name);
+   end Template;
 
 end Natools.Web.Sites;

@@ -19,6 +19,9 @@
 -- pages (i.e. a website).                                                  --
 ------------------------------------------------------------------------------
 
+with Natools.Web.Containers;
+with Natools.S_Expressions.Caches;
+
 private with Natools.S_Expressions.Atom_Refs;
 private with Natools.S_Expressions.Lockable;
 private with Natools.Web.Page_Maps;
@@ -28,22 +31,38 @@ package Natools.Web.Sites is
    type Site is tagged private;
 
    function Create (File_Name : String) return Site;
+      --  Build a new object from the given file
 
    procedure Reload (Object : in out Site);
+      --  Reload Object data from its original file
+
+
+   function Template
+     (Object : Site;
+      Name : S_Expressions.Atom)
+     return S_Expressions.Caches.Cursor;
+      --  Retrieve a template from its name
+
+   function Default_Template (Object : Site) return S_Expressions.Atom;
+      --  Retrieve the default template name
 
 private
 
    type Site is tagged record
+      Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Pages : Page_Maps.Raw_Maps.Constant_Map;
+      Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 
    type Site_Builder is record
+      Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Path_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       Path_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Pages : Page_Maps.Raw_Maps.Unsafe_Maps.Map;
+      Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 
    procedure Update

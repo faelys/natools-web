@@ -4,18 +4,24 @@
    (extra-decl "\
    type Command is
      (Error,
+      Set_Default_Template,
       Set_File_Prefix,
       Set_File_Suffix,
       Set_Path_Prefix,
       Set_Path_Suffix,
+      Set_Template_File,
+      Set_Templates,
       Site_Map);")
    (Command
       (hash-package Natools.Static_Maps.Web.Sites.Commands)
       (function To_Command)
       (not-found Error)
       (nodes
-         (Set_File_Prefix  file-prefix)
-         (Set_File_Suffix  file-suffix)
-         (Set_Path_Prefix  path-prefix)
-         (Set_Path_Suffix  path-suffix)
-         (Site_Map         site-map pages))))
+         (Set_Default_Template  default-template)
+         (Set_File_Prefix       file-prefix)
+         (Set_File_Suffix       file-suffix)
+         (Set_Path_Prefix       path-prefix)
+         (Set_Path_Suffix       path-suffix)
+         (Set_Template_File     template-file)
+         (Set_Templates         templates)
+         (Site_Map              site-map pages))))
