@@ -19,16 +19,18 @@
 -- pages (i.e. a website).                                                  --
 ------------------------------------------------------------------------------
 
-with Natools.Web.Containers;
+with Ada.Streams;
+with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Caches;
+with Natools.Web.Containers;
+with Natools.Web.Exchanges;
 
 private with Natools.S_Expressions.Atom_Refs;
 private with Natools.S_Expressions.Lockable;
-private with Natools.Web.Page_Maps;
 
 package Natools.Web.Sites is
 
-   type Site is tagged private;
+   type Site is private;
 
    function Create (File_Name : String) return Site;
       --  Build a new object from the given file
@@ -46,12 +48,27 @@ package Natools.Web.Sites is
    function Default_Template (Object : Site) return S_Expressions.Atom;
       --  Retrieve the default template name
 
+
+   type Page is interface;
+
+   procedure Respond
+     (Object : in out Page;
+      Exchange : in out Exchanges.Exchange;
+      Parent : aliased in Site;
+      Extra_Path : in S_Expressions.Atom)
+     is abstract
+     with Pre'Class => not Exchanges.Has_Response (Exchange);
+
+
+   package Page_Maps is new Constant_Indefinite_Ordered_Maps
+     (S_Expressions.Atom, Page'Class, Ada.Streams."<");
+
 private
 
-   type Site is tagged record
+   type Site is record
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
-      Pages : Page_Maps.Raw_Maps.Constant_Map;
+      Pages : Page_Maps.Constant_Map;
       Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 
@@ -61,7 +78,7 @@ private
       File_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Path_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       Path_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
-      Pages : Page_Maps.Raw_Maps.Unsafe_Maps.Map;
+      Pages : Page_Maps.Unsafe_Maps.Map;
       Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 

@@ -210,7 +210,7 @@ package body Natools.Web.Sites is
       Object :=
         (Default_Template => Builder.Default_Template,
          File_Name => Object.File_Name,
-         Pages => Page_Maps.Raw_Maps.Create (Builder.Pages),
+         Pages => Page_Maps.Create (Builder.Pages),
          Templates => Builder.Templates);
 
       if Object.Default_Template.Is_Empty then
