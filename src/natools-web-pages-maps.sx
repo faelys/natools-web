@@ -2,9 +2,21 @@
    pure
    (test-function T)
    (extra-decl "\
+   type Command is
+     (Unknown_Command,
+      Element,
+      Template);
+
    type Component is
      (Error,
       Elements);")
+   (Command
+      (hash-package Natools.Static_Maps.Web.Pages.Commands)
+      (function To_Command)
+      (not-found Unknown_Command)
+      (nodes
+         (Element   element)
+         (Template  template)))
    (Component
       (hash-package Natools.Static_Maps.Web.Pages.Components)
       (function To_Component)

@@ -14,6 +14,7 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Lockable;
@@ -22,11 +23,32 @@ with Natools.Static_Maps.Web.Pages;
 
 package body Natools.Web.Pages is
 
+   type Context_Type
+     (Site : access constant Sites.Site;
+      Page : access constant Page_Data)
+     is null record;
+
+   procedure Append
+     (Exchange : in out Exchanges.Exchange;
+      Context : in Context_Type;
+      Data : in S_Expressions.Atom);
+
    procedure Execute
      (Data : in out Page_Data;
       Context : in Meaningless_Type;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Context : in Context_Type;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class);
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Context : in Context_Type;
+      Template : in S_Expressions.Caches.Cursor);
 
 
    ---------------------------
@@ -58,6 +80,65 @@ package body Natools.Web.Pages is
 
 
 
+   -------------------
+   -- Page Renderer --
+   -------------------
+
+   procedure Append
+     (Exchange : in out Exchanges.Exchange;
+      Context : in Context_Type;
+      Data : in S_Expressions.Atom)
+   is
+      pragma Unreferenced (Context);
+   begin
+      Exchanges.Append (Exchange, Data);
+   end Append;
+
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Context : in Context_Type;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      use type S_Expressions.Events.Event;
+      package Commands renames Natools.Static_Maps.Web.Pages;
+   begin
+      case Commands.To_Command (S_Expressions.To_String (Name)) is
+         when Commands.Unknown_Command =>
+            null;
+
+         when Commands.Element =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               Render (Exchange, Context, Containers.Get_Expression
+                 (Context.Page.Elements, Arguments.Current_Atom));
+            end if;
+
+         when Commands.Template =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               Render (Exchange, Context,
+                 Sites.Template (Context.Site.all, Arguments.Current_Atom));
+            end if;
+      end case;
+   end Render;
+
+
+   procedure Render_Page is new S_Expressions.Interpreter_Loop
+     (Exchanges.Exchange, Context_Type, Render, Append);
+
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Context : in Context_Type;
+      Template : in S_Expressions.Caches.Cursor)
+   is
+      Destroyed_Template : S_Expressions.Caches.Cursor := Template;
+   begin
+      Render_Page (Destroyed_Template, Exchange, Context);
+   end Render;
+
+
+
    ----------------------
    -- Public Interface --
    ----------------------
@@ -85,5 +166,35 @@ package body Natools.Web.Pages is
    begin
       return (Ref => Data_Refs.Create (Create_Page'Access));
    end Create;
+
+
+   overriding procedure Respond
+     (Object : in out Page_Ref;
+      Exchange : in out Exchanges.Exchange;
+      Parent : aliased in Sites.Site;
+      Extra_Path : in S_Expressions.Atom)
+   is
+      Template_Name : constant S_Expressions.Atom
+        := Sites.Default_Template (Parent);
+      Template : S_Expressions.Caches.Cursor;
+      Accessor : constant Data_Refs.Accessor := Object.Ref.Query;
+   begin
+      if Extra_Path'Length > 0 then
+         return;
+      end if;
+
+      declare
+         Cursor : constant Containers.Expression_Maps.Cursor
+           := Accessor.Data.Elements.Find (Template_Name);
+      begin
+         if Containers.Expression_Maps.Has_Element (Cursor) then
+            Template := Containers.Expression_Maps.Element (Cursor);
+         else
+            Template := Sites.Template (Parent, Template_Name);
+         end if;
+      end;
+
+      Render (Exchange, (Parent'Access, Accessor.Data), Template);
+   end Respond;
 
 end Natools.Web.Pages;

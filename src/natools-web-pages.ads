@@ -15,6 +15,8 @@
 ------------------------------------------------------------------------------
 
 with Natools.S_Expressions;
+with Natools.Web.Exchanges;
+with Natools.Web.Sites;
 
 private with Natools.References;
 private with Natools.S_Expressions.Atom_Refs;
@@ -23,10 +25,16 @@ private with Natools.Web.Containers;
 
 package Natools.Web.Pages is
 
-   type Page_Ref is tagged private;
+   type Page_Ref is new Sites.Page with private;
 
    function Create (File_Path, Web_Path : in S_Expressions.Atom)
      return Page_Ref;
+
+   overriding procedure Respond
+     (Object : in out Page_Ref;
+      Exchange : in out Exchanges.Exchange;
+      Parent : aliased in Sites.Site;
+      Extra_Path : in S_Expressions.Atom);
 
 private
 
@@ -41,7 +49,7 @@ private
       Storage_Pools.Access_In_Default_Pool'Storage_Pool,
       Storage_Pools.Access_In_Default_Pool'Storage_Pool);
 
-   type Page_Ref is tagged record
+   type Page_Ref is new Sites.Page with record
       Ref : Data_Refs.Reference;
    end record;
 
