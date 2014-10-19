@@ -38,6 +38,11 @@ package Natools.Web.Sites is
    procedure Reload (Object : in out Site);
       --  Reload Object data from its original file
 
+   procedure Respond
+     (Object : aliased in out Site;
+      Exchange : in out Exchanges.Exchange);
+      --  Look up internal data to provide a response in Exchange
+
 
    function Template
      (Object : Site;
@@ -68,7 +73,7 @@ private
    type Site is record
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
-      Pages : Page_Maps.Constant_Map;
+      Pages : Page_Maps.Updatable_Map;
       Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 

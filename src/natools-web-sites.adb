@@ -38,6 +38,12 @@ package body Natools.Web.Sites is
       Context : in Meaningless_Type;
       Common_Name : in S_Expressions.Atom);
 
+   procedure Get_Page
+     (Container : in Page_Maps.Updatable_Map;
+      Path : in S_Expressions.Atom;
+      Result : out Page_Maps.Cursor;
+      Extra_Path_First : out S_Expressions.Offset);
+
    procedure Execute
      (Builder : in out Site_Builder;
       Context : in Meaningless_Type;
@@ -52,6 +58,46 @@ package body Natools.Web.Sites is
    ------------------------------
    -- Local Helper Subprograms --
    ------------------------------
+
+   procedure Get_Page
+     (Container : in Page_Maps.Updatable_Map;
+      Path : in S_Expressions.Atom;
+      Result : out Page_Maps.Cursor;
+      Extra_Path_First : out S_Expressions.Offset)
+   is
+      use type S_Expressions.Atom;
+      use type S_Expressions.Octet;
+      use type S_Expressions.Offset;
+   begin
+      Result := Container.Floor (Path);
+
+      if not Page_Maps.Has_Element (Result) then
+         Extra_Path_First := 0;
+         return;
+      end if;
+
+      declare
+         Found_Path : constant S_Expressions.Atom := Page_Maps.Key (Result);
+      begin
+         if Found_Path'Length > Path'Length
+           or else Path (Path'First .. Path'First + Found_Path'Length - 1)
+              /= Found_Path
+         then
+            Page_Maps.Clear (Result);
+            return;
+         end if;
+
+         Extra_Path_First := Path'First + Found_Path'Length;
+      end;
+
+      if Extra_Path_First in Path'Range
+        and then Path (Extra_Path_First) /= Character'Pos ('/')
+      then
+         Page_Maps.Clear (Result);
+         return;
+      end if;
+   end Get_Page;
+
 
    procedure Set_If_Possible
      (Reference : in out S_Expressions.Atom_Refs.Immutable_Reference;
@@ -218,6 +264,68 @@ package body Natools.Web.Sites is
            (S_Expressions.To_Atom ("html"));
       end if;
    end Reload;
+
+
+   procedure Respond
+     (Object : aliased in out Site;
+      Exchange : in out Exchanges.Exchange)
+   is
+      use type S_Expressions.Octet;
+      use type S_Expressions.Offset;
+
+      procedure Call_Page
+        (Key : in S_Expressions.Atom;
+         Page_Object : in out Page'Class);
+
+      Path : constant S_Expressions.Atom
+        := S_Expressions.To_Atom (Exchanges.Path (Exchange));
+
+      procedure Call_Page
+        (Key : in S_Expressions.Atom;
+         Page_Object : in out Page'Class)
+      is
+         use type S_Expressions.Atom;
+      begin
+         pragma Assert (Key'Length <= Path'Length
+           and then Key = Path (Path'First .. Path'First + Key'Length - 1));
+
+         Respond (Page_Object, Exchange, Object,
+           Path (Path'First + Key'Length .. Path'Last));
+      end Call_Page;
+
+      Cursor : Page_Maps.Cursor;
+      Extra_Path_First : S_Expressions.Offset;
+   begin
+      Get_Page (Object.Pages, Path, Cursor, Extra_Path_First);
+
+      if not Page_Maps.Has_Element (Cursor) then
+         return;
+      end if;
+
+      Response_Loop :
+      loop
+         Object.Pages.Update_Element (Cursor, Call_Page'Access);
+
+         exit Response_Loop when Exchanges.Has_Response (Exchange);
+
+         Find_Parent :
+         loop
+            Remove_Path_Component :
+            loop
+               Extra_Path_First := Extra_Path_First - 1;
+
+               exit Response_Loop
+                 when Extra_Path_First not in Path'Range;
+               exit Remove_Path_Component
+                 when Path (Extra_Path_First) = Character'Pos ('/');
+            end loop Remove_Path_Component;
+
+            Cursor := Object.Pages.Find
+              (Path (Path'First .. Extra_Path_First - 1));
+            exit Find_Parent when Page_Maps.Has_Element (Cursor);
+         end loop Find_Parent;
+      end loop Response_Loop;
+   end Respond;
 
 
 
