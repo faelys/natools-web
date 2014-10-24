@@ -1,0 +1,18 @@
+with "webtools";
+with "../ada-syslog/adasyslog_gnat";
+
+project Tests is
+   for Source_Dirs use ("tests");
+   for Main use ("simple_site.adb");
+
+   for Object_Dir use Webtools'Object_Dir;
+   for Exec_Dir use Webtools'Exec_Dir;
+
+   package Compiler is
+      for Default_Switches use Webtools.Compiler'Default_Switches;
+   end Compiler;
+
+   package Linker is
+      for Default_Switches use Webtools.Linker'Default_Switches;
+   end Linker;
+end Tests;
