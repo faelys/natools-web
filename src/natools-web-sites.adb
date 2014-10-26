@@ -250,9 +250,20 @@ package body Natools.Web.Sites is
       Reader : S_Expressions.File_Readers.S_Reader
         := S_Expressions.File_Readers.Reader
            (S_Expressions.To_String (Object.File_Name.Query.Data.all));
-      Builder : Site_Builder;
+      Empty_Atom : constant S_Expressions.Atom_Refs.Immutable_Reference
+        := S_Expressions.Atom_Ref_Constructors.Create
+           (S_Expressions.Null_Atom);
+      Builder : Site_Builder
+        := (Default_Template
+              => S_Expressions.Atom_Refs.Null_Immutable_Reference,
+            File_Prefix => Empty_Atom,
+            File_Suffix => Empty_Atom,
+            Path_Prefix => Empty_Atom,
+            Path_Suffix => Empty_Atom,
+            Pages | Templates => <>);
    begin
       Update (Builder, Reader);
+
       Object :=
         (Default_Template => Builder.Default_Template,
          File_Name => Object.File_Name,
