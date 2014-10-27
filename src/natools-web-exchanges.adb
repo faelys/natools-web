@@ -14,6 +14,8 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with AWS.MIME;
+
 package body Natools.Web.Exchanges is
 
    procedure Ensure_Kind
@@ -85,14 +87,30 @@ package body Natools.Web.Exchanges is
             raise Program_Error with "Empty response cannot be exported";
 
          when Responses.Buffer =>
-            return AWS.Response.Build
-              (S_Expressions.To_String (Object.MIME_Type.Query.Data.all),
-               Object.Response_Body.Data);
+            if Object.MIME_Type.Is_Empty then
+               return AWS.Response.Build
+                 ("text/html",
+                  Object.Response_Body.Data);
+            else
+               return AWS.Response.Build
+                 (S_Expressions.To_String (Object.MIME_Type.Query.Data.all),
+                  Object.Response_Body.Data);
+            end if;
 
          when Responses.File =>
-            return AWS.Response.File
-              (S_Expressions.To_String (Object.MIME_Type.Query.Data.all),
-               S_Expressions.To_String (Object.Response_Body.Data));
+            if Object.MIME_Type.Is_Empty then
+               declare
+                  Filename : constant String
+                    := S_Expressions.To_String (Object.Response_Body.Data);
+               begin
+                  return AWS.Response.File
+                    (AWS.MIME.Content_Type (Filename), Filename);
+               end;
+            else
+               return AWS.Response.File
+                 (S_Expressions.To_String (Object.MIME_Type.Query.Data.all),
+                  S_Expressions.To_String (Object.Response_Body.Data));
+            end if;
       end case;
    end Response;
 
