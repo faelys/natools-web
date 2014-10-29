@@ -14,10 +14,17 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Printers;
 
 package body Natools.Web.Containers is
+
+   procedure Add_Atom
+     (List : in out Unsafe_Atom_Lists.List;
+      Context : in Meaningless_Type;
+      Atom : in S_Expressions.Atom);
+      --  Append a new atom to List
 
    procedure Add_Expression
      (Map : in out Expression_Maps.Unsafe_Maps.Map;
@@ -30,6 +37,17 @@ package body Natools.Web.Containers is
    ------------------------------
    -- Local Helper Subprograms --
    ------------------------------
+
+   procedure Add_Atom
+     (List : in out Unsafe_Atom_Lists.List;
+      Context : in Meaningless_Type;
+      Atom : in S_Expressions.Atom)
+   is
+      pragma Unreferenced (Context);
+   begin
+      List.Append (Atom);
+   end Add_Atom;
+
 
    procedure Add_Expression
      (Map : in out Expression_Maps.Unsafe_Maps.Map;
@@ -45,14 +63,19 @@ package body Natools.Web.Containers is
    end Add_Expression;
 
 
+   procedure List_Reader is new S_Expressions.Interpreter_Loop
+     (Unsafe_Atom_Lists.List, Meaningless_Type,
+      Dispatch_Without_Argument => Add_Atom);
+
+
    procedure Map_Reader is new S_Expressions.Interpreter_Loop
      (Expression_Maps.Unsafe_Maps.Map, Meaningless_Type, Add_Expression);
 
 
 
-   ------------------------
+   --------------------------
    -- Expression Interface --
-   ------------------------
+   --------------------------
 
    procedure Set_Expressions
      (Map : in out Expression_Maps.Constant_Map;
@@ -94,5 +117,39 @@ package body Natools.Web.Containers is
       return Result;
    end Get_Expression;
 
-end Natools.Web.Containers;
 
+
+   ---------------------------
+   -- Atom Arrays Interface --
+   ---------------------------
+
+   procedure Append_Atoms
+     (Target : in out Unsafe_Atom_Lists.List;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+   begin
+      List_Reader (Expression, Target, Meaningless_Value);
+   end Append_Atoms;
+
+
+   function Create (Source : Unsafe_Atom_Lists.List)
+     return Atom_Array_Refs.Immutable_Reference
+   is
+      function Create_Array return Atom_Array;
+
+      function Create_Array return Atom_Array is
+         Cursor : Unsafe_Atom_Lists.Cursor := Source.First;
+         Result : Atom_Array (1 .. S_Expressions.Count (Source.Length));
+      begin
+         for I in Result'Range loop
+            Result (I) := S_Expressions.Atom_Ref_Constructors.Create
+              (Unsafe_Atom_Lists.Element (Cursor));
+            Unsafe_Atom_Lists.Next (Cursor);
+         end loop;
+
+         return Result;
+      end Create_Array;
+   begin
+      return Atom_Array_Refs.Create (Create_Array'Access);
+   end Create;
+
+end Natools.Web.Containers;
