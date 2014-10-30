@@ -9,6 +9,7 @@
       Set_File_Suffix,
       Set_Path_Prefix,
       Set_Path_Suffix,
+      Set_Static_Paths,
       Set_Template_File,
       Set_Templates,
       Site_Map);")
@@ -22,6 +23,7 @@
          (Set_File_Suffix       file-suffix)
          (Set_Path_Prefix       path-prefix)
          (Set_Path_Suffix       path-suffix)
+         (Set_Static_Paths      static static-path static-paths)
          (Set_Template_File     template-file)
          (Set_Templates         templates)
          (Site_Map              site-map pages))))

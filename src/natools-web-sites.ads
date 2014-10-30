@@ -74,6 +74,7 @@ private
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Pages : Page_Maps.Updatable_Map;
+      Static : Containers.Atom_Array_Refs.Immutable_Reference;
       Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 
@@ -84,6 +85,7 @@ private
       Path_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       Path_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Pages : Page_Maps.Unsafe_Maps.Map;
+      Static : Containers.Unsafe_Atom_Lists.List;
       Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 

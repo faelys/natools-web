@@ -14,6 +14,7 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Ada.Directories;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
@@ -198,6 +199,9 @@ package body Natools.Web.Sites is
          when Commands.Set_Path_Suffix =>
             Set_If_Possible (Builder.Path_Suffix, Arguments);
 
+         when Commands.Set_Static_Paths =>
+            Containers.Append_Atoms (Builder.Static, Arguments);
+
          when Commands.Set_Template_File =>
             if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
                declare
@@ -260,7 +264,7 @@ package body Natools.Web.Sites is
             File_Suffix => Empty_Atom,
             Path_Prefix => Empty_Atom,
             Path_Suffix => Empty_Atom,
-            Pages | Templates => <>);
+            Pages | Static | Templates => <>);
    begin
       Update (Builder, Reader);
 
@@ -268,6 +272,7 @@ package body Natools.Web.Sites is
         (Default_Template => Builder.Default_Template,
          File_Name => Object.File_Name,
          Pages => Page_Maps.Create (Builder.Pages),
+         Static => Containers.Create (Builder.Static),
          Templates => Builder.Templates);
 
       if Object.Default_Template.Is_Empty then
@@ -288,6 +293,8 @@ package body Natools.Web.Sites is
         (Key : in S_Expressions.Atom;
          Page_Object : in out Page'Class);
 
+      procedure Send_File_If_Exists (In_Directory : in S_Expressions.Atom);
+
       Path : constant S_Expressions.Atom
         := S_Expressions.To_Atom (Exchanges.Path (Exchange));
 
@@ -304,9 +311,30 @@ package body Natools.Web.Sites is
            Path (Path'First + Key'Length .. Path'Last));
       end Call_Page;
 
+      procedure Send_File_If_Exists (In_Directory : in S_Expressions.Atom) is
+         use type S_Expressions.Atom;
+         Candidate_Name : constant S_Expressions.Atom := In_Directory & Path;
+      begin
+         if Ada.Directories.Exists
+              (S_Expressions.To_String (Candidate_Name))
+         then
+            Exchanges.Send_File (Exchange, Candidate_Name);
+         end if;
+      end Send_File_If_Exists;
+
       Cursor : Page_Maps.Cursor;
       Extra_Path_First : S_Expressions.Offset;
    begin
+      if not Object.Static.Is_Empty then
+         for Path_Ref of Object.Static.Query.Data.all loop
+            Send_File_If_Exists (Path_Ref.Query.Data.all);
+
+            if Exchanges.Has_Response (Exchange) then
+               return;
+            end if;
+         end loop;
+      end if;
+
       Get_Page (Object.Pages, Path, Cursor, Extra_Path_First);
 
       if not Page_Maps.Has_Element (Cursor) then
