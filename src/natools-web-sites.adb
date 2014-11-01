@@ -372,6 +372,23 @@ package body Natools.Web.Sites is
    -- Site Data Accessors --
    -------------------------
 
+   procedure Get_Template
+     (Object : in Site;
+      Name : in S_Expressions.Atom;
+      Template : out S_Expressions.Caches.Cursor;
+      Found : out Boolean)
+   is
+      Cursor : constant Containers.Expression_Maps.Cursor
+        := Object.Templates.Find (Name);
+   begin
+      Found := Containers.Expression_Maps.Has_Element (Cursor);
+
+      if Found then
+         Template := Containers.Expression_Maps.Element (Cursor);
+      end if;
+   end Get_Template;
+
+
    function Default_Template (Object : Site) return S_Expressions.Atom is
    begin
       return Object.Default_Template.Query.Data.all;

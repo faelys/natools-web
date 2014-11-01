@@ -44,6 +44,13 @@ package Natools.Web.Sites is
       --  Look up internal data to provide a response in Exchange
 
 
+   procedure Get_Template
+     (Object : in Site;
+      Name : in S_Expressions.Atom;
+      Template : out S_Expressions.Caches.Cursor;
+      Found : out Boolean);
+      --  Raw access to templates, without '?' suffix resolution
+
    function Template
      (Object : Site;
       Name : S_Expressions.Atom)
