@@ -20,6 +20,7 @@ with Natools.Web.Sites;
 
 private with Natools.References;
 private with Natools.S_Expressions.Atom_Refs;
+private with Natools.S_Expressions.Caches;
 private with Natools.Storage_Pools;
 private with Natools.Web.Containers;
 
@@ -43,6 +44,13 @@ private
       Web_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Elements : Containers.Expression_Maps.Constant_Map;
    end record;
+
+   procedure Get_Element
+     (Data : in Page_Data;
+      Name : in S_Expressions.Atom;
+      Element : out S_Expressions.Caches.Cursor;
+      Found : out Boolean);
+
 
    package Data_Refs is new References
      (Page_Data,

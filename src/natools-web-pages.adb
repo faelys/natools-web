@@ -14,7 +14,6 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
-with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Lockable;
@@ -45,10 +44,12 @@ package body Natools.Web.Pages is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
 
-   procedure Render
+   procedure Sub_Render
      (Exchange : in out Exchanges.Exchange;
       Context : in Context_Type;
-      Template : in S_Expressions.Caches.Cursor);
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Lookup_Element : in Boolean := False;
+      Lookup_Template : in Boolean := False);
 
 
    ---------------------------
@@ -109,16 +110,10 @@ package body Natools.Web.Pages is
             null;
 
          when Commands.Element =>
-            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
-               Render (Exchange, Context, Containers.Get_Expression
-                 (Context.Page.Elements, Arguments.Current_Atom));
-            end if;
+            Sub_Render (Exchange, Context, Arguments, Lookup_Element => True);
 
          when Commands.Template =>
-            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
-               Render (Exchange, Context,
-                 Sites.Template (Context.Site.all, Arguments.Current_Atom));
-            end if;
+            Sub_Render (Exchange, Context, Arguments, Lookup_Template => True);
       end case;
    end Render;
 
@@ -127,15 +122,87 @@ package body Natools.Web.Pages is
      (Exchanges.Exchange, Context_Type, Render, Append);
 
 
-   procedure Render
+   procedure Sub_Render
      (Exchange : in out Exchanges.Exchange;
       Context : in Context_Type;
-      Template : in S_Expressions.Caches.Cursor)
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Lookup_Element : in Boolean := False;
+      Lookup_Template : in Boolean := False)
    is
-      Destroyed_Template : S_Expressions.Caches.Cursor := Template;
+      use type S_Expressions.Events.Event;
+      Template : S_Expressions.Caches.Cursor;
    begin
-      Render_Page (Destroyed_Template, Exchange, Context);
-   end Render;
+      if (Lookup_Element or Lookup_Template)
+        and then Expression.Current_Event = S_Expressions.Events.Add_Atom
+      then
+         declare
+            Name : constant S_Expressions.Atom := Expression.Current_Atom;
+            Event : S_Expressions.Events.Event;
+            Found : Boolean;
+         begin
+            if Lookup_Element then
+               Context.Page.Get_Element (Name, Template, Found);
+
+               if Found then
+                  Render_Page (Template, Exchange, Context);
+                  return;
+               end if;
+            end if;
+
+            if Lookup_Template then
+               Sites.Get_Template (Context.Site.all, Name, Template, Found);
+
+               if Found then
+                  Render_Page (Template, Exchange, Context);
+                  return;
+               end if;
+            end if;
+
+            Expression.Next (Event);
+
+            case Event is
+               when S_Expressions.Events.Close_List
+                 | S_Expressions.Events.End_Of_Input
+                 | S_Expressions.Events.Error
+               =>
+                  Log (Severities.Error,
+                    "Page expression """
+                    & S_Expressions.To_String (Name)
+                    & """ not found");
+                  return;
+
+               when S_Expressions.Events.Open_List
+                 | S_Expressions.Events.Add_Atom
+               =>
+                  null;  --  proceed to rendering Expression
+            end case;
+         end;
+      end if;
+
+      Render_Page (Expression, Exchange, Context);
+   end Sub_Render;
+
+
+
+   -------------------------
+   -- Page_Data Interface --
+   -------------------------
+
+   procedure Get_Element
+     (Data : in Page_Data;
+      Name : in S_Expressions.Atom;
+      Element : out S_Expressions.Caches.Cursor;
+      Found : out Boolean)
+   is
+      Cursor : constant Containers.Expression_Maps.Cursor
+        := Data.Elements.Find (Name);
+   begin
+      Found := Containers.Expression_Maps.Has_Element (Cursor);
+
+      if Found then
+         Element := Containers.Expression_Maps.Element (Cursor);
+      end if;
+   end Get_Element;
 
 
 
@@ -194,7 +261,7 @@ package body Natools.Web.Pages is
          end if;
       end;
 
-      Render (Exchange, (Parent'Access, Accessor.Data), Template);
+      Render_Page (Template, Exchange, (Parent'Access, Accessor.Data));
    end Respond;
 
 end Natools.Web.Pages;
