@@ -6,5 +6,8 @@
   </head>
   <body>\n"
 (element body)
-"  </body>
+"    <div class=\"footer\">\n"
+(element footer "<p>Default footer</p>\n")
+"    </div>
+  </body>
 </html>\n")
