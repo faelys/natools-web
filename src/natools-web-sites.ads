@@ -49,12 +49,6 @@ package Natools.Web.Sites is
       Name : in S_Expressions.Atom;
       Template : out S_Expressions.Caches.Cursor;
       Found : out Boolean);
-      --  Raw access to templates, without '?' suffix resolution
-
-   function Template
-     (Object : Site;
-      Name : S_Expressions.Atom)
-     return S_Expressions.Caches.Cursor;
       --  Retrieve a template from its name
 
    function Default_Template (Object : Site) return S_Expressions.Atom;

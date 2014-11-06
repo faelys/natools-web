@@ -394,13 +394,4 @@ package body Natools.Web.Sites is
       return Object.Default_Template.Query.Data.all;
    end Default_Template;
 
-
-   function Template
-     (Object : Site;
-      Name : S_Expressions.Atom)
-     return S_Expressions.Caches.Cursor is
-   begin
-      return Containers.Get_Expression (Object.Templates, Name);
-   end Template;
-
 end Natools.Web.Sites;
