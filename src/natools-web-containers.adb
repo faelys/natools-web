@@ -88,36 +88,6 @@ package body Natools.Web.Containers is
    end Set_Expressions;
 
 
-   function Get_Expression
-     (Map : Expression_Maps.Constant_Map;
-      Label : S_Expressions.Atom)
-     return S_Expressions.Caches.Cursor
-   is
-      use type S_Expressions.Octet;
-      use type S_Expressions.Offset;
-
-      Result : S_Expressions.Caches.Cursor;
-      Cursor : Expression_Maps.Cursor := Map.Find (Label);
-   begin
-      if Expression_Maps.Has_Element (Cursor) then
-         Result := Expression_Maps.Element (Cursor);
-      elsif Label'Length >= 1
-        and then Label (Label'Last) = Character'Pos ('?')
-      then
-         Cursor := Map.Find (Label (Label'First .. Label'Last - 1));
-
-         if Expression_Maps.Has_Element (Cursor) then
-            Result := Expression_Maps.Element (Cursor);
-         end if;
-      else
-         Log (Severities.Error,
-           "Expression """ & S_Expressions.To_String (Label) & """ not found");
-      end if;
-
-      return Result;
-   end Get_Expression;
-
-
 
    ---------------------------
    -- Atom Arrays Interface --

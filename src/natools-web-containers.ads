@@ -41,14 +41,6 @@ package Natools.Web.Containers is
       Expression_List : in out S_Expressions.Lockable.Descriptor'Class);
       --  (Re)initialize expression database with the given list
 
-   function Get_Expression
-     (Map : Expression_Maps.Constant_Map;
-      Label : S_Expressions.Atom)
-     return S_Expressions.Caches.Cursor;
-      --  Return the S-expression associated with the given label.
-      --  When label ends with '?', look up without it and
-      --  dont report error when not found.
-
 
 
    package Unsafe_Atom_Lists is
