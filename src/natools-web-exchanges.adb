@@ -66,6 +66,12 @@ package body Natools.Web.Exchanges is
    end Append;
 
 
+   procedure Not_Found (Object : in out Exchange) is
+   begin
+      Object.Status_Code := AWS.Messages.S404;
+   end Not_Found;
+
+
    procedure Send_File
      (Object : in out Exchange;
       File_Name : in S_Expressions.Atom) is
@@ -90,11 +96,13 @@ package body Natools.Web.Exchanges is
             if Object.MIME_Type.Is_Empty then
                return AWS.Response.Build
                  ("text/html",
-                  Object.Response_Body.Data);
+                  Object.Response_Body.Data,
+                  Object.Status_Code);
             else
                return AWS.Response.Build
                  (S_Expressions.To_String (Object.MIME_Type.Query.Data.all),
-                  Object.Response_Body.Data);
+                  Object.Response_Body.Data,
+                  Object.Status_Code);
             end if;
 
          when Responses.File =>
@@ -104,12 +112,15 @@ package body Natools.Web.Exchanges is
                     := S_Expressions.To_String (Object.Response_Body.Data);
                begin
                   return AWS.Response.File
-                    (AWS.MIME.Content_Type (Filename), Filename);
+                    (AWS.MIME.Content_Type (Filename),
+                     Filename,
+                     Object.Status_Code);
                end;
             else
                return AWS.Response.File
                  (S_Expressions.To_String (Object.MIME_Type.Query.Data.all),
-                  S_Expressions.To_String (Object.Response_Body.Data));
+                  S_Expressions.To_String (Object.Response_Body.Data),
+                  Object.Status_Code);
             end if;
       end case;
    end Response;

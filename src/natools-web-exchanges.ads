@@ -26,6 +26,7 @@ with AWS.Response;
 with AWS.Status;
 with Natools.S_Expressions;
 
+private with AWS.Messages;
 private with Natools.S_Expressions.Atom_Buffers;
 private with Natools.S_Expressions.Atom_Refs;
 
@@ -55,6 +56,10 @@ package Natools.Web.Exchanges is
       File_Name : in S_Expressions.Atom);
       --  Send File_Name as a response in Object
 
+
+   procedure Not_Found (Object : in out Exchange);
+      --  Set internal state to HTTP 404 Not Found
+
 private
 
    package Responses is
@@ -65,6 +70,7 @@ private
       Kind : Responses.Kind := Responses.Empty;
       MIME_Type : S_Expressions.Atom_Refs.Immutable_Reference;
       Response_Body : S_Expressions.Atom_Buffers.Atom_Buffer;
+      Status_Code : AWS.Messages.Status_Code := AWS.Messages.S200;
    end record;
 
    function Has_Response (Object : Exchange) return Boolean
