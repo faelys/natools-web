@@ -1,0 +1,24 @@
+(Natools.Static_Maps.Web.Error_Pages
+   pure
+   (test-function T)
+   (extra-decl "\
+   type Command is
+     (Unknown_Command,
+      Message,
+      Path,
+      Status_Code);")
+   (Command
+      (hash-package Natools.Static_Maps.Web.Error_Pages.Commands)
+      (function To_Command)
+      (not-found Unknown_Command)
+      (nodes
+         (Message      message)
+         (Path         path)
+         (Status_Code  code status status-code)))
+   (String
+      (indefinite-elements)
+      (hash-package Natools.Static_Maps.Web.Error_Pages.Messages)
+      (function To_Message)
+      (nodes
+         ("\"Not Found\"" 404)
+         ("\"Gone\""      410))))
