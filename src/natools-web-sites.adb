@@ -19,6 +19,7 @@ with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.Sites;
+with Natools.Web.Error_Pages;
 with Natools.Web.Pages;
 
 package body Natools.Web.Sites is
@@ -338,6 +339,7 @@ package body Natools.Web.Sites is
       Get_Page (Object.Pages, Path, Cursor, Extra_Path_First);
 
       if not Page_Maps.Has_Element (Cursor) then
+         Error_Pages.Not_Found (Exchange, Object);
          return;
       end if;
 
@@ -364,6 +366,10 @@ package body Natools.Web.Sites is
             exit Find_Parent when Page_Maps.Has_Element (Cursor);
          end loop Find_Parent;
       end loop Response_Loop;
+
+      if not Exchanges.Has_Response (Exchange) then
+         Error_Pages.Not_Found (Exchange, Object);
+      end if;
    end Respond;
 
 
