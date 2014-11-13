@@ -46,3 +46,4 @@ chain(){
 check /first first.html
 check /second second.html
 check /style.css ../data/static/style.css
+check /non-existant 404.html
