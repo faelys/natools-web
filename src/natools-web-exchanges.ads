@@ -32,8 +32,24 @@ private with Natools.S_Expressions.Atom_Refs;
 
 package Natools.Web.Exchanges is
 
+   type Request_Method is (GET, HEAD, POST, Unknown_Method);
+   subtype Known_Method is Request_Method range GET .. POST;
+   type Method_Array is array (Positive range <>) of Known_Method;
+   type Method_Set is private;
+
+   function To_Set (List : Method_Array) return Method_Set;
+   function Is_In (Method : Request_Method; Set : Method_Set) return Boolean;
+
+   function Image (List : Method_Array) return String;
+   function Image (Set : Method_Set) return String;
+
+
+
    type Exchange (Request : access constant AWS.Status.Data)
      is limited private;
+
+   function Method (Object : Exchange) return Request_Method;
+      --  Method requested by client
 
    function Path (Object : Exchange) return String;
       --  Path part of the requested URL
@@ -57,16 +73,27 @@ package Natools.Web.Exchanges is
       --  Send File_Name as a response in Object
 
 
+   procedure Method_Not_Allowed
+     (Object : in out Exchange;
+      Allow : in Method_Set);
+      --  Set internal state to HTTP 405 Method Not Allowed
+
    procedure Not_Found (Object : in out Exchange);
       --  Set internal state to HTTP 404 Not Found
 
 private
+
+   type Method_Set is array (Known_Method) of Boolean with Pack;
+
+   function Is_In (Method : Request_Method; Set : Method_Set) return Boolean
+     is (Method in Set'Range and then Set (Method));
 
    package Responses is
       type Kind is (Empty, Buffer, File);
    end Responses;
 
    type Exchange (Request : access constant AWS.Status.Data) is record
+      Allow : Method_Set := (others => False);
       Kind : Responses.Kind := Responses.Empty;
       MIME_Type : S_Expressions.Atom_Refs.Immutable_Reference;
       Response_Body : S_Expressions.Atom_Buffers.Atom_Buffer;

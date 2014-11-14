@@ -14,6 +14,7 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with AWS.Response.Set;
 with AWS.MIME;
 
 package body Natools.Web.Exchanges is
@@ -42,9 +43,77 @@ package body Natools.Web.Exchanges is
 
 
 
+   --------------------------------
+   -- Request Method Subprograms --
+   --------------------------------
+
+   function To_Set (List : Method_Array) return Method_Set is
+      Result : Method_Set := (others => False);
+   begin
+      for I in List'Range loop
+         Result (List (I)) := True;
+      end loop;
+
+      return Result;
+   end To_Set;
+
+
+   function Image (List : Method_Array) return String is
+   begin
+      return Image (To_Set (List));
+   end Image;
+
+
+   function Image (Set : Method_Set) return String is
+      Buffer : String := "GET, HEAD, POST";
+      First : Boolean := True;
+      Last : Natural := Buffer'First - 1;
+
+      procedure Raw_Append (S : in String);
+      procedure Append (S : in String);
+
+      procedure Raw_Append (S : in String) is
+      begin
+         Buffer (Last + 1 .. Last + S'Length) := S;
+         Last := Last + S'Length;
+      end Raw_Append;
+
+      procedure Append (S : in String) is
+      begin
+         if First then
+            First := False;
+         else
+            Raw_Append (", ");
+         end if;
+
+         Raw_Append (S);
+      end Append;
+   begin
+      for M in Set'Range loop
+         if Set (M) then
+            Append (Request_Method'Image (M));
+         end if;
+      end loop;
+
+      return Buffer (Buffer'First .. Last);
+   end Image;
+
+
+
    -----------------------
    -- Request Accessors --
    -----------------------
+
+   function Method (Object : Exchange) return Request_Method is
+   begin
+      case AWS.Status.Method (Object.Request.all) is
+         when AWS.Status.GET  => return GET;
+         when AWS.Status.HEAD => return HEAD;
+         when AWS.Status.POST => return POST;
+         when others          => return Unknown_Method;
+      end case;
+   end Method;
+
 
    function Path (Object : Exchange) return String is
    begin
@@ -64,6 +133,15 @@ package body Natools.Web.Exchanges is
       Ensure_Kind (Object, Responses.Buffer);
       Object.Response_Body.Append (Data);
    end Append;
+
+
+   procedure Method_Not_Allowed
+     (Object : in out Exchange;
+      Allow : in Method_Set) is
+   begin
+      Object.Status_Code := AWS.Messages.S405;
+      Object.Allow := Allow;
+   end Method_Not_Allowed;
 
 
    procedure Not_Found (Object : in out Exchange) is
@@ -87,6 +165,7 @@ package body Natools.Web.Exchanges is
    ---------------------
 
    function Response (Object : Exchange) return AWS.Response.Data is
+      Result : AWS.Response.Data;
    begin
       case Object.Kind is
          when Responses.Empty =>
@@ -94,12 +173,12 @@ package body Natools.Web.Exchanges is
 
          when Responses.Buffer =>
             if Object.MIME_Type.Is_Empty then
-               return AWS.Response.Build
+               Result := AWS.Response.Build
                  ("text/html",
                   Object.Response_Body.Data,
                   Object.Status_Code);
             else
-               return AWS.Response.Build
+               Result := AWS.Response.Build
                  (S_Expressions.To_String (Object.MIME_Type.Query.Data.all),
                   Object.Response_Body.Data,
                   Object.Status_Code);
@@ -111,18 +190,27 @@ package body Natools.Web.Exchanges is
                   Filename : constant String
                     := S_Expressions.To_String (Object.Response_Body.Data);
                begin
-                  return AWS.Response.File
+                  Result := AWS.Response.File
                     (AWS.MIME.Content_Type (Filename),
                      Filename,
                      Object.Status_Code);
                end;
             else
-               return AWS.Response.File
+               Result := AWS.Response.File
                  (S_Expressions.To_String (Object.MIME_Type.Query.Data.all),
                   S_Expressions.To_String (Object.Response_Body.Data),
                   Object.Status_Code);
             end if;
       end case;
+
+      if Object.Allow /= Method_Set'(others => False) then
+         AWS.Response.Set.Add_Header
+           (Result,
+            AWS.Messages.Allow_Token,
+            Image (Object.Allow));
+      end if;
+
+      return Result;
    end Response;
 
 end Natools.Web.Exchanges;
