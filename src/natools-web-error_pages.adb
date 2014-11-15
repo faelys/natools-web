@@ -149,6 +149,55 @@ package body Natools.Web.Error_Pages is
    -- Public Interface --
    ----------------------
 
+   procedure Check_Method
+     (Exchange : in out Exchanges.Exchange;
+      Site : aliased in Sites.Site;
+      Allowed_Set : in Exchanges.Method_Set;
+      Allowed : out Boolean) is
+   begin
+      Allowed := Exchanges.Is_In (Exchanges.Method (Exchange), Allowed_Set);
+
+      if not Allowed then
+         Method_Not_Allowed (Exchange, Site, Allowed_Set);
+      end if;
+   end Check_Method;
+
+
+   procedure Check_Method
+     (Exchange : in out Exchanges.Exchange;
+      Site : aliased in Sites.Site;
+      Allowed_Methods : in Exchanges.Method_Array;
+      Allowed : out Boolean) is
+   begin
+      Check_Method
+        (Exchange, Site, Exchanges.To_Set (Allowed_Methods), Allowed);
+   end Check_Method;
+
+
+   procedure Check_Method
+     (Exchange : in out Exchanges.Exchange;
+      Site : aliased in Sites.Site;
+      Allowed_Method : in Exchanges.Known_Method;
+      Allowed : out Boolean) is
+   begin
+      Check_Method (Exchange, Site, (1 => Allowed_Method), Allowed);
+   end Check_Method;
+
+
+   procedure Method_Not_Allowed
+     (Exchange : in out Exchanges.Exchange;
+      Site : aliased in Sites.Site;
+      Allow : in Exchanges.Method_Set)
+   is
+      Context : constant Error_Context
+        := (Site => Site'Access,
+            Code => S_Expressions.To_Atom ("405"));
+   begin
+      Exchanges.Method_Not_Allowed (Exchange, Allow);
+      Main_Render (Exchange, Context);
+   end Method_Not_Allowed;
+
+
    procedure Not_Found
      (Exchange : in out Exchanges.Exchange;
       Site : aliased in Sites.Site)

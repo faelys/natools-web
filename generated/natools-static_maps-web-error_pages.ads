@@ -1,4 +1,4 @@
---  Generated at 2014-11-11 19:00:28 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2014-11-15 15:29:11 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-error_pages-maps.sx
 
 package Natools.Static_Maps.Web.Error_Pages is
@@ -34,11 +34,13 @@ private
          Status_Code);
 
    Map_2_Key_0 : aliased constant String := "404";
-   Map_2_Key_1 : aliased constant String := "410";
-   Map_2_Keys : constant array (0 .. 1) of access constant String
+   Map_2_Key_1 : aliased constant String := "405";
+   Map_2_Key_2 : aliased constant String := "410";
+   Map_2_Keys : constant array (0 .. 2) of access constant String
      := (Map_2_Key_0'Access,
-         Map_2_Key_1'Access);
-   subtype Map_2_Hash is Natural range 0 .. 1;
+         Map_2_Key_1'Access,
+         Map_2_Key_2'Access);
+   subtype Map_2_Hash is Natural range 0 .. 2;
    function Map_2_Elements (Hash : Map_2_Hash)
      return String;
 

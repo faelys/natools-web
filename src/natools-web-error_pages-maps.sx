@@ -21,4 +21,5 @@
       (function To_Message)
       (nodes
          ("\"Not Found\"" 404)
+         ("\"Method Not Allowed\"" 405)
          ("\"Gone\""      410))))
