@@ -19,6 +19,7 @@ with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Lockable;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.Static_Maps.Web.Pages;
+with Natools.Web.Error_Pages;
 
 package body Natools.Web.Pages is
 
@@ -267,6 +268,18 @@ package body Natools.Web.Pages is
       if Extra_Path'Length > 0 then
          return;
       end if;
+
+      Check_Method :
+      declare
+         use Exchanges;
+         Allowed : Boolean;
+      begin
+         Error_Pages.Check_Method (Exchange, Parent, (GET, HEAD), Allowed);
+
+         if not Allowed then
+            return;
+         end if;
+      end Check_Method;
 
       declare
          Accessor : constant Data_Refs.Accessor := Object.Ref.Query;
