@@ -29,28 +29,28 @@ package Natools.Web.Error_Pages is
 
    procedure Method_Not_Allowed
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site;
+      Site : not null access constant Sites.Site;
       Allow : in Exchanges.Method_Set);
 
    procedure Not_Found
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site);
+      Site : not null access constant Sites.Site);
 
 
 
    procedure Check_Method
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site;
+      Site : not null access constant Sites.Site;
       Allowed_Set : in Exchanges.Method_Set;
       Allowed : out Boolean);
    procedure Check_Method
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site;
+      Site : not null access constant Sites.Site;
       Allowed_Methods : in Exchanges.Method_Array;
       Allowed : out Boolean);
    procedure Check_Method
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site;
+      Site : not null access constant Sites.Site;
       Allowed_Method : in Exchanges.Known_Method;
       Allowed : out Boolean);
       --  Check whether the method of Exchange is allowed, and if not

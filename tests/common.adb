@@ -24,7 +24,7 @@ package body Common is
       Aliased_Request : aliased constant AWS.Status.Data := Request;
       Exchange : Natools.Web.Exchanges.Exchange (Aliased_Request'Access);
    begin
-      Natools.Web.Sites.Respond (Site, Exchange);
+      Natools.Web.Sites.Respond (Site'Access, Exchange);
       return Natools.Web.Exchanges.Response (Exchange);
    end Respond;
 

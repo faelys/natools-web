@@ -151,7 +151,7 @@ package body Natools.Web.Error_Pages is
 
    procedure Check_Method
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site;
+      Site : not null access constant Sites.Site;
       Allowed_Set : in Exchanges.Method_Set;
       Allowed : out Boolean) is
    begin
@@ -165,7 +165,7 @@ package body Natools.Web.Error_Pages is
 
    procedure Check_Method
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site;
+      Site : not null access constant Sites.Site;
       Allowed_Methods : in Exchanges.Method_Array;
       Allowed : out Boolean) is
    begin
@@ -176,7 +176,7 @@ package body Natools.Web.Error_Pages is
 
    procedure Check_Method
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site;
+      Site : not null access constant Sites.Site;
       Allowed_Method : in Exchanges.Known_Method;
       Allowed : out Boolean) is
    begin
@@ -186,11 +186,11 @@ package body Natools.Web.Error_Pages is
 
    procedure Method_Not_Allowed
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site;
+      Site : not null access constant Sites.Site;
       Allow : in Exchanges.Method_Set)
    is
       Context : constant Error_Context
-        := (Site => Site'Access,
+        := (Site => Site,
             Code => S_Expressions.To_Atom ("405"));
    begin
       Exchanges.Method_Not_Allowed (Exchange, Allow);
@@ -200,10 +200,10 @@ package body Natools.Web.Error_Pages is
 
    procedure Not_Found
      (Exchange : in out Exchanges.Exchange;
-      Site : aliased in Sites.Site)
+      Site : not null access constant Sites.Site)
    is
       Context : constant Error_Context
-        := (Site => Site'Access,
+        := (Site => Site,
             Code => S_Expressions.To_Atom ("404"));
    begin
       Exchanges.Not_Found (Exchange);

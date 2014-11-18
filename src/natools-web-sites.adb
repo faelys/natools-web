@@ -284,7 +284,7 @@ package body Natools.Web.Sites is
 
 
    procedure Respond
-     (Object : aliased in out Site;
+     (Object : not null access Site;
       Exchange : in out Exchanges.Exchange)
    is
       use type S_Expressions.Octet;

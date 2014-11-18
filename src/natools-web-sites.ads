@@ -22,11 +22,11 @@
 with Ada.Streams;
 with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Caches;
+with Natools.S_Expressions.Lockable;
 with Natools.Web.Containers;
 with Natools.Web.Exchanges;
 
 private with Natools.S_Expressions.Atom_Refs;
-private with Natools.S_Expressions.Lockable;
 
 package Natools.Web.Sites is
 
@@ -39,7 +39,7 @@ package Natools.Web.Sites is
       --  Reload Object data from its original file
 
    procedure Respond
-     (Object : aliased in out Site;
+     (Object : not null access Site;
       Exchange : in out Exchanges.Exchange);
       --  Look up internal data to provide a response in Exchange
 
@@ -60,7 +60,7 @@ package Natools.Web.Sites is
    procedure Respond
      (Object : in out Page;
       Exchange : in out Exchanges.Exchange;
-      Parent : aliased in Site;
+      Parent : not null access constant Site;
       Extra_Path : in S_Expressions.Atom)
      is abstract
      with Pre'Class => not Exchanges.Has_Response (Exchange);

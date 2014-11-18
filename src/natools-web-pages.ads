@@ -34,7 +34,7 @@ package Natools.Web.Pages is
    overriding procedure Respond
      (Object : in out Page_Ref;
       Exchange : in out Exchanges.Exchange;
-      Parent : aliased in Sites.Site;
+      Parent : not null access constant Sites.Site;
       Extra_Path : in S_Expressions.Atom);
 
 private
