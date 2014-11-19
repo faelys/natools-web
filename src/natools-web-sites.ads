@@ -69,6 +69,20 @@ package Natools.Web.Sites is
    package Page_Maps is new Constant_Indefinite_Ordered_Maps
      (S_Expressions.Atom, Page'Class, Ada.Streams."<");
 
+
+   type Visible is interface;
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Object : in Visible;
+      Parent : not null access constant Site;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     is abstract;
+
+
+   package Visible_Maps is new Constant_Indefinite_Ordered_Maps
+     (S_Expressions.Atom, Visible'Class, Ada.Streams."<");
+
 private
 
    type Site is record
