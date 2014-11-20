@@ -14,7 +14,7 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
-with Natools.S_Expressions;
+with Natools.S_Expressions.Lockable;
 with Natools.Web.Exchanges;
 with Natools.Web.Sites;
 
@@ -26,7 +26,7 @@ private with Natools.Web.Containers;
 
 package Natools.Web.Pages is
 
-   type Page_Ref is new Sites.Page with private;
+   type Page_Ref is new Sites.Visible and Sites.Page with private;
 
    function Create (File_Path, Web_Path : in S_Expressions.Atom)
      return Page_Ref;
@@ -36,6 +36,12 @@ package Natools.Web.Pages is
       Exchange : in out Exchanges.Exchange;
       Parent : not null access constant Sites.Site;
       Extra_Path : in S_Expressions.Atom);
+
+   overriding procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Object : in Page_Ref;
+      Parent : not null access constant Sites.Site;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
 
 private
 
@@ -57,7 +63,7 @@ private
       Storage_Pools.Access_In_Default_Pool'Storage_Pool,
       Storage_Pools.Access_In_Default_Pool'Storage_Pool);
 
-   type Page_Ref is new Sites.Page with record
+   type Page_Ref is new Sites.Visible and Sites.Page with record
       Ref : Data_Refs.Reference;
    end record;
 

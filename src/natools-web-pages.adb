@@ -16,7 +16,6 @@
 
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
-with Natools.S_Expressions.Lockable;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.Static_Maps.Web.Pages;
 with Natools.Web.Error_Pages;
@@ -257,6 +256,19 @@ package body Natools.Web.Pages is
    begin
       return (Ref => Data_Refs.Create (Create_Page'Access));
    end Create;
+
+
+   overriding procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Object : in Page_Ref;
+      Parent : not null access constant Sites.Site;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+   begin
+      Render_Page
+        (Expression,
+         Exchange,
+         (Parent, Object.Ref.Query.Data));
+   end Render;
 
 
    overriding procedure Respond
