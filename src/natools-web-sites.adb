@@ -240,17 +240,6 @@ package body Natools.Web.Sites is
    -- Site Public Interface --
    ---------------------------
 
-   function Create (File_Name : String) return Site is
-      Result : Site
-        := (File_Name => S_Expressions.Atom_Ref_Constructors.Create
-                           (S_Expressions.To_Atom (File_Name)),
-            others => <>);
-   begin
-      Reload (Result);
-      return Result;
-   end Create;
-
-
    procedure Reload (Object : in out Site) is
       Reader : S_Expressions.File_Readers.S_Reader
         := S_Expressions.File_Readers.Reader
@@ -269,22 +258,33 @@ package body Natools.Web.Sites is
    begin
       Update (Builder, Reader);
 
-      Object :=
-        (Default_Template => Builder.Default_Template,
-         File_Name => Object.File_Name,
-         Pages => Page_Maps.Create (Builder.Pages),
-         Static => Containers.Create (Builder.Static),
-         Templates => Builder.Templates);
+      Recursive_Set_Parent (Object, null);
+
+      Object.Default_Template := Builder.Default_Template;
+      Object.Pages := Page_Maps.Create (Builder.Pages);
+      Object.Static := Containers.Create (Builder.Static);
+      Object.Templates := Builder.Templates;
 
       if Object.Default_Template.Is_Empty then
          Object.Default_Template := S_Expressions.Atom_Ref_Constructors.Create
            (S_Expressions.To_Atom ("html"));
       end if;
+
+      Recursive_Set_Parent (Object, Object.Self);
    end Reload;
 
 
+   procedure Reset (Ref : in Mutable_Site_Access; File_Name : in String) is
+   begin
+      Ref.Self := Site_Access (Ref);
+      Ref.File_Name := S_Expressions.Atom_Ref_Constructors.Create
+        (S_Expressions.To_Atom (File_Name));
+      Reload (Ref.all);
+   end Reset;
+
+
    procedure Respond
-     (Object : not null access Site;
+     (Object : in out Site;
       Exchange : in out Exchanges.Exchange)
    is
       use type S_Expressions.Octet;
@@ -308,8 +308,10 @@ package body Natools.Web.Sites is
          pragma Assert (Key'Length <= Path'Length
            and then Key = Path (Path'First .. Path'First + Key'Length - 1));
 
-         Respond (Page_Object, Exchange, Object,
-           Path (Path'First + Key'Length .. Path'Last));
+         Respond
+           (Page_Object,
+            Exchange,
+            Path (Path'First + Key'Length .. Path'Last));
       end Call_Page;
 
       procedure Send_File_If_Exists (In_Directory : in S_Expressions.Atom) is
@@ -339,7 +341,7 @@ package body Natools.Web.Sites is
       Get_Page (Object.Pages, Path, Cursor, Extra_Path_First);
 
       if not Page_Maps.Has_Element (Cursor) then
-         Error_Pages.Not_Found (Exchange, Object);
+         Error_Pages.Not_Found (Exchange, Object'Access);
          return;
       end if;
 
@@ -368,7 +370,7 @@ package body Natools.Web.Sites is
       end loop Response_Loop;
 
       if not Exchanges.Has_Response (Exchange) then
-         Error_Pages.Not_Found (Exchange, Object);
+         Error_Pages.Not_Found (Exchange, Object'Access);
       end if;
    end Respond;
 
@@ -399,5 +401,45 @@ package body Natools.Web.Sites is
    begin
       return Object.Default_Template.Query.Data.all;
    end Default_Template;
+
+
+
+   ----------------------------
+   -- Site Private Interface --
+   ----------------------------
+
+   procedure Recursive_Set_Parent
+     (Object : in out Site;
+      Parent : in Site_Access)
+   is
+      procedure Update_Page
+        (Key : in S_Expressions.Atom;
+         Page_Object : in out Page'Class);
+
+      procedure Update_Page
+        (Key : in S_Expressions.Atom;
+         Page_Object : in out Page'Class)
+      is
+         pragma Unreferenced (Key);
+      begin
+         Set_Parent (Page_Object, Parent);
+      end Update_Page;
+
+      Cursor : Page_Maps.Cursor := Object.Pages.First;
+   begin
+      while Page_Maps.Has_Element (Cursor) loop
+         Object.Pages.Update_Element (Cursor, Update_Page'Access);
+         Page_Maps.Next (Cursor);
+      end loop;
+   end Recursive_Set_Parent;
+
+
+   overriding procedure Finalize (Object : in out Site) is
+   begin
+      if not Object.Pages.Is_Empty then
+         Recursive_Set_Parent (Object, null);
+         Object.Pages.Clear;
+      end if;
+   end Finalize;
 
 end Natools.Web.Sites;

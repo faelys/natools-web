@@ -24,7 +24,7 @@ package body Common is
       Aliased_Request : aliased constant AWS.Status.Data := Request;
       Exchange : Natools.Web.Exchanges.Exchange (Aliased_Request'Access);
    begin
-      Natools.Web.Sites.Respond (Site'Access, Exchange);
+      Natools.Web.Sites.Respond (Site, Exchange);
       return Natools.Web.Exchanges.Response (Exchange);
    end Respond;
 
@@ -54,4 +54,3 @@ package body Common is
    end Syslog_Log;
 
 end Common;
-

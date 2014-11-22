@@ -42,9 +42,10 @@ begin
    end if;
 
    if Ada.Command_Line.Argument_Count >= 1 then
-      Common.Site := Natools.Web.Sites.Create (Ada.Command_Line.Argument (1));
+      Natools.Web.Sites.Reset
+        (Common.Site'Access, Ada.Command_Line.Argument (1));
    else
-      Common.Site := Natools.Web.Sites.Create ("site.sx");
+      Natools.Web.Sites.Reset (Common.Site'Access, "site.sx");
    end if;
 
    AWS.Server.Start (WS, Common.Respond'Access, AWS.Config.Get_Current);

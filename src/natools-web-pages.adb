@@ -22,14 +22,9 @@ with Natools.Web.Error_Pages;
 
 package body Natools.Web.Pages is
 
-   type Context_Type
-     (Site : access constant Sites.Site;
-      Page : access constant Page_Data)
-     is null record;
-
    procedure Append
      (Exchange : in out Exchanges.Exchange;
-      Context : in Context_Type;
+      Page : in Page_Data;
       Data : in S_Expressions.Atom);
 
    procedure Execute
@@ -40,20 +35,20 @@ package body Natools.Web.Pages is
 
    procedure Render
      (Exchange : in out Exchanges.Exchange;
-      Context : in Context_Type;
+      Page : in Page_Data;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
 
    procedure Sub_Render
      (Exchange : in out Exchanges.Exchange;
-      Context : in Context_Type;
+      Page : in Page_Data;
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
       Lookup_Element : in Boolean := False;
       Lookup_Template : in Boolean := False);
 
    procedure Sub_Render
      (Exchange : in out Exchanges.Exchange;
-      Context : in Context_Type;
+      Page : in Page_Data;
       Name : in S_Expressions.Atom;
       Fallback : in out S_Expressions.Lockable.Descriptor'Class;
       Lookup_Element : in Boolean;
@@ -96,10 +91,10 @@ package body Natools.Web.Pages is
 
    procedure Append
      (Exchange : in out Exchanges.Exchange;
-      Context : in Context_Type;
+      Page : in Page_Data;
       Data : in S_Expressions.Atom)
    is
-      pragma Unreferenced (Context);
+      pragma Unreferenced (Page);
    begin
       Exchanges.Append (Exchange, Data);
    end Append;
@@ -107,7 +102,7 @@ package body Natools.Web.Pages is
 
    procedure Render
      (Exchange : in out Exchanges.Exchange;
-      Context : in Context_Type;
+      Page : in Page_Data;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
@@ -119,21 +114,21 @@ package body Natools.Web.Pages is
             null;
 
          when Commands.Element =>
-            Sub_Render (Exchange, Context, Arguments, Lookup_Element => True);
+            Sub_Render (Exchange, Page, Arguments, Lookup_Element => True);
 
          when Commands.Template =>
-            Sub_Render (Exchange, Context, Arguments, Lookup_Template => True);
+            Sub_Render (Exchange, Page, Arguments, Lookup_Template => True);
       end case;
    end Render;
 
 
    procedure Render_Page is new S_Expressions.Interpreter_Loop
-     (Exchanges.Exchange, Context_Type, Render, Append);
+     (Exchanges.Exchange, Page_Data, Render, Append);
 
 
    procedure Sub_Render
      (Exchange : in out Exchanges.Exchange;
-      Context : in Context_Type;
+      Page : in Page_Data;
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
       Lookup_Element : in Boolean := False;
       Lookup_Template : in Boolean := False)
@@ -148,19 +143,19 @@ package body Natools.Web.Pages is
          begin
             Expression.Next;
             Sub_Render
-              (Exchange, Context,
+              (Exchange, Page,
                Name, Expression,
                Lookup_Element, Lookup_Template);
          end;
       else
-         Render_Page (Expression, Exchange, Context);
+         Render_Page (Expression, Exchange, Page);
       end if;
    end Sub_Render;
 
 
    procedure Sub_Render
      (Exchange : in out Exchanges.Exchange;
-      Context : in Context_Type;
+      Page : in Page_Data;
       Name : in S_Expressions.Atom;
       Fallback : in out S_Expressions.Lockable.Descriptor'Class;
       Lookup_Element : in Boolean;
@@ -170,19 +165,19 @@ package body Natools.Web.Pages is
       Found : Boolean;
    begin
       if Lookup_Element then
-         Context.Page.Get_Element (Name, Template, Found);
+         Page.Get_Element (Name, Template, Found);
 
          if Found then
-            Render_Page (Template, Exchange, Context);
+            Render_Page (Template, Exchange, Page);
             return;
          end if;
       end if;
 
       if Lookup_Template then
-         Sites.Get_Template (Context.Site.all, Name, Template, Found);
+         Page.Site.Get_Template (Name, Template, Found);
 
          if Found then
-            Render_Page (Template, Exchange, Context);
+            Render_Page (Template, Exchange, Page);
             return;
          end if;
       end if;
@@ -201,7 +196,7 @@ package body Natools.Web.Pages is
          when S_Expressions.Events.Open_List
            | S_Expressions.Events.Add_Atom
          =>
-            Render_Page (Fallback, Exchange, Context);
+            Render_Page (Fallback, Exchange, Page);
       end case;
    end Sub_Render;
 
@@ -233,7 +228,9 @@ package body Natools.Web.Pages is
    -- Public Interface --
    ----------------------
 
-   function Create (File_Path, Web_Path : in S_Expressions.Atom)
+   function Create
+     (File_Path, Web_Path : in S_Expressions.Atom;
+      Parent : Sites.Site_Access := null)
      return Page_Ref
    is
       function Create_Page return Page_Data;
@@ -244,7 +241,8 @@ package body Natools.Web.Pages is
               (S_Expressions.To_String (File_Path));
       begin
          return Result : Page_Data
-           := (File_Path =>
+           := (Site => Parent,
+               File_Path =>
                   S_Expressions.Atom_Ref_Constructors.Create (File_Path),
                Web_Path =>
                   S_Expressions.Atom_Ref_Constructors.Create (Web_Path),
@@ -261,50 +259,60 @@ package body Natools.Web.Pages is
    overriding procedure Render
      (Exchange : in out Exchanges.Exchange;
       Object : in Page_Ref;
-      Parent : not null access constant Sites.Site;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
       Render_Page
         (Expression,
          Exchange,
-         (Parent, Object.Ref.Query.Data));
+         Object.Ref.Query.Data.all);
    end Render;
 
 
    overriding procedure Respond
      (Object : in out Page_Ref;
       Exchange : in out Exchanges.Exchange;
-      Parent : not null access constant Sites.Site;
       Extra_Path : in S_Expressions.Atom) is
    begin
       if Extra_Path'Length > 0 then
          return;
       end if;
 
-      Check_Method :
-      declare
-         use Exchanges;
-         Allowed : Boolean;
-      begin
-         Error_Pages.Check_Method (Exchange, Parent, (GET, HEAD), Allowed);
-
-         if not Allowed then
-            return;
-         end if;
-      end Check_Method;
-
       declare
          Accessor : constant Data_Refs.Accessor := Object.Ref.Query;
          Null_Expression : S_Expressions.Caches.Cursor;
       begin
+         Check_Method :
+         declare
+            use Exchanges;
+            Allowed : Boolean;
+         begin
+            Error_Pages.Check_Method
+              (Exchange,
+               Accessor.Data.Site,
+               (GET, HEAD),
+               Allowed);
+
+            if not Allowed then
+               return;
+            end if;
+         end Check_Method;
+
          Sub_Render
            (Exchange,
-            (Parent, Accessor.Data),
-            Sites.Default_Template (Parent.all),
+            Accessor.Data.all,
+            Accessor.Data.Site.Default_Template,
             Null_Expression,
             Lookup_Element => True,
             Lookup_Template => True);
       end;
    end Respond;
+
+
+   overriding procedure Set_Parent
+     (Object : in out Page_Ref;
+      Parent : in Sites.Site_Access) is
+   begin
+      Object.Ref.Update.Data.Site := Parent;
+   end Set_Parent;
 
 end Natools.Web.Pages;
