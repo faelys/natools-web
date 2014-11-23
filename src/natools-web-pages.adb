@@ -116,6 +116,12 @@ package body Natools.Web.Pages is
          when Commands.Element =>
             Sub_Render (Exchange, Page, Arguments, Lookup_Element => True);
 
+         when Commands.Element_Or_Template =>
+            Sub_Render
+              (Exchange, Page, Arguments,
+               Lookup_Element => True,
+               Lookup_Template => True);
+
          when Commands.Template =>
             Sub_Render (Exchange, Page, Arguments, Lookup_Template => True);
       end case;

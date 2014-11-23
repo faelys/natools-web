@@ -1,4 +1,4 @@
---  Generated at 2014-10-18 15:16:43 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2014-11-23 11:59:46 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-pages-maps.sx
 
 package Natools.Static_Maps.Web.Pages is
@@ -7,6 +7,7 @@ package Natools.Static_Maps.Web.Pages is
    type Command is
      (Unknown_Command,
       Element,
+      Element_Or_Template,
       Template);
 
    type Component is
@@ -19,12 +20,18 @@ package Natools.Static_Maps.Web.Pages is
 private
 
    Map_1_Key_0 : aliased constant String := "element";
-   Map_1_Key_1 : aliased constant String := "template";
-   Map_1_Keys : constant array (0 .. 1) of access constant String
+   Map_1_Key_1 : aliased constant String := "render";
+   Map_1_Key_2 : aliased constant String := "element-or-template";
+   Map_1_Key_3 : aliased constant String := "template";
+   Map_1_Keys : constant array (0 .. 3) of access constant String
      := (Map_1_Key_0'Access,
-         Map_1_Key_1'Access);
-   Map_1_Elements : constant array (0 .. 1) of Command
+         Map_1_Key_1'Access,
+         Map_1_Key_2'Access,
+         Map_1_Key_3'Access);
+   Map_1_Elements : constant array (0 .. 3) of Command
      := (Element,
+         Element_Or_Template,
+         Element_Or_Template,
          Template);
 
    Map_2_Key_0 : aliased constant String := "elements";

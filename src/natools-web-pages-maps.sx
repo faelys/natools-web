@@ -5,6 +5,7 @@
    type Command is
      (Unknown_Command,
       Element,
+      Element_Or_Template,
       Template);
 
    type Component is
@@ -16,6 +17,7 @@
       (not-found Unknown_Command)
       (nodes
          (Element   element)
+         (Element_Or_Template  render element-or-template)
          (Template  template)))
    (Component
       (hash-package Natools.Static_Maps.Web.Pages.Components)
