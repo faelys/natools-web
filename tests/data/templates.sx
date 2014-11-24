@@ -5,12 +5,16 @@
     <title>" (element title) "</title>
   </head>
   <body>\n"
-(element body)
+(render html-body)
 "    <div class=\"footer\">\n"
 (element footer "<p>Default footer</p>\n")
 "    </div>
   </body>
 </html>\n")
+
+(html-body
+"<h1>" (element title) "</h1>\n"
+(element main-text))
 
 (error-page "\
 <html>

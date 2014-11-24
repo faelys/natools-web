@@ -1,6 +1,5 @@
 (elements
-   (body "\
-<h1>Second Page</h1>
+   (main-text "\
 <p>Data in the second page.</p>\n")
    (footer "<p>Special footer</p>\n")
    (title "Second Page"))
