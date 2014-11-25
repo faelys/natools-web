@@ -15,6 +15,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Command_Line;
+with Ada.Directories;
 with Ada.Text_IO;
 with AWS.Config;
 with AWS.Server;
@@ -50,11 +51,18 @@ begin
 
    AWS.Server.Start (WS, Common.Respond'Access, AWS.Config.Get_Current);
 
-   if Debug then
-      Ada.Text_IO.Put_Line ("Websever started");
-      AWS.Server.Wait (AWS.Server.Q_Key_Pressed);
-   else
+   if not Debug then
       AWS.Server.Wait;
+   elsif Ada.Directories.Exists (Ada.Command_Line.Argument (2)) then
+      Ada.Text_IO.Put_Line ("Websever started, waiting for removal of "
+        & Ada.Command_Line.Argument (2));
+      loop
+         delay 1.0;
+         exit when not Ada.Directories.Exists (Ada.Command_Line.Argument (2));
+      end loop;
+   else
+      Ada.Text_IO.Put_Line ("Websever started, waiting for Q press");
+      AWS.Server.Wait (AWS.Server.Q_Key_Pressed);
    end if;
 
    AWS.Server.Shutdown (WS);
