@@ -10,7 +10,8 @@
 
    type Component is
      (Error,
-      Elements);")
+      Elements,
+      Tags);")
    (Command
       (hash-package Natools.Static_Maps.Web.Pages.Commands)
       (function To_Command)
@@ -24,4 +25,5 @@
       (function To_Component)
       (not-found Error)
       (nodes
+         (Tags tags)
          (Elements  elements layout))))

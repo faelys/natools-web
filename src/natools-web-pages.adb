@@ -76,6 +76,9 @@ package body Natools.Web.Pages is
 
          when Components.Elements =>
             Containers.Set_Expressions (Data.Elements, Arguments);
+
+         when Components.Tags =>
+            Tags.Append (Data.Tags, Arguments);
       end case;
    end Execute;
 
@@ -252,6 +255,7 @@ package body Natools.Web.Pages is
                   S_Expressions.Atom_Ref_Constructors.Create (File_Path),
                Web_Path =>
                   S_Expressions.Atom_Ref_Constructors.Create (Web_Path),
+               Tags => <>,
                Elements => <>)
          do
             Read_Page (Reader, Result, Meaningless_Value);

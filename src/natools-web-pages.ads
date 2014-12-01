@@ -17,6 +17,7 @@
 with Natools.S_Expressions.Lockable;
 with Natools.Web.Exchanges;
 with Natools.Web.Sites;
+with Natools.Web.Tags;
 
 private with Natools.References;
 private with Natools.S_Expressions.Atom_Refs;
@@ -26,12 +27,14 @@ private with Natools.Web.Containers;
 
 package Natools.Web.Pages is
 
-   type Page_Ref is new Sites.Visible and Sites.Page with private;
+   type Page_Ref is new Tags.Visible and Sites.Page with private;
 
    function Create
      (File_Path, Web_Path : in S_Expressions.Atom;
       Parent : Sites.Site_Access := null)
      return Page_Ref;
+
+   function Get_Tags (Page : Page_Ref) return Tags.Tag_List;
 
    overriding procedure Render
      (Exchange : in out Exchanges.Exchange;
@@ -54,6 +57,7 @@ private
       File_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Web_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Elements : Containers.Expression_Maps.Constant_Map;
+      Tags : Web.Tags.Tag_List;
    end record;
 
    procedure Get_Element
@@ -68,8 +72,11 @@ private
       Storage_Pools.Access_In_Default_Pool'Storage_Pool,
       Storage_Pools.Access_In_Default_Pool'Storage_Pool);
 
-   type Page_Ref is new Sites.Visible and Sites.Page with record
+   type Page_Ref is new Tags.Visible and Sites.Page with record
       Ref : Data_Refs.Reference;
    end record;
+
+   function Get_Tags (Page : Page_Ref) return Tags.Tag_List
+     is (Page.Ref.Query.Data.Tags);
 
 end Natools.Web.Pages;
