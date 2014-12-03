@@ -137,6 +137,7 @@ package body Natools.Web.Sites is
       Page : constant Pages.Page_Ref := Pages.Create (File, Path);
    begin
       Builder.Pages.Insert (Path, Page);
+      Tags.Register (Builder.Tags, Page.Get_Tags, Page);
    end Add_Page;
 
 
@@ -254,7 +255,7 @@ package body Natools.Web.Sites is
             File_Suffix => Empty_Atom,
             Path_Prefix => Empty_Atom,
             Path_Suffix => Empty_Atom,
-            Pages | Static | Templates => <>);
+            Pages | Static | Tags | Templates => <>);
    begin
       Update (Builder, Reader);
 
@@ -263,6 +264,7 @@ package body Natools.Web.Sites is
       Object.Default_Template := Builder.Default_Template;
       Object.Pages := Page_Maps.Create (Builder.Pages);
       Object.Static := Containers.Create (Builder.Static);
+      Object.Tags := Tags.Create (Builder.Tags);
       Object.Templates := Builder.Templates;
 
       if Object.Default_Template.Is_Empty then
@@ -379,6 +381,12 @@ package body Natools.Web.Sites is
    -------------------------
    -- Site Data Accessors --
    -------------------------
+
+   function Get_Tags (Object : Site) return Tags.Tag_DB is
+   begin
+      return Object.Tags;
+   end Get_Tags;
+
 
    procedure Get_Template
      (Object : in Site;

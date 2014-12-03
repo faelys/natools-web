@@ -25,6 +25,7 @@ with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
 with Natools.Web.Containers;
 with Natools.Web.Exchanges;
+with Natools.Web.Tags;
 
 private with Ada.Finalization;
 private with Natools.S_Expressions.Atom_Refs;
@@ -46,6 +47,9 @@ package Natools.Web.Sites is
       Exchange : in out Exchanges.Exchange);
       --  Look up internal data to provide a response in Exchange
 
+
+   function Get_Tags (Object : Site) return Tags.Tag_DB;
+      --  Return the whole tag database
 
    procedure Get_Template
      (Object : in Site;
@@ -96,6 +100,7 @@ private
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Pages : Page_Maps.Updatable_Map;
       Static : Containers.Atom_Array_Refs.Immutable_Reference;
+      Tags : Web.Tags.Tag_DB;
       Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 
@@ -114,6 +119,7 @@ private
       Path_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Pages : Page_Maps.Unsafe_Maps.Map;
       Static : Containers.Unsafe_Atom_Lists.List;
+      Tags : Web.Tags.Tag_DB_Builder;
       Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 
