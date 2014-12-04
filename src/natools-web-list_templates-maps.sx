@@ -1,0 +1,23 @@
+(Natools.Static_Maps.Web.List_Templates
+   pure
+   (test-function T)
+   (extra-decl "\
+   type Command is
+     (Unknown_Command,
+      Backward,
+      Ellipsis_Prefix,
+      Ellipsis_Suffix,
+      Forward,
+      Length_Limit,
+      Template);")
+   (Command
+      (hash-package Natools.Static_Maps.Web.List_Templates.Commands)
+      (function To_Command)
+      (not-found Unknown_Command)
+      (nodes
+         (Backward  backward backwards reverse)
+         (Ellipsis_Prefix  ellipsis-prefix)
+         (Ellipsis_Suffix  ellipsis-suffix ellipsis)
+         (Forward  forward forwards)
+         (Length_Limit length-limit limit max maximum)
+         (Template  template render))))
