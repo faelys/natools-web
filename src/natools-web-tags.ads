@@ -65,6 +65,13 @@ package Natools.Web.Tags is
 
    function Create (Builder : Tag_DB_Builder) return Tag_DB;
 
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      DB : in Tag_DB;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Parent_Tags : in Tag_List := Empty_Tag_List);
+      --  Render Expression as 'tag_name tag_template' or a list of such expr
+
    procedure Reset
      (DB : in out Tag_DB;
       Builder : in Tag_DB_Builder);
@@ -83,6 +90,12 @@ package Natools.Web.Tags is
 
    function Is_Empty (Tag : Tag_Contents) return Boolean;
       --  Return whether Tag is empty
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Tag : in Tag_Contents;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+      --  Render the given Tag into Exchange
 
 private
 

@@ -1,0 +1,19 @@
+(Natools.Static_Maps.Web.Tags
+   pure
+   (test-function T)
+   (extra-decl "\
+   type List_Command is
+     (Unknown_List_Command,
+      All_Elements,
+      Full_Name,
+      Last_Name,
+      Name);")
+   (List_Command
+      (hash-package Natools.Static_Maps.Web.Tags.Commands)
+      (function To_List_Command)
+      (not-found Unknown_List_Command)
+      (nodes
+         (All_Elements   all-elements)
+         (Full_Name   full-name)
+         (Last_Name   last-name)
+         (Name   name))))
