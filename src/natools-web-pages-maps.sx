@@ -6,6 +6,7 @@
      (Unknown_Command,
       Element,
       Element_Or_Template,
+      Tags,
       Template);
 
    type Component is
@@ -19,6 +20,7 @@
       (nodes
          (Element   element)
          (Element_Or_Template  render element-or-template)
+         (Tags  pagelist page-list tag tags)
          (Template  template)))
    (Component
       (hash-package Natools.Static_Maps.Web.Pages.Components)

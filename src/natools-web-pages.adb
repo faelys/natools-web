@@ -125,6 +125,13 @@ package body Natools.Web.Pages is
                Lookup_Element => True,
                Lookup_Template => True);
 
+         when Commands.Tags =>
+            Tags.Render
+              (Exchange,
+               Page.Site.Get_Tags,
+               Arguments,
+               Page.Tags);
+
          when Commands.Template =>
             Sub_Render (Exchange, Page, Arguments, Lookup_Template => True);
       end case;
