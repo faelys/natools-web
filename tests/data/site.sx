@@ -4,4 +4,4 @@
 (path-prefix /)
 (static-paths data/maintenance data/static)
 (template-file data/templates.sx)
-(pages first second)
+(pages index first second)

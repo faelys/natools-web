@@ -3,3 +3,4 @@
 <p>Data in the second page.</p>\n")
    (footer "<p>Special footer</p>\n")
    (title "Second Page"))
+(tags (2 pages/news))

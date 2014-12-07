@@ -48,3 +48,4 @@ check /second second.html
 check /style.css ../data/static/style.css
 check /non-existant 404.html
 check /first 405.html -d ''
+check /index index.html

@@ -1,0 +1,9 @@
+(elements
+   (title Index)
+   (main-text
+      (tags
+         (pages
+            "<ul>\n"
+            (all-elements
+               (render "<li>" (element title) "</li>\n"))
+            "</ul>\n"))))
