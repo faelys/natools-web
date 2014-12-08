@@ -152,53 +152,19 @@ package body Natools.Web.List_Templates is
 
    procedure Render
      (Exchange : in out Exchanges.Exchange;
-      Container : in Context;
+      Iterator : in Iterators.Reversible_Iterator'Class;
       Param : in Parameters)
    is
-      function Start return Cursor;
-      procedure Proceed (Position : in out Cursor);
-
-      function Start return Cursor is
-      begin
-         case Param.Going is
-            when Forward =>
-               return First (Container);
-            when Backward =>
-               return Last (Container);
-         end case;
-      end Start;
-
-      procedure Proceed (Position : in out Cursor) is
-      begin
-         case Param.Going is
-            when Forward =>  Next (Position);
-            when Backward => Previous (Position);
-         end case;
-      end Proceed;
+      procedure Loop_Body
+        (Position : in Iterators.Cursor; Exit_Loop : out Boolean);
 
       Rendered : Count := 0;
-      Position : Cursor := Start;
-   begin
-      if Param.Limit > 0 and then not Param.Ellipsis_Prefix.Is_Empty then
-         declare
-            C : Cursor := First (Container);
-            Seen : Count := 0;
-         begin
-            while Has_Element (C) loop
-               Seen := Seen + 1;
-               exit when Seen > Param.Limit;
-               Next (C);
-            end loop;
 
-            if Seen > Param.Limit then
-               Exchanges.Append
-                 (Exchange,
-                  Param.Ellipsis_Prefix.Query.Data.all);
-            end if;
-         end;
-      end if;
+      procedure Loop_Body
+        (Position : in Iterators.Cursor; Exit_Loop : out Boolean) is
+      begin
+         Exit_Loop := False;
 
-      while Has_Element (Position) loop
          declare
             Template_Copy : S_Expressions.Caches.Cursor := Param.Template;
          begin
@@ -214,11 +180,42 @@ package body Natools.Web.List_Templates is
                   Param.Ellipsis_Suffix.Query.Data.all);
             end if;
 
-            exit;
+            Exit_Loop := True;
          end if;
+      end Loop_Body;
 
-         Proceed (Position);
-      end loop;
+      Exit_Loop : Boolean;
+   begin
+      if Param.Limit > 0 and then not Param.Ellipsis_Prefix.Is_Empty then
+         declare
+            Seen : Count := 0;
+         begin
+            for I in Iterator loop
+               Seen := Seen + 1;
+               exit when Seen > Param.Limit;
+            end loop;
+
+            if Seen > Param.Limit then
+               Exchanges.Append
+                 (Exchange,
+                  Param.Ellipsis_Prefix.Query.Data.all);
+            end if;
+         end;
+      end if;
+
+      case Param.Going is
+         when Forward =>
+            for Position in Iterator loop
+               Loop_Body (Position, Exit_Loop);
+               exit when Exit_Loop;
+            end loop;
+
+         when Backward =>
+            for Position in reverse Iterator loop
+               Loop_Body (Position, Exit_Loop);
+               exit when Exit_Loop;
+            end loop;
+      end case;
    end Render;
 
 end Natools.Web.List_Templates;

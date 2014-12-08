@@ -20,6 +20,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers;
+with Ada.Iterator_Interfaces;
 with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
@@ -50,20 +51,14 @@ package Natools.Web.List_Templates is
 
 
    generic
-      type Context (<>) is limited private;
-      type Cursor (<>) is limited private;
-      with function First (Container : Context) return Cursor is <>;
-      with function Last (Container : Context) return Cursor is <>;
-      with procedure Next (Position : in out Cursor) is <>;
-      with procedure Previous (Position : in out Cursor) is <>;
-      with function Has_Element (Position : Cursor) return Boolean is <>;
+      with package Iterators is new Ada.Iterator_Interfaces (<>);
       with procedure Render
         (Exchange : in out Exchanges.Exchange;
-         Position : in Cursor;
+         Position : in Iterators.Cursor;
          Expression : in out S_Expressions.Lockable.Descriptor'Class) is <>;
    procedure Render
      (Exchange : in out Exchanges.Exchange;
-      Container : in Context;
+      Iterator : in Iterators.Reversible_Iterator'Class;
       Param : in Parameters);
 
 end Natools.Web.List_Templates;

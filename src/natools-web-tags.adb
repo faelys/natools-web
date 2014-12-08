@@ -145,14 +145,7 @@ package body Natools.Web.Tags is
      (Exchanges.Exchange, Tag_List_Context, Render_Tag);
 
    procedure Render_Pages is new List_Templates.Render
-     (Context => Page_Maps.Constant_Map,
-      Cursor => Page_Maps.Cursor,
-      First => Page_Maps.First,
-      Last => Page_Maps.Last,
-      Next => Page_Maps.Next,
-      Previous => Page_Maps.Previous,
-      Has_Element => Page_Maps.Has_Element,
-      Render => Render_Page);
+     (Page_Maps.Map_Iterator_Interfaces, Render_Page);
 
 
 
@@ -304,7 +297,7 @@ package body Natools.Web.Tags is
          when Commands.All_Elements =>
             Render_Pages
               (Exchange,
-               Tag_Maps.Element (Tag.Position),
+               Tag_Maps.Element (Tag.Position).Iterate,
                List_Templates.Read_Parameters (Arguments));
 
          when Commands.Full_Name =>
