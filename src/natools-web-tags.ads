@@ -140,13 +140,6 @@ private
       Element : in Visible'Class);
       --  Add a single Element to the map designated by Tag
 
-   procedure Add_To_Tag
-     (Builder : in out Tag_DB_Builder;
-      Tag : in S_Expressions.Atom;
-      Key : in S_Expressions.Atom;
-      Element : in Visible'Class);
-      --  Add Element to Tag and to all its parents
-
    function Create (Builder : in Tag_DB_Builder) return Tag_Maps.Constant_Map;
 
    type Tag_DB is record

@@ -25,6 +25,9 @@ package body Natools.Web.Tags is
    use type S_Expressions.Octet;
    use type S_Expressions.Offset;
 
+   package Atom_Maps is new Ada.Containers.Indefinite_Ordered_Maps
+     (S_Expressions.Atom, S_Expressions.Atom, S_Expressions.Less_Than);
+
    type Offset_Array is
      array (S_Expressions.Count range <>) of S_Expressions.Offset;
 
@@ -444,37 +447,36 @@ package body Natools.Web.Tags is
       Element : in Visible'Class)
    is
       Map_Position : Builder_Maps.Cursor;
+      Element_Position : Page_Maps.Unsafe_Maps.Cursor;
+      Fallback_Key : S_Expressions.Atom := Key & (1 => 0);
       Inserted : Boolean;
    begin
       Builder.Internal.Insert
         (Tag, Page_Maps.Unsafe_Maps.Empty_Map,
          Map_Position, Inserted);
-      Builder.Internal.Reference (Map_Position).Insert (Key, Element);
+
+      declare
+         Ref : constant Builder_Maps.Reference_Type
+           := Builder.Internal.Reference (Map_Position);
+      begin
+         Ref.Insert (Key, Element, Element_Position, Inserted);
+
+         while not Inserted loop
+            Ref.Insert (Fallback_Key, Element, Element_Position, Inserted);
+            Fallback_Key (Fallback_Key'Last)
+              := Fallback_Key (Fallback_Key'Last) + 1;
+
+            if Fallback_Key (Fallback_Key'Last) = 0 then
+               Log (Severities.Error, "Unable to insert into tag """
+                  & S_Expressions.To_String (Tag)
+                  & """ with key """
+                  & S_Expressions.To_String (Key)
+                  & """: all fallback possibilities are exhausted");
+               exit;
+            end if;
+         end loop;
+      end;
    end Add_Entry;
-
-
-   procedure Add_To_Tag
-     (Builder : in out Tag_DB_Builder;
-      Tag : in S_Expressions.Atom;
-      Key : in S_Expressions.Atom;
-      Element : in Visible'Class)
-   is
-      Last : S_Expressions.Offset := Tag'Last;
-   begin
-      Insert :
-      loop
-         Add_Entry (Builder, Tag (Tag'First .. Last), Key, Element);
-
-         Find_Parent :
-         loop
-            Last := Last - 1;
-            exit Insert when Last not in Tag'Range;
-            exit Find_Parent when Tag (Last) = Path_Separator;
-         end loop Find_Parent;
-
-         Last := Last - 1;
-      end loop Insert;
-   end Add_To_Tag;
 
 
    function Create (Builder : Tag_DB_Builder) return Tag_Maps.Constant_Map is
@@ -493,13 +495,97 @@ package body Natools.Web.Tags is
    procedure Register
      (Builder : in out Tag_DB_Builder;
       Keys : in Tag_List;
-      Element : in Visible'Class) is
+      Element : in Visible'Class)
+   is
+      procedure Insert_Or_Log
+        (Container : in out Atom_Maps.Map;
+         Tag, Key : in S_Expressions.Atom;
+         Tag_Kind : in String;
+         Severity : in Severities.Code);
+
+      procedure Insert_Or_Log
+        (Container : in out Atom_Maps.Map;
+         Tag, Key : in S_Expressions.Atom;
+         Tag_Kind : in String;
+         Severity : in Severities.Code)
+      is
+         Position : Atom_Maps.Cursor;
+         Inserted : Boolean;
+      begin
+         Container.Insert (Tag, Key, Position, Inserted);
+
+         if not Inserted and then Atom_Maps.Element (Position) /= Key then
+            pragma Assert (Tag = Atom_Maps.Key (Position));
+            Log (Severity,
+              "Registering element to " & Tag_Kind & " tag """
+              & S_Expressions.To_String (Tag)
+              & """ with conflicting keys """
+              & S_Expressions.To_String (Atom_Maps.Element (Position))
+              & """ and """
+              & S_Expressions.To_String (Key)
+              & """, dropping the latter");
+         end if;
+      end Insert_Or_Log;
+
+      Explicit, Implicit : Atom_Maps.Map;
+      Last : S_Expressions.Offset;
    begin
-      if not Keys.Internal.Is_Empty then
-         for Descr of Keys.Internal.Query loop
-            Add_To_Tag (Builder, Descr.Tag.Query, Descr.Key.Query, Element);
-         end loop;
+      if Keys.Internal.Is_Empty then
+         return;
       end if;
+
+      Process_Explicit :
+      for Descr of Keys.Internal.Query loop
+         Insert_Or_Log
+           (Explicit,
+            Descr.Tag.Query, Descr.Key.Query,
+            "explicit", Severities.Error);
+      end loop Process_Explicit;
+
+      Process_Implicit :
+      for Descr of Keys.Internal.Query loop
+         declare
+            Key : constant S_Expressions.Atom := Descr.Key.Query;
+            Tag : constant S_Expressions.Atom := Descr.Tag.Query;
+         begin
+            Last := Tag'Last;
+
+            Insert_Pairs :
+            loop
+               Find_Parent :
+               loop
+                  Last := Last - 1;
+                  exit Insert_Pairs when Last not in Tag'Range;
+                  exit Find_Parent when Tag (Last) = Path_Separator;
+               end loop Find_Parent;
+
+               Last := Last - 1;
+
+               if not Explicit.Contains (Tag (Tag'First .. Last)) then
+                  Insert_Or_Log
+                    (Implicit,
+                     Tag (Tag'First .. Last), Key,
+                     "implicit", Severities.Warning);
+               end if;
+            end loop Insert_Pairs;
+         end;
+      end loop Process_Implicit;
+
+      for Cursor in Explicit.Iterate loop
+         Add_Entry
+           (Builder,
+            Atom_Maps.Key (Cursor),
+            Atom_Maps.Element (Cursor),
+            Element);
+      end loop;
+
+      for Cursor in Implicit.Iterate loop
+         Add_Entry
+           (Builder,
+            Atom_Maps.Key (Cursor),
+            Atom_Maps.Element (Cursor),
+            Element);
+      end loop;
    end Register;
 
 
