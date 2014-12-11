@@ -38,7 +38,7 @@ package body Natools.Web.Tags is
       Separators : Offset_Array (1 .. Separator_Count);
    end record;
 
-   type Tag_List_Context is record
+   type Tag_DB_Context is record
       DB : Tag_DB;
       Parent_Tags : Tag_List;
    end record;
@@ -47,9 +47,13 @@ package body Natools.Web.Tags is
    Path_Separator : constant S_Expressions.Octet := Character'Pos ('/');
 
 
-   function Is_Path_Prefix (Small, Large : S_Expressions.Atom) return Boolean
+   function Is_Prefix (Small, Large : S_Expressions.Atom) return Boolean
      is (Small'Length <= Large'Length
-         and then Small = Large (Large'First .. Large'First + Small'Length - 1)
+     and then Small = Large (Large'First .. Large'First + Small'Length - 1));
+      --  Check whether Small is a prefix of Large
+
+   function Is_Path_Prefix (Small, Large : S_Expressions.Atom) return Boolean
+     is (Is_Prefix (Small, Large)
          and then (Small'Length = Large'Length
             or else Large (Large'First + Small'Length) = Path_Separator));
       --  Check whether Small is a parent path of Large
@@ -61,6 +65,13 @@ package body Natools.Web.Tags is
       Key : in S_Expressions.Atom;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
       --  Parse Expression for tag names and add (tag, key) to List
+
+   function Adjust
+     (Position : Tag_List_Cursor;
+      Prefix : S_Expressions.Atom;
+      Proceed : not null access procedure (Pos : in out Tag_List_Cursor))
+     return Tag_List_Cursor;
+      --  Repeatedly apply Proceed to Position until it has the correct prefix
 
    procedure Append
      (List : in out Tag_List;
@@ -120,7 +131,7 @@ package body Natools.Web.Tags is
 
    procedure Render_Tag
      (Exchange : in out Exchanges.Exchange;
-      Context : in Tag_List_Context;
+      Context : in Tag_DB_Context;
       Tag_Name : in S_Expressions.Atom;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
       --  Look-up for the tag named Tag_Name and render it
@@ -145,10 +156,13 @@ package body Natools.Web.Tags is
      (Exchanges.Exchange, Tag_Contents, Render_Contents, Append);
 
    procedure Render is new S_Expressions.Interpreter_Loop
-     (Exchanges.Exchange, Tag_List_Context, Render_Tag);
+     (Exchanges.Exchange, Tag_DB_Context, Render_Tag);
 
    procedure Render_Pages is new List_Templates.Render
      (Page_Maps.Map_Iterator_Interfaces, Render_Page);
+
+   procedure Render_List is new List_Templates.Render
+     (Tag_List_Iterators);
 
 
 
@@ -175,6 +189,25 @@ package body Natools.Web.Tags is
          Expression.Next (Event);
       end loop;
    end Add_Tags_To_List;
+
+
+   function Adjust
+     (Position : Tag_List_Cursor;
+      Prefix : S_Expressions.Atom;
+      Proceed : not null access procedure (Pos : in out Tag_List_Cursor))
+     return Tag_List_Cursor
+   is
+      Result : Tag_List_Cursor := Position;
+   begin
+      while Has_Element (Result)
+        and then not Is_Prefix (Prefix,
+            Result.List.Query.Data (Result.Index).Tag.Query)
+      loop
+         Proceed (Result);
+      end loop;
+
+      return Result;
+   end Adjust;
 
 
    procedure Append
@@ -331,7 +364,7 @@ package body Natools.Web.Tags is
 
    procedure Render_Tag
      (Exchange : in out Exchanges.Exchange;
-      Context : in Tag_List_Context;
+      Context : in Tag_DB_Context;
       Tag_Name : in S_Expressions.Atom;
       Expression : in out S_Expressions.Lockable.Descriptor'Class)
    is
@@ -433,6 +466,107 @@ package body Natools.Web.Tags is
    begin
       Add_To_List (Expression, List, Meaningless_Value);
    end Append;
+
+
+   overriding function First (Iterator : Tag_List_Iterator)
+     return Tag_List_Cursor is
+   begin
+      if Iterator.List.Is_Empty
+        or else Iterator.List.Query.Data'Length = 0
+      then
+         return No_Element;
+      else
+         return Adjust
+           ((DB => Iterator.DB,
+             List => Iterator.List,
+             Index => Iterator.List.Query.Data'First),
+            Iterator.Prefix.Query,
+            Next'Access);
+      end if;
+   end First;
+
+
+   overriding function Last (Iterator : Tag_List_Iterator)
+     return Tag_List_Cursor is
+   begin
+      if Iterator.List.Is_Empty
+        or else Iterator.List.Query.Data'Length = 0
+      then
+         return No_Element;
+      else
+         return Adjust
+           ((DB => Iterator.DB,
+             List => Iterator.List,
+             Index => Iterator.List.Query.Data'Last),
+            Iterator.Prefix.Query,
+            Previous'Access);
+      end if;
+   end Last;
+
+
+   procedure Next (Position : in out Tag_List_Cursor) is
+   begin
+      if Has_Element (Position) then
+         Position.Index := Position.Index + 1;
+      end if;
+   end Next;
+
+
+   overriding function Next
+     (Iterator : Tag_List_Iterator;
+      Position : Tag_List_Cursor)
+     return Tag_List_Cursor
+   is
+      Result : Tag_List_Cursor := Position;
+   begin
+      pragma Assert (not Has_Element (Position)
+        or else (Iterator.DB = Position.DB
+           and then Tag_Lists."=" (Iterator.List, Position.List)));
+
+      Next (Result);
+
+      return Adjust (Result, Iterator.Prefix.Query, Next'Access);
+   end Next;
+
+
+   procedure Previous (Position : in out Tag_List_Cursor) is
+   begin
+      if Has_Element (Position) then
+         Position.Index := Position.Index - 1;
+      end if;
+   end Previous;
+
+
+   overriding function Previous
+     (Iterator : Tag_List_Iterator;
+      Position : Tag_List_Cursor)
+     return Tag_List_Cursor
+   is
+      Result : Tag_List_Cursor := Position;
+   begin
+      pragma Assert (not Has_Element (Position)
+        or else (Iterator.DB = Position.DB
+           and then Tag_Lists."=" (Iterator.List, Position.List)));
+
+      Previous (Result);
+
+      return Adjust (Result, Iterator.Prefix.Query, Previous'Access);
+   end Previous;
+
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Position : in Tag_List_Cursor;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+   begin
+      Render
+        (Expression,
+         Exchange,
+         Get_Tag
+           (Position.DB,
+            Position.List.Query.Data (Position.Index).Tag.Query,
+            (Internal => Position.List)));
+   end Render;
 
 
 
@@ -606,7 +740,7 @@ package body Natools.Web.Tags is
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
       Parent_Tags : in Tag_List := Empty_Tag_List)
    is
-      Context : constant Tag_List_Context := (DB, Parent_Tags);
+      Context : constant Tag_DB_Context := (DB, Parent_Tags);
    begin
       case Expression.Current_Event is
          when S_Expressions.Events.Add_Atom =>
@@ -623,6 +757,23 @@ package body Natools.Web.Tags is
          when others =>
             null;
       end case;
+   end Render;
+
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      List : in Tag_List;
+      DB : in Tag_DB;
+      Prefix : in S_Expressions.Atom;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+   begin
+      Render_List
+        (Exchange,
+         Tag_List_Iterator'
+           (DB => DB,
+            List => List.Internal,
+            Prefix => Create_Ref (Prefix)),
+         List_Templates.Read_Parameters (Expression));
    end Render;
 
 

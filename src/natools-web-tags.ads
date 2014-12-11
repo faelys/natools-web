@@ -25,6 +25,7 @@ with Natools.S_Expressions.Lockable;
 with Natools.Web.Exchanges;
 
 private with Ada.Containers.Indefinite_Ordered_Maps;
+private with Ada.Iterator_Interfaces;
 private with Natools.References;
 private with Natools.Storage_Pools;
 
@@ -71,6 +72,15 @@ package Natools.Web.Tags is
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
       Parent_Tags : in Tag_List := Empty_Tag_List);
       --  Render Expression as 'tag_name tag_template' or a list of such expr
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      List : in Tag_List;
+      DB : in Tag_DB;
+      Prefix : in S_Expressions.Atom;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+      --  Render a list of tags composed of the elements in List whose names
+      --  start with Prefix.
 
    procedure Reset
      (DB : in out Tag_DB;
@@ -153,6 +163,57 @@ private
 
    function Is_Empty (Tag : Tag_Contents) return Boolean
      is (not Tag_Maps.Has_Element (Tag.Position));
+
+
+   type Tag_List_Cursor is record
+      DB : Tag_DB;
+      List : Tag_Lists.Immutable_Reference;
+      Index : Natural := 0;
+   end record;
+
+   function Has_Element (Position : Tag_List_Cursor) return Boolean
+     is ((not Position.List.Is_Empty)
+         and then Position.Index in Position.List.Query.Data'Range);
+
+   function No_Element return Tag_List_Cursor
+     is ((DB => <>,
+          List => Tag_Lists.Null_Immutable_Reference,
+          Index => 0));
+
+   procedure Next (Position : in out Tag_List_Cursor);
+
+   procedure Previous (Position : in out Tag_List_Cursor);
+
+   procedure Render
+     (Exchange : in out Exchanges.Exchange;
+      Position : in Tag_List_Cursor;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+   package Tag_List_Iterators is new Ada.Iterator_Interfaces
+     (Tag_List_Cursor, Has_Element);
+
+   type Tag_List_Iterator is new Tag_List_Iterators.Reversible_Iterator
+   with record
+      DB : Tag_DB;
+      List : Tag_Lists.Immutable_Reference;
+      Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
+   end record;
+
+   overriding function First (Iterator : Tag_List_Iterator)
+     return Tag_List_Cursor;
+
+   overriding function Last (Iterator : Tag_List_Iterator)
+     return Tag_List_Cursor;
+
+   overriding function Next
+     (Iterator : Tag_List_Iterator;
+      Position : Tag_List_Cursor)
+     return Tag_List_Cursor;
+
+   overriding function Previous
+     (Iterator : Tag_List_Iterator;
+      Position : Tag_List_Cursor)
+     return Tag_List_Cursor;
 
    Empty_Description : constant Tag_Description := (Tag | Key => <>);
 
