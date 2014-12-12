@@ -125,6 +125,22 @@ package body Natools.Web.Pages is
                Lookup_Element => True,
                Lookup_Template => True);
 
+         when Commands.My_Tags =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               declare
+                  Prefix : constant S_Expressions.Atom
+                    := Arguments.Current_Atom;
+               begin
+                  Arguments.Next;
+                  Tags.Render
+                    (Exchange,
+                     Page.Tags,
+                     Page.Site.Get_Tags,
+                     Prefix,
+                     Arguments);
+               end;
+            end if;
+
          when Commands.Tags =>
             Tags.Render
               (Exchange,
