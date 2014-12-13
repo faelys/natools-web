@@ -6,4 +6,5 @@
             "<ul>\n"
             (all-elements
                (render "<li>" (element title) "</li>\n"))
-            "</ul>\n"))))
+            "</ul>\n")))
+   (sidebar ""))

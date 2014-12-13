@@ -6,7 +6,11 @@
   </head>
   <body>\n"
 (render html-body)
-"    <div class=\"footer\">\n"
+"    <div class=\"sidebar\">\n"
+(render sidebar
+   "<p>Tags:" (tag-list tags/ (render " " (name (2)))) "</p>\n")
+"    </div>
+    <div class=\"footer\">\n"
 (element footer "<p>Default footer</p>\n")
 "    </div>
   </body>
