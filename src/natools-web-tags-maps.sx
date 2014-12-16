@@ -5,8 +5,11 @@
    type List_Command is
      (Unknown_List_Command,
       All_Elements,
+      Current_Element,
+      Greater_Elements,
       Full_Name,
       Last_Name,
+      Lesser_Elements,
       Name);")
    (List_Command
       (hash-package Natools.Static_Maps.Web.Tags.Commands)
@@ -14,6 +17,9 @@
       (not-found Unknown_List_Command)
       (nodes
          (All_Elements   all-elements)
+         (Current_Element   current-element)
+         (Greater_Elements   greater-elements)
          (Full_Name   full-name)
          (Last_Name   last-name)
+         (Lesser_Elements   lesser-elements)
          (Name   name))))

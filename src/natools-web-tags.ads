@@ -157,7 +157,7 @@ private
    end record;
 
    type Tag_Contents is record
-      Parent : Tag_Description;
+      Current_Element : Page_Maps.Cursor;
       Position : Tag_Maps.Cursor;
    end record;
 

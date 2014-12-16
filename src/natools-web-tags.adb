@@ -336,6 +336,35 @@ package body Natools.Web.Tags is
                Tag_Maps.Element (Tag.Position).Iterate,
                List_Templates.Read_Parameters (Arguments));
 
+         when Commands.Current_Element =>
+            if Page_Maps.Has_Element (Tag.Current_Element) then
+               Render
+                 (Exchange,
+                  Page_Maps.Element (Tag.Current_Element),
+                  Arguments);
+            else
+               Log (Severities.Error,
+                 "Current_Element called when it's empty");
+            end if;
+
+         when Commands.Greater_Elements =>
+            if Page_Maps.Has_Element (Tag.Current_Element) then
+               declare
+                  Page_Map : constant Page_Maps.Constant_Map
+                    := Tag_Maps.Element (Tag.Position);
+               begin
+                  Render_Pages
+                    (Exchange,
+                     Page_Map.Iterate
+                       (Page_Maps.Next (Tag.Current_Element),
+                        Page_Map.Last),
+                     List_Templates.Read_Parameters (Arguments));
+               end;
+            else
+               Log (Severities.Error,
+                 "Greater_Elements called without current element");
+            end if;
+
          when Commands.Full_Name =>
             Exchanges.Append (Exchange, Tag_Maps.Key (Tag.Position));
 
@@ -355,6 +384,24 @@ package body Natools.Web.Tags is
                  (Exchange,
                   Full_Name (I + 1 .. Full_Name'Last));
             end;
+
+         when Commands.Lesser_Elements =>
+            if Page_Maps.Has_Element (Tag.Current_Element) then
+               declare
+                  Page_Map : constant Page_Maps.Constant_Map
+                    := Tag_Maps.Element (Tag.Position);
+               begin
+                  Render_Pages
+                    (Exchange,
+                     Page_Map.Iterate
+                       (Page_Map.First,
+                        Page_Maps.Previous (Tag.Current_Element)),
+                     List_Templates.Read_Parameters (Arguments));
+               end;
+            else
+               Log (Severities.Error,
+                 "Lesser_Elements called without current element");
+            end if;
 
          when Commands.Name =>
             Render (Arguments, Exchange, Create (Tag_Maps.Key (Tag.Position)));
@@ -796,20 +843,38 @@ package body Natools.Web.Tags is
       Parent_Tags : in Tag_List := Empty_Tag_List)
      return Tag_Contents
    is
-      Tag : Tag_Description := Empty_Description;
+      Descr : Tag_Description := Empty_Description;
+      Result : Tag_Contents
+        := (Position => DB.Internal.Find (Name),
+            Current_Element => Page_Maps.No_Element);
    begin
-      if not Parent_Tags.Internal.Is_Empty then
+      if not Parent_Tags.Internal.Is_Empty
+        and then Tag_Maps.Has_Element (Result.Position)
+      then
          for T of Parent_Tags.Internal.Query loop
-            if Is_Path_Prefix (Name, T.Tag.Query) then
-               Tag := T;
+            if Name = T.Tag.Query then
+               Descr := T;
                exit;
             end if;
          end loop;
+
+         if Descr.Tag.Is_Empty then
+            for T of Parent_Tags.Internal.Query loop
+               if Is_Path_Prefix (Name, T.Tag.Query) then
+                  Descr := T;
+                  exit;
+               end if;
+            end loop;
+         end if;
+
+         if not Descr.Key.Is_Empty then
+            Result.Current_Element
+              := Tag_Maps.Element (Result.Position).Find (Descr.Key.Query);
+            pragma Assert (Page_Maps.Has_Element (Result.Current_Element));
+         end if;
       end if;
 
-      return
-        (Position => DB.Internal.Find (Name),
-         Parent => Tag);
+      return Result;
    end Get_Tag;
 
 
