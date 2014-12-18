@@ -173,7 +173,7 @@ package body Natools.Web.List_Templates is
 
          Rendered := Rendered + 1;
 
-         if Param.Limit > 0 and then Rendered > Param.Limit then
+         if Param.Limit > 0 and then Rendered >= Param.Limit then
             if not Param.Ellipsis_Suffix.Is_Empty then
                Exchanges.Append
                  (Exchange,
