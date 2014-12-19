@@ -24,7 +24,7 @@ with Ada.Iterator_Interfaces;
 with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
-with Natools.Web.Exchanges;
+with Natools.Web.Sites;
 
 package Natools.Web.List_Templates is
 
@@ -53,11 +53,11 @@ package Natools.Web.List_Templates is
    generic
       with package Iterators is new Ada.Iterator_Interfaces (<>);
       with procedure Render
-        (Exchange : in out Exchanges.Exchange;
+        (Exchange : in out Sites.Exchange;
          Position : in Iterators.Cursor;
          Expression : in out S_Expressions.Lockable.Descriptor'Class) is <>;
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Iterator : in Iterators.Reversible_Iterator'Class;
       Param : in Parameters);
 

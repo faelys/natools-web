@@ -17,7 +17,9 @@
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.Tags;
+with Natools.Web.Exchanges;
 with Natools.Web.List_Templates;
+with Natools.Web.Sites;
 
 package body Natools.Web.Tags is
 
@@ -82,13 +84,13 @@ package body Natools.Web.Tags is
       --  to be small and seldom (re)built.
 
    procedure Append
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Tag : in Tag_Contents;
       Data : in S_Expressions.Atom);
       --  Append Data to Exchange, ignoring Tag
 
    procedure Append
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Name : in Processed_Name;
       Data : in S_Expressions.Atom);
       --  Append Data to Exchange, ignoring Name
@@ -110,27 +112,27 @@ package body Natools.Web.Tags is
       --  Return the selected path components from Name
 
    procedure Render_Components
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Name : in Processed_Name;
       First_Index : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
       --  Render a range of path component from Name
 
    procedure Render_Contents
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Tag : in Tag_Contents;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
       --  Render the given template element for Tag into Exchange
 
    procedure Render_Page
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Position : in Page_Maps.Cursor;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
       --  Dispatch rendering to the visible element at Position
 
    procedure Render_Tag
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Tag_DB_Context;
       Tag_Name : in S_Expressions.Atom;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
@@ -150,13 +152,13 @@ package body Natools.Web.Tags is
       --  Parse a tag list and append it to a Tag_List object
 
    procedure Render is new S_Expressions.Interpreter_Loop
-     (Exchanges.Exchange, Processed_Name, Render_Components, Append);
+     (Sites.Exchange, Processed_Name, Render_Components, Append);
 
    procedure Render is new S_Expressions.Interpreter_Loop
-     (Exchanges.Exchange, Tag_Contents, Render_Contents, Append);
+     (Sites.Exchange, Tag_Contents, Render_Contents, Append);
 
    procedure Render is new S_Expressions.Interpreter_Loop
-     (Exchanges.Exchange, Tag_DB_Context, Render_Tag);
+     (Sites.Exchange, Tag_DB_Context, Render_Tag);
 
    procedure Render_Pages is new List_Templates.Render
      (Page_Maps.Map_Iterator_Interfaces, Render_Page);
@@ -224,7 +226,7 @@ package body Natools.Web.Tags is
 
 
    procedure Append
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Tag : in Tag_Contents;
       Data : in S_Expressions.Atom)
    is
@@ -235,7 +237,7 @@ package body Natools.Web.Tags is
 
 
    procedure Append
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Name : in Processed_Name;
       Data : in S_Expressions.Atom)
    is
@@ -297,7 +299,7 @@ package body Natools.Web.Tags is
 
 
    procedure Render_Components
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Name : in Processed_Name;
       First_Index : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
@@ -318,7 +320,7 @@ package body Natools.Web.Tags is
 
 
    procedure Render_Contents
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Tag : in Tag_Contents;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
@@ -410,7 +412,7 @@ package body Natools.Web.Tags is
 
 
    procedure Render_Tag
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Tag_DB_Context;
       Tag_Name : in S_Expressions.Atom;
       Expression : in out S_Expressions.Lockable.Descriptor'Class)
@@ -429,7 +431,7 @@ package body Natools.Web.Tags is
 
 
    procedure Render_Page
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Position : in Page_Maps.Cursor;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
@@ -602,7 +604,7 @@ package body Natools.Web.Tags is
 
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Position : in Tag_List_Cursor;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
@@ -782,7 +784,7 @@ package body Natools.Web.Tags is
 
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       DB : in Tag_DB;
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
       Parent_Tags : in Tag_List := Empty_Tag_List)
@@ -808,7 +810,7 @@ package body Natools.Web.Tags is
 
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       List : in Tag_List;
       DB : in Tag_DB;
       Prefix : in S_Expressions.Atom;
@@ -879,7 +881,7 @@ package body Natools.Web.Tags is
 
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Tag : in Tag_Contents;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin

@@ -27,24 +27,21 @@ with Natools.Web.Containers;
 with Natools.Web.Exchanges;
 with Natools.Web.Tags;
 
-private with Ada.Finalization;
 private with Natools.S_Expressions.Atom_Refs;
 
 package Natools.Web.Sites is
 
    type Site is tagged limited private;
-   type Mutable_Site_Access is access all Site;
-   type Site_Access is access constant Site;
 
    procedure Reload (Object : in out Site);
       --  Reload Object data from its original file
 
-   procedure Reset (Ref : in Mutable_Site_Access; File_Name : in String);
+   procedure Reset (Object : in out Site; File_Name : in String);
       --  (Re)initialize Object with data from the given file
 
    procedure Respond
      (Object : in out Site;
-      Exchange : in out Exchanges.Exchange);
+      Exchange : aliased in out Exchanges.Exchange);
       --  Look up internal data to provide a response in Exchange
 
 
@@ -62,18 +59,21 @@ package Natools.Web.Sites is
       --  Retrieve the default template name
 
 
+   type Exchange
+     (Backend : not null access Exchanges.Exchange;
+      Site : not null access Sites.Site)
+     is limited private
+     with Implicit_Dereference => Backend;
+
+
    type Page is interface;
 
    procedure Respond
      (Object : in out Page;
-      Exchange : in out Exchanges.Exchange;
+      Exchange : in out Sites.Exchange;
       Extra_Path : in S_Expressions.Atom)
      is abstract
-     with Pre'Class => not Exchanges.Has_Response (Exchange);
-
-   procedure Set_Parent
-     (Object : in out Page;
-      Parent : in Site_Access) is abstract;
+     with Pre'Class => not Exchanges.Has_Response (Exchange.Backend.all);
 
 
    package Page_Maps is new Constant_Indefinite_Ordered_Maps
@@ -83,7 +83,7 @@ package Natools.Web.Sites is
    type Visible is interface;
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Object : in Visible;
       Expression : in out S_Expressions.Lockable.Descriptor'Class)
      is abstract;
@@ -94,8 +94,12 @@ package Natools.Web.Sites is
 
 private
 
-   type Site is limited new Ada.Finalization.Limited_Controlled with record
-      Self : Site_Access := null;
+   type Exchange
+     (Backend : not null access Exchanges.Exchange;
+      Site : not null access Sites.Site)
+     is limited null record;
+
+   type Site is tagged limited record
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Pages : Page_Maps.Updatable_Map;
@@ -103,13 +107,6 @@ private
       Tags : Web.Tags.Tag_DB;
       Templates : Containers.Expression_Maps.Constant_Map;
    end record;
-
-   procedure Recursive_Set_Parent
-     (Object : in out Site;
-      Parent : in Site_Access);
-      --  Call Set_Parent on all children of Object.
-
-   overriding procedure Finalize (Object : in out Site);
 
    type Site_Builder is record
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;

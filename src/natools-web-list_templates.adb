@@ -17,6 +17,7 @@
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.List_Templates;
+with Natools.Web.Exchanges;
 
 package body Natools.Web.List_Templates is
 
@@ -151,7 +152,7 @@ package body Natools.Web.List_Templates is
    -----------------------
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Iterator : in Iterators.Reversible_Iterator'Class;
       Param : in Parameters)
    is

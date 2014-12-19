@@ -15,7 +15,6 @@
 ------------------------------------------------------------------------------
 
 with Natools.S_Expressions.Lockable;
-with Natools.Web.Exchanges;
 with Natools.Web.Sites;
 with Natools.Web.Tags;
 
@@ -30,30 +29,24 @@ package Natools.Web.Pages is
    type Page_Ref is new Tags.Visible and Sites.Page with private;
 
    function Create
-     (File_Path, Web_Path : in S_Expressions.Atom;
-      Parent : Sites.Site_Access := null)
+     (File_Path, Web_Path : in S_Expressions.Atom)
      return Page_Ref;
 
    function Get_Tags (Page : Page_Ref) return Tags.Tag_List;
 
    overriding procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Object : in Page_Ref;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
 
    overriding procedure Respond
      (Object : in out Page_Ref;
-      Exchange : in out Exchanges.Exchange;
+      Exchange : in out Sites.Exchange;
       Extra_Path : in S_Expressions.Atom);
-
-   overriding procedure Set_Parent
-     (Object : in out Page_Ref;
-      Parent : in Sites.Site_Access);
 
 private
 
    type Page_Data is tagged limited record
-      Site : Sites.Site_Access := null;
       File_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Web_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Elements : Containers.Expression_Maps.Constant_Map;

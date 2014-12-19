@@ -22,7 +22,8 @@ package body Common is
 
    function Respond (Request : AWS.Status.Data) return AWS.Response.Data is
       Aliased_Request : aliased constant AWS.Status.Data := Request;
-      Exchange : Natools.Web.Exchanges.Exchange (Aliased_Request'Access);
+      Exchange : aliased Natools.Web.Exchanges.Exchange
+        (Aliased_Request'Access);
    begin
       Natools.Web.Sites.Respond (Site, Exchange);
       return Natools.Web.Exchanges.Response (Exchange);

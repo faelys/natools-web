@@ -22,7 +22,8 @@
 with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Lockable;
-with Natools.Web.Exchanges;
+
+limited with Natools.Web.Sites;
 
 private with Ada.Containers.Indefinite_Ordered_Maps;
 private with Ada.Iterator_Interfaces;
@@ -34,7 +35,7 @@ package Natools.Web.Tags is
    type Visible is interface;
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Object : in Visible;
       Expression : in out S_Expressions.Lockable.Descriptor'Class)
      is abstract;
@@ -67,14 +68,14 @@ package Natools.Web.Tags is
    function Create (Builder : Tag_DB_Builder) return Tag_DB;
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       DB : in Tag_DB;
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
       Parent_Tags : in Tag_List := Empty_Tag_List);
       --  Render Expression as 'tag_name tag_template' or a list of such expr
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       List : in Tag_List;
       DB : in Tag_DB;
       Prefix : in S_Expressions.Atom;
@@ -102,7 +103,7 @@ package Natools.Web.Tags is
       --  Return whether Tag is empty
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Tag : in Tag_Contents;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
       --  Render the given Tag into Exchange
@@ -185,7 +186,7 @@ private
    procedure Previous (Position : in out Tag_List_Cursor);
 
    procedure Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Position : in Tag_List_Cursor;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
 

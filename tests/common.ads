@@ -25,7 +25,7 @@ with Natools.Web.Sites;
 
 package Common is
 
-   Site : aliased Natools.Web.Sites.Site;
+   Site : Natools.Web.Sites.Site;
 
    function Respond (Request : AWS.Status.Data) return AWS.Response.Data;
 
