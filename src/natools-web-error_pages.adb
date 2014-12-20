@@ -49,7 +49,7 @@ package body Natools.Web.Error_Pages is
    is
       pragma Unreferenced (Context);
    begin
-      Exchanges.Append (Exchange, Data);
+      Exchange.Append (Data);
    end Append;
 
 
@@ -58,19 +58,17 @@ package body Natools.Web.Error_Pages is
       Context : in Error_Context)
    is
    begin
-      Exchanges.Append (Exchange, S_Expressions.To_Atom
-        ("<html><head><title>Error "));
-      Exchanges.Append (Exchange, Context.Code);
-      Exchanges.Append (Exchange, S_Expressions.To_Atom
-        ("</title></head><body><h1>Error "));
-      Exchanges.Append (Exchange, Context.Code);
-      Exchanges.Append (Exchange, S_Expressions.To_Atom
-        ("</h1><p>"));
-      Exchanges.Append (Exchange, S_Expressions.To_Atom
-        (Natools.Static_Maps.Web.Error_Pages.To_Message
-           (S_Expressions.To_String (Context.Code))));
-      Exchanges.Append (Exchange, S_Expressions.To_Atom
-        ("</p></body></html>"));
+      Exchange.Append (S_Expressions.To_Atom ("<html><head><title>Error "));
+      Exchange.Append (Context.Code);
+      Exchange.Append
+        (S_Expressions.To_Atom ("</title></head><body><h1>Error "));
+      Exchange.Append (Context.Code);
+      Exchange.Append (S_Expressions.To_Atom ("</h1><p>"));
+      Exchange.Append
+        (S_Expressions.To_Atom
+           (Natools.Static_Maps.Web.Error_Pages.To_Message
+              (S_Expressions.To_String (Context.Code))));
+      Exchange.Append (S_Expressions.To_Atom ("</p></body></html>"));
    end Default_Page;
 
 
@@ -88,18 +86,16 @@ package body Natools.Web.Error_Pages is
             null;
 
          when Message =>
-            Exchanges.Append
-              (Exchange,
-               S_Expressions.To_Atom (To_Message
+            Exchange.Append
+              (S_Expressions.To_Atom (To_Message
                  (S_Expressions.To_String (Context.Code))));
 
          when Path =>
-            Exchanges.Append
-              (Exchange,
-               S_Expressions.To_Atom (Exchanges.Path (Exchange)));
+            Exchange.Append
+              (S_Expressions.To_Atom (Exchanges.Path (Exchange)));
 
          when Status_Code =>
-            Exchanges.Append (Exchange, Context.Code);
+            Exchange.Append (Context.Code);
       end case;
    end Execute;
 

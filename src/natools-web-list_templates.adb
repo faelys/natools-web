@@ -17,7 +17,6 @@
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.List_Templates;
-with Natools.Web.Exchanges;
 
 package body Natools.Web.List_Templates is
 
@@ -176,9 +175,7 @@ package body Natools.Web.List_Templates is
 
          if Param.Limit > 0 and then Rendered >= Param.Limit then
             if not Param.Ellipsis_Suffix.Is_Empty then
-               Exchanges.Append
-                 (Exchange,
-                  Param.Ellipsis_Suffix.Query.Data.all);
+               Exchange.Append (Param.Ellipsis_Suffix.Query);
             end if;
 
             Exit_Loop := True;
@@ -197,9 +194,7 @@ package body Natools.Web.List_Templates is
             end loop;
 
             if Seen > Param.Limit then
-               Exchanges.Append
-                 (Exchange,
-                  Param.Ellipsis_Prefix.Query.Data.all);
+               Exchange.Append (Param.Ellipsis_Prefix.Query);
             end if;
          end;
       end if;

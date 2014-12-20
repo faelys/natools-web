@@ -46,7 +46,7 @@ package Natools.Web.Exchanges is
 
 
    type Exchange (Request : access constant AWS.Status.Data)
-     is limited private;
+     is tagged limited private;
 
    function Method (Object : Exchange) return Request_Method;
       --  Method requested by client
@@ -92,7 +92,8 @@ private
       type Kind is (Empty, Buffer, File);
    end Responses;
 
-   type Exchange (Request : access constant AWS.Status.Data) is record
+   type Exchange (Request : access constant AWS.Status.Data)
+     is tagged limited record
       Allow : Method_Set := (others => False);
       Kind : Responses.Kind := Responses.Empty;
       MIME_Type : S_Expressions.Atom_Refs.Immutable_Reference;

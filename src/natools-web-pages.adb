@@ -100,7 +100,7 @@ package body Natools.Web.Pages is
    is
       pragma Unreferenced (Page);
    begin
-      Exchanges.Append (Exchange, Data);
+      Exchange.Append (Data);
    end Append;
 
 

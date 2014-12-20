@@ -17,7 +17,6 @@
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.Tags;
-with Natools.Web.Exchanges;
 with Natools.Web.List_Templates;
 with Natools.Web.Sites;
 
@@ -232,7 +231,7 @@ package body Natools.Web.Tags is
    is
       pragma Unreferenced (Tag);
    begin
-      Exchanges.Append (Exchange, Data);
+      Exchange.Append (Data);
    end Append;
 
 
@@ -243,7 +242,7 @@ package body Natools.Web.Tags is
    is
       pragma Unreferenced (Name);
    begin
-      Exchanges.Append (Exchange, Data);
+      Exchange.Append (Data);
    end Append;
 
 
@@ -314,7 +313,7 @@ package body Natools.Web.Tags is
             else First);
    begin
       if First > 0 and Last > 0 then
-         Exchanges.Append (Exchange, Name_Components (Name, First, Last));
+         Exchange.Append (Name_Components (Name, First, Last));
       end if;
    end Render_Components;
 
@@ -368,7 +367,7 @@ package body Natools.Web.Tags is
             end if;
 
          when Commands.Full_Name =>
-            Exchanges.Append (Exchange, Tag_Maps.Key (Tag.Position));
+            Exchange.Append (Tag_Maps.Key (Tag.Position));
 
          when Commands.Last_Name =>
             declare
@@ -382,9 +381,7 @@ package body Natools.Web.Tags is
                   I := I - 1;
                end loop;
 
-               Exchanges.Append
-                 (Exchange,
-                  Full_Name (I + 1 .. Full_Name'Last));
+               Exchange.Append (Full_Name (I + 1 .. Full_Name'Last));
             end;
 
          when Commands.Lesser_Elements =>
