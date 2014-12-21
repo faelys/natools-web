@@ -55,6 +55,20 @@ package Natools.Web.Sites is
       Found : out Boolean);
       --  Retrieve a template from its name
 
+   function Get_Template
+     (Object : in Site;
+      Elements : in Containers.Expression_Maps.Constant_Map;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Name : in S_Expressions.Atom := S_Expressions.Null_Atom;
+      Lookup_Template : in Boolean := True;
+      Lookup_Element : in Boolean := True;
+      Lookup_Name : in Boolean := False)
+     return S_Expressions.Caches.Cursor;
+      --  Look for an expression named Name or Expression.Current_Atom
+      --  in Elements, or Object templates, or fallback on Expression.
+      --  If Name is empty and Lookup_Name is true, use the current atom in
+      --  Expression as name.
+
    function Default_Template (Object : Site) return S_Expressions.Atom;
       --  Retrieve the default template name
 

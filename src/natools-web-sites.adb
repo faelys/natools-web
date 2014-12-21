@@ -402,6 +402,65 @@ package body Natools.Web.Sites is
    end Get_Template;
 
 
+   function Get_Template
+     (Object : in Site;
+      Elements : in Containers.Expression_Maps.Constant_Map;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Name : in S_Expressions.Atom := S_Expressions.Null_Atom;
+      Lookup_Template : in Boolean := True;
+      Lookup_Element : in Boolean := True;
+      Lookup_Name : in Boolean := False)
+     return S_Expressions.Caches.Cursor
+   is
+      Cursor : Containers.Expression_Maps.Cursor;
+
+      use type S_Expressions.Events.Event;
+   begin
+      --  Check whether Name should be extracted from Expression
+
+      if Name'Length = 0
+        and then (not Lookup_Name)
+        and then (Lookup_Template or Lookup_Element)
+        and then Expression.Current_Event = S_Expressions.Events.Add_Atom
+      then
+         declare
+            Actual_Name : constant S_Expressions.Atom
+              := Expression.Current_Atom;
+         begin
+            Expression.Next;
+            return Get_Template
+              (Object, Elements, Expression,
+               Actual_Name,
+               Lookup_Template, Lookup_Element, True);
+         end;
+      end if;
+
+      --  Try Name among elements
+
+      Cursor := Elements.Find (Name);
+
+      if Containers.Expression_Maps.Has_Element (Cursor) then
+         return Containers.Expression_Maps.Element (Cursor);
+      end if;
+
+      --  Try Name among templates
+
+      Cursor := Object.Templates.Find (Name);
+
+      if Containers.Expression_Maps.Has_Element (Cursor) then
+         return Containers.Expression_Maps.Element (Cursor);
+      end if;
+
+      --  Fallback on Expression, converting it destructively if needed
+
+      if Expression in S_Expressions.Caches.Cursor then
+         return S_Expressions.Caches.Cursor (Expression);
+      else
+         return S_Expressions.Caches.Move (Expression);
+      end if;
+   end Get_Template;
+
+
    function Default_Template (Object : Site) return S_Expressions.Atom is
    begin
       return Object.Default_Template.Query.Data.all;
