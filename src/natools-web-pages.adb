@@ -40,21 +40,12 @@ package body Natools.Web.Pages is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
 
-   procedure Sub_Render
-     (Exchange : in out Sites.Exchange;
-      Page : in Page_Data;
-      Expression : in out S_Expressions.Lockable.Descriptor'Class;
-      Lookup_Element : in Boolean := False;
-      Lookup_Template : in Boolean := False);
 
-   procedure Sub_Render
-     (Exchange : in out Sites.Exchange;
-      Page : in Page_Data;
-      Name : in S_Expressions.Atom;
-      Fallback : in out S_Expressions.Lockable.Descriptor'Class;
-      Lookup_Element : in Boolean;
-      Lookup_Template : in Boolean)
-     with Pre => Lookup_Element or Lookup_Template;
+   procedure Read_Page is new S_Expressions.Interpreter_Loop
+     (Page_Data, Meaningless_Type, Execute);
+
+   procedure Render_Page is new S_Expressions.Interpreter_Loop
+     (Sites.Exchange, Page_Data, Render, Append);
 
 
    ---------------------------
@@ -82,10 +73,6 @@ package body Natools.Web.Pages is
             Tags.Append (Data.Tags, Arguments);
       end case;
    end Execute;
-
-
-   procedure Read_Page is new S_Expressions.Interpreter_Loop
-     (Page_Data, Meaningless_Type, Execute);
 
 
 
@@ -118,13 +105,23 @@ package body Natools.Web.Pages is
             null;
 
          when Commands.Element =>
-            Sub_Render (Exchange, Page, Arguments, Lookup_Element => True);
+            declare
+               Template : S_Expressions.Caches.Cursor
+                 := Exchange.Site.Get_Template
+                    (Page.Elements,
+                     Arguments,
+                     Lookup_Template => False);
+            begin
+               Render_Page (Template, Exchange, Page);
+            end;
 
          when Commands.Element_Or_Template =>
-            Sub_Render
-              (Exchange, Page, Arguments,
-               Lookup_Element => True,
-               Lookup_Template => True);
+            declare
+               Template : S_Expressions.Caches.Cursor
+                 := Exchange.Site.Get_Template (Page.Elements, Arguments);
+            begin
+               Render_Page (Template, Exchange, Page);
+            end;
 
          when Commands.My_Tags =>
             if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
@@ -150,88 +147,17 @@ package body Natools.Web.Pages is
                Page.Tags);
 
          when Commands.Template =>
-            Sub_Render (Exchange, Page, Arguments, Lookup_Template => True);
+            declare
+               Template : S_Expressions.Caches.Cursor
+                 := Exchange.Site.Get_Template
+                    (Page.Elements,
+                     Arguments,
+                     Lookup_Element => False);
+            begin
+               Render_Page (Template, Exchange, Page);
+            end;
       end case;
    end Render;
-
-
-   procedure Render_Page is new S_Expressions.Interpreter_Loop
-     (Sites.Exchange, Page_Data, Render, Append);
-
-
-   procedure Sub_Render
-     (Exchange : in out Sites.Exchange;
-      Page : in Page_Data;
-      Expression : in out S_Expressions.Lockable.Descriptor'Class;
-      Lookup_Element : in Boolean := False;
-      Lookup_Template : in Boolean := False)
-   is
-      use type S_Expressions.Events.Event;
-   begin
-      if (Lookup_Element or Lookup_Template)
-        and then Expression.Current_Event = S_Expressions.Events.Add_Atom
-      then
-         declare
-            Name : constant S_Expressions.Atom := Expression.Current_Atom;
-         begin
-            Expression.Next;
-            Sub_Render
-              (Exchange, Page,
-               Name, Expression,
-               Lookup_Element, Lookup_Template);
-         end;
-      else
-         Render_Page (Expression, Exchange, Page);
-      end if;
-   end Sub_Render;
-
-
-   procedure Sub_Render
-     (Exchange : in out Sites.Exchange;
-      Page : in Page_Data;
-      Name : in S_Expressions.Atom;
-      Fallback : in out S_Expressions.Lockable.Descriptor'Class;
-      Lookup_Element : in Boolean;
-      Lookup_Template : in Boolean)
-   is
-      Template : S_Expressions.Caches.Cursor;
-      Found : Boolean;
-   begin
-      if Lookup_Element then
-         Page.Get_Element (Name, Template, Found);
-
-         if Found then
-            Render_Page (Template, Exchange, Page);
-            return;
-         end if;
-      end if;
-
-      if Lookup_Template then
-         Exchange.Site.Get_Template (Name, Template, Found);
-
-         if Found then
-            Render_Page (Template, Exchange, Page);
-            return;
-         end if;
-      end if;
-
-      case Fallback.Current_Event is
-         when S_Expressions.Events.Close_List
-           | S_Expressions.Events.End_Of_Input
-           | S_Expressions.Events.Error
-         =>
-            Log (Severities.Error,
-              "Page expression """
-              & S_Expressions.To_String (Name)
-              & """ not found");
-            return;
-
-         when S_Expressions.Events.Open_List
-           | S_Expressions.Events.Add_Atom
-         =>
-            Render_Page (Fallback, Exchange, Page);
-      end case;
-   end Sub_Render;
 
 
 
@@ -311,7 +237,7 @@ package body Natools.Web.Pages is
 
       declare
          Accessor : constant Data_Refs.Accessor := Object.Ref.Query;
-         Null_Expression : S_Expressions.Caches.Cursor;
+         Expression : S_Expressions.Caches.Cursor;
       begin
          Check_Method :
          declare
@@ -329,13 +255,15 @@ package body Natools.Web.Pages is
             end if;
          end Check_Method;
 
-         Sub_Render
-           (Exchange,
-            Accessor.Data.all,
+         Expression := Exchange.Site.Get_Template
+           (Accessor.Data.Elements,
+            Expression,
             Exchange.Site.Default_Template,
-            Null_Expression,
             Lookup_Element => True,
-            Lookup_Template => True);
+            Lookup_Template => True,
+            Lookup_Name => True);
+
+         Render_Page (Expression, Exchange, Accessor.Data.all);
       end;
    end Respond;
 
