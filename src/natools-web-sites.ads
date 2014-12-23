@@ -19,7 +19,6 @@
 -- pages (i.e. a website).                                                  --
 ------------------------------------------------------------------------------
 
-with Ada.Streams;
 with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
@@ -91,20 +90,8 @@ package Natools.Web.Sites is
 
 
    package Page_Maps is new Constant_Indefinite_Ordered_Maps
-     (S_Expressions.Atom, Page'Class, Ada.Streams."<");
+     (S_Expressions.Atom, Page'Class, S_Expressions."<");
 
-
-   type Visible is interface;
-
-   procedure Render
-     (Exchange : in out Sites.Exchange;
-      Object : in Visible;
-      Expression : in out S_Expressions.Lockable.Descriptor'Class)
-     is abstract;
-
-
-   package Visible_Maps is new Constant_Indefinite_Ordered_Maps
-     (S_Expressions.Atom, Visible'Class, Ada.Streams."<");
 
 private
 
