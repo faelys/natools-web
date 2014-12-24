@@ -188,7 +188,7 @@ package body Natools.Web.Pages is
    ----------------------
 
    function Create
-     (File_Path, Web_Path : in S_Expressions.Atom)
+     (File_Path, Web_Path : in S_Expressions.Atom_Refs.Immutable_Reference)
      return Page_Ref
    is
       function Create_Page return Page_Data;
@@ -196,13 +196,11 @@ package body Natools.Web.Pages is
       function Create_Page return Page_Data is
          Reader : Natools.S_Expressions.File_Readers.S_Reader
            := Natools.S_Expressions.File_Readers.Reader
-              (S_Expressions.To_String (File_Path));
+              (S_Expressions.To_String (File_Path.Query));
       begin
          return Result : Page_Data
-           := (File_Path =>
-                  S_Expressions.Atom_Ref_Constructors.Create (File_Path),
-               Web_Path =>
-                  S_Expressions.Atom_Ref_Constructors.Create (Web_Path),
+           := (File_Path => File_Path,
+               Web_Path => Web_Path,
                Tags => <>,
                Elements => <>)
          do
@@ -266,5 +264,38 @@ package body Natools.Web.Pages is
          Render_Page (Expression, Exchange, Accessor.Data.all);
       end;
    end Respond;
+
+
+
+   -----------------------
+   -- Page Constructors --
+   -----------------------
+
+   function Create (File : in S_Expressions.Atom)
+     return Sites.Page_Loader'Class is
+   begin
+      return Loader'(File_Path
+        => S_Expressions.Atom_Ref_Constructors.Create (File));
+   end Create;
+
+
+   overriding procedure Load
+     (Object : in out Loader;
+      Builder : in out Sites.Site_Builder;
+      Path : in S_Expressions.Atom)
+   is
+      Page : constant Page_Ref := Create
+        (Object.File_Path,
+         S_Expressions.Atom_Ref_Constructors.Create (Path));
+   begin
+      Sites.Insert (Builder, Path, Page);
+      Sites.Insert (Builder, Page.Get_Tags, Page);
+   end Load;
+
+
+   procedure Register_Loader (Site : in out Sites.Site) is
+   begin
+      Site.Register ("page", Create'Access);
+   end Register_Loader;
 
 end Natools.Web.Pages;

@@ -20,24 +20,24 @@ with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.Sites;
 with Natools.Web.Error_Pages;
-with Natools.Web.Pages;
 
 package body Natools.Web.Sites is
 
    procedure Add_Page
      (Builder : in out Site_Builder;
+      Constructor : in Page_Constructor;
       File_Root : in S_Expressions.Atom;
       Path_Root : in S_Expressions.Atom);
 
    procedure Add_Page
      (Builder : in out Site_Builder;
-      Context : in Meaningless_Type;
+      Constructor : in Page_Constructor;
       File_Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
 
    procedure Add_Page_Simple
      (Builder : in out Site_Builder;
-      Context : in Meaningless_Type;
+      Constructor : in Page_Constructor;
       Common_Name : in S_Expressions.Atom);
 
    procedure Get_Page
@@ -121,10 +121,26 @@ package body Natools.Web.Sites is
 
    procedure Add_Page
      (Builder : in out Site_Builder;
+      Constructor : in Page_Constructor;
       File_Root : in S_Expressions.Atom;
       Path_Root : in S_Expressions.Atom)
    is
       use type S_Expressions.Atom;
+
+      function Get_Loader (File : S_Expressions.Atom) return Page_Loader'Class;
+
+      function Get_Loader
+        (File : S_Expressions.Atom) return Page_Loader'Class
+      is
+         Cursor : constant Page_Loaders.Cursor
+           := Builder.Old_Loaders.Find (File);
+      begin
+         if Page_Loaders.Has_Element (Cursor) then
+            return Page_Loaders.Element (Cursor);
+         else
+            return Constructor (File);
+         end if;
+      end Get_Loader;
 
       File : constant S_Expressions.Atom
         := Builder.File_Prefix.Query.Data.all
@@ -134,41 +150,39 @@ package body Natools.Web.Sites is
         := Builder.Path_Prefix.Query.Data.all
          & Path_Root
          & Builder.Path_Suffix.Query.Data.all;
-      Page : constant Pages.Page_Ref := Pages.Create (File, Path);
+
+      Loader : Page_Loader'Class := Get_Loader (File);
    begin
-      Builder.Pages.Insert (Path, Page);
-      Tags.Register (Builder.Tags, Page.Get_Tags, Page);
+      Load (Loader, Builder, Path);
+      Builder.New_Loaders.Insert (File, Loader);
    end Add_Page;
 
 
    procedure Add_Page
      (Builder : in out Site_Builder;
-      Context : in Meaningless_Type;
+      Constructor : in Page_Constructor;
       File_Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
-      pragma Unreferenced (Context);
       use type S_Expressions.Events.Event;
    begin
       if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
-         Add_Page (Builder, File_Name, Arguments.Current_Atom);
+         Add_Page (Builder, Constructor, File_Name, Arguments.Current_Atom);
       end if;
    end Add_Page;
 
 
    procedure Add_Page_Simple
      (Builder : in out Site_Builder;
-      Context : in Meaningless_Type;
-      Common_Name : in S_Expressions.Atom)
-   is
-      pragma Unreferenced (Context);
+      Constructor : in Page_Constructor;
+      Common_Name : in S_Expressions.Atom) is
    begin
-      Add_Page (Builder, Common_Name, Common_Name);
+      Add_Page (Builder, Constructor, Common_Name, Common_Name);
    end Add_Page_Simple;
 
 
    procedure Add_Pages is new S_Expressions.Interpreter_Loop
-     (Site_Builder, Meaningless_Type, Add_Page, Add_Page_Simple);
+     (Site_Builder, Page_Constructor, Add_Page, Add_Page_Simple);
 
 
    procedure Execute
@@ -180,11 +194,34 @@ package body Natools.Web.Sites is
       pragma Unreferenced (Context);
       package Commands renames Natools.Static_Maps.Web.Sites;
       use type S_Expressions.Events.Event;
+      use type S_Expressions.Atom;
+      use type S_Expressions.Octet;
+      use type S_Expressions.Offset;
    begin
       case Commands.To_Command (S_Expressions.To_String (Name)) is
          when Commands.Error =>
-            Log (Severities.Error, "Unknown site command """
-              & S_Expressions.To_String (Name) & '"');
+            declare
+               Cursor : Page_Constructors.Cursor
+                 := Builder.Constructors.Find (Name);
+            begin
+               if not Page_Constructors.Has_Element (Cursor)
+                 and then Name'Length > 1
+                 and then Name (Name'Last) = Character'Pos ('s')
+               then
+                  Cursor := Builder.Constructors.Find
+                    (Name (Name'First .. Name'Last - 1));
+               end if;
+
+               if Page_Constructors.Has_Element (Cursor) then
+                  Add_Pages
+                    (Arguments,
+                     Builder,
+                     Page_Constructors.Element (Cursor));
+               else
+                  Log (Severities.Error, "Unknown site command """
+                    & S_Expressions.To_String (Name) & '"');
+               end if;
+            end;
 
          when Commands.Set_Default_Template =>
             Set_If_Possible (Builder.Default_Template, Arguments);
@@ -217,15 +254,30 @@ package body Natools.Web.Sites is
 
          when Commands.Set_Templates =>
             Containers.Set_Expressions (Builder.Templates, Arguments);
-
-         when Commands.Site_Map =>
-            Add_Pages (Arguments, Builder, Meaningless_Value);
       end case;
    end Execute;
 
 
    procedure Interpreter is new S_Expressions.Interpreter_Loop
      (Site_Builder, Meaningless_Type, Execute);
+
+
+   procedure Insert
+     (Builder : in out Site_Builder;
+      Path : in S_Expressions.Atom;
+      New_Page : in Page'Class) is
+   begin
+      Builder.Pages.Insert (Path, New_Page);
+   end Insert;
+
+
+   procedure Insert
+     (Builder : in out Site_Builder;
+      Tags : in Web.Tags.Tag_List;
+      Visible : in Web.Tags.Visible'Class) is
+   begin
+      Web.Tags.Register (Builder.Tags, Tags, Visible);
+   end Insert;
 
 
    procedure Update
@@ -241,6 +293,15 @@ package body Natools.Web.Sites is
    -- Site Public Interface --
    ---------------------------
 
+   procedure Register
+     (Self : in out Site;
+      Name : in String;
+      Constructor : in Page_Constructor) is
+   begin
+      Self.Constructors.Insert (S_Expressions.To_Atom (Name), Constructor);
+   end Register;
+
+
    procedure Reload (Object : in out Site) is
       Reader : S_Expressions.File_Readers.S_Reader
         := S_Expressions.File_Readers.Reader
@@ -249,10 +310,13 @@ package body Natools.Web.Sites is
         := S_Expressions.Atom_Ref_Constructors.Create
            (S_Expressions.Null_Atom);
       Builder : Site_Builder
-        := (Default_Template
+        := (Constructors => Object.Constructors'Access,
+            Default_Template
               => S_Expressions.Atom_Refs.Null_Immutable_Reference,
             File_Prefix => Empty_Atom,
             File_Suffix => Empty_Atom,
+            New_Loaders => <>,
+            Old_Loaders => Object.Loaders,
             Path_Prefix => Empty_Atom,
             Path_Suffix => Empty_Atom,
             Pages | Static | Tags | Templates => <>);
@@ -260,6 +324,7 @@ package body Natools.Web.Sites is
       Update (Builder, Reader);
 
       Object.Default_Template := Builder.Default_Template;
+      Object.Loaders := Page_Loaders.Create (Builder.New_Loaders);
       Object.Pages := Page_Maps.Create (Builder.Pages);
       Object.Static := Containers.Create (Builder.Static);
       Object.Tags := Tags.Create (Builder.Tags);

@@ -14,12 +14,12 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Lockable;
 with Natools.Web.Sites;
 with Natools.Web.Tags;
 
 private with Natools.References;
-private with Natools.S_Expressions.Atom_Refs;
 private with Natools.S_Expressions.Caches;
 private with Natools.Storage_Pools;
 private with Natools.Web.Containers;
@@ -29,7 +29,7 @@ package Natools.Web.Pages is
    type Page_Ref is new Tags.Visible and Sites.Page with private;
 
    function Create
-     (File_Path, Web_Path : in S_Expressions.Atom)
+     (File_Path, Web_Path : in S_Expressions.Atom_Refs.Immutable_Reference)
      return Page_Ref;
 
    function Get_Tags (Page : Page_Ref) return Tags.Tag_List;
@@ -43,6 +43,19 @@ package Natools.Web.Pages is
      (Object : in out Page_Ref;
       Exchange : in out Sites.Exchange;
       Extra_Path : in S_Expressions.Atom);
+
+
+   type Loader is new Sites.Page_Loader with private;
+
+   overriding procedure Load
+     (Object : in out Loader;
+      Builder : in out Sites.Site_Builder;
+      Path : in S_Expressions.Atom);
+
+   function Create (File : in S_Expressions.Atom)
+     return Sites.Page_Loader'Class;
+
+   procedure Register_Loader (Site : in out Sites.Site);
 
 private
 
@@ -71,5 +84,10 @@ private
 
    function Get_Tags (Page : Page_Ref) return Tags.Tag_List
      is (Page.Ref.Query.Data.Tags);
+
+
+   type Loader is new Sites.Page_Loader with record
+      File_Path : S_Expressions.Atom_Refs.Immutable_Reference;
+   end record;
 
 end Natools.Web.Pages;

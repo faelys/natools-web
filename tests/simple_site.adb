@@ -20,6 +20,7 @@ with Ada.Text_IO;
 with AWS.Config;
 with AWS.Server;
 with Common;
+with Natools.Web.Pages;
 with Natools.Web.Sites;
 with Syslog.Guess.App_Name;
 with Syslog.Guess.Hostname;
@@ -41,6 +42,8 @@ begin
       Syslog.Set_Default_Facility (Syslog.Facilities.Daemon);
       Natools.Web.Log := Common.Syslog_Log'Access;
    end if;
+
+   Natools.Web.Pages.Register_Loader (Common.Site);
 
    if Ada.Command_Line.Argument_Count >= 1 then
       Natools.Web.Sites.Reset (Common.Site, Ada.Command_Line.Argument (1));

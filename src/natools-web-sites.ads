@@ -26,6 +26,7 @@ with Natools.Web.Containers;
 with Natools.Web.Exchanges;
 with Natools.Web.Tags;
 
+private with Ada.Containers.Indefinite_Ordered_Maps;
 private with Natools.S_Expressions.Atom_Refs;
 
 package Natools.Web.Sites is
@@ -88,10 +89,47 @@ package Natools.Web.Sites is
      is abstract
      with Pre'Class => not Exchanges.Has_Response (Exchange.Backend.all);
 
-
    package Page_Maps is new Constant_Indefinite_Ordered_Maps
      (S_Expressions.Atom, Page'Class, S_Expressions."<");
 
+
+   type Site_Builder (<>) is limited private;
+      --  Temporary representation of Site objects while they are being built
+
+   procedure Insert
+     (Builder : in out Site_Builder;
+      Path : in S_Expressions.Atom;
+      New_Page : in Page'Class);
+      --  Add to Builder a new page with the given web path
+
+   procedure Insert
+     (Builder : in out Site_Builder;
+      Tags : in Web.Tags.Tag_List;
+      Visible : in Web.Tags.Visible'Class);
+      --  Add to Builder a new Visible with the given tags
+
+
+   type Page_Loader is interface;
+
+   procedure Load
+     (Object : in out Page_Loader;
+      Builder : in out Site_Builder;
+      Path : in S_Expressions.Atom)
+     is abstract;
+      --  Create pages and register them in Builder
+
+
+   type Page_Constructor is not null access function
+     (File_Name : in S_Expressions.Atom)
+     return Page_Loader'Class;
+      --  Create a page loader associated with the given file name
+
+   procedure Register
+     (Self : in out Site;
+      Name : in String;
+      Constructor : in Page_Constructor);
+      --  Regeister Constructor for Name in Self.
+      --  WARNING: it is not safe to call this procedure concurrently
 
 private
 
@@ -100,19 +138,31 @@ private
       Site : not null access Sites.Site)
      is limited null record;
 
+   package Page_Loaders is new Constant_Indefinite_Ordered_Maps
+     (S_Expressions.Atom, Page_Loader'Class, S_Expressions.Less_Than);
+
+   package Page_Constructors is new Ada.Containers.Indefinite_Ordered_Maps
+     (S_Expressions.Atom, Page_Constructor, S_Expressions.Less_Than);
+
    type Site is tagged limited record
+      Constructors : aliased Page_Constructors.Map;
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
+      Loaders : Page_Loaders.Constant_Map;
       Pages : Page_Maps.Updatable_Map;
       Static : Containers.Atom_Array_Refs.Immutable_Reference;
       Tags : Web.Tags.Tag_DB;
       Templates : Containers.Expression_Maps.Constant_Map;
    end record;
 
-   type Site_Builder is record
+   type Site_Builder
+     (Constructors : not null access Page_Constructors.Map)
+   is limited record
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
+      New_Loaders : Page_Loaders.Unsafe_Maps.Map;
+      Old_Loaders : Page_Loaders.Constant_Map;
       Path_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       Path_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Pages : Page_Maps.Unsafe_Maps.Map;
