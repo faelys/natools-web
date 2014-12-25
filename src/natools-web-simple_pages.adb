@@ -17,11 +17,11 @@
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Atom_Ref_Constructors;
-with Natools.Static_Maps.Web.Pages;
+with Natools.Static_Maps.Web.Simple_Pages;
 with Natools.Web.Error_Pages;
 with Natools.Web.Exchanges;
 
-package body Natools.Web.Pages is
+package body Natools.Web.Simple_Pages is
 
    procedure Append
      (Exchange : in out Sites.Exchange;
@@ -59,7 +59,7 @@ package body Natools.Web.Pages is
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
       pragma Unreferenced (Context);
-      package Components renames Natools.Static_Maps.Web.Pages;
+      package Components renames Natools.Static_Maps.Web.Simple_Pages;
    begin
       case Components.To_Component (S_Expressions.To_String (Name)) is
          when Components.Error =>
@@ -98,7 +98,7 @@ package body Natools.Web.Pages is
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
       use type S_Expressions.Events.Event;
-      package Commands renames Natools.Static_Maps.Web.Pages;
+      package Commands renames Natools.Static_Maps.Web.Simple_Pages;
    begin
       case Commands.To_Command (S_Expressions.To_String (Name)) is
          when Commands.Unknown_Command =>
@@ -295,7 +295,7 @@ package body Natools.Web.Pages is
 
    procedure Register_Loader (Site : in out Sites.Site) is
    begin
-      Site.Register ("page", Create'Access);
+      Site.Register ("simple-page", Create'Access);
    end Register_Loader;
 
-end Natools.Web.Pages;
+end Natools.Web.Simple_Pages;

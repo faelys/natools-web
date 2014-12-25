@@ -1,7 +1,7 @@
---  Generated at 2014-12-12 23:56:29 +0000 by Natools.Static_Hash_Maps
---  from src/natools-web-pages-maps.sx
+--  Generated at 2014-12-25 22:09:31 +0000 by Natools.Static_Hash_Maps
+--  from src/natools-web-simple_pages-maps.sx
 
-package Natools.Static_Maps.Web.Pages is
+package Natools.Static_Maps.Web.Simple_Pages is
    pragma Pure;
 
    type Command is
@@ -70,4 +70,4 @@ private
          Elements,
          Elements);
 
-end Natools.Static_Maps.Web.Pages;
+end Natools.Static_Maps.Web.Simple_Pages;

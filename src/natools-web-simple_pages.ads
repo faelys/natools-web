@@ -14,6 +14,12 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+------------------------------------------------------------------------------
+-- Natools.Web.Simple_Pages provides a simple implementation of Sites.Page  --
+-- and Tags.Visible, representing a single page in a usual blog-style       --
+-- static site.                                                             --
+------------------------------------------------------------------------------
+
 with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Lockable;
 with Natools.Web.Sites;
@@ -24,7 +30,7 @@ private with Natools.S_Expressions.Caches;
 private with Natools.Storage_Pools;
 private with Natools.Web.Containers;
 
-package Natools.Web.Pages is
+package Natools.Web.Simple_Pages is
 
    type Page_Ref is new Tags.Visible and Sites.Page with private;
 
@@ -90,4 +96,4 @@ private
       File_Path : S_Expressions.Atom_Refs.Immutable_Reference;
    end record;
 
-end Natools.Web.Pages;
+end Natools.Web.Simple_Pages;

@@ -1,6 +1,6 @@
 with Interfaces; use Interfaces;
 
-package body Natools.Static_Maps.Web.Pages.Components is
+package body Natools.Static_Maps.Web.Simple_Pages.Components is
 
    P : constant array (0 .. 0) of Natural :=
      (0 .. 0 => 1);
@@ -29,4 +29,4 @@ package body Natools.Static_Maps.Web.Pages.Components is
       return (Natural (G (F1)) + Natural (G (F2))) mod 3;
    end Hash;
 
-end Natools.Static_Maps.Web.Pages.Components;
+end Natools.Static_Maps.Web.Simple_Pages.Components;
