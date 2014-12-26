@@ -1,0 +1,61 @@
+(Natools.Static_Maps.Web.Tag_Pages
+   pure
+   (test-function T)
+   (extra-decl "\
+   type Command is
+     (Unknown_Command,
+      Current_Tag,
+      Element,
+      Element_Or_Template,
+      If_Index,
+      If_Slash_Index,
+      If_Slashless_Index,
+      If_Tag,
+      Root_Tag,
+      Template);
+
+   type Component is
+     (Unknown_Component,
+      Elements,
+      Index_Elements,
+      No_Slash_Index,
+      No_Slash_Redirect,
+      No_Slashless_Index,
+      No_Slashless_Redirect,
+      Root,
+      Slash_Index_Elements,
+      Slash_Redirect,
+      Slashless_Index_Elements,
+      Slashless_Redirect,
+      Tag_Elements);")
+   (Command
+      (hash-package Natools.Static_Maps.Web.Tag_Pages.Commands)
+      (function To_Command)
+      (not-found Unknown_Command)
+      (nodes
+         (Element   element)
+         (Current_Tag   current-tag current)
+         (Element_Or_Template   render element-or-template)
+         (If_Index   if-index)
+         (If_Slash_Index   if-slash-index)
+         (If_Slashless_Index   if-slashless-index)
+         (If_Tag   if-tag if-child)
+         (Root_Tag   root-tag root)
+         (Template   template)))
+   (Component
+      (hash-package Natools.Static_Maps.Web.Tag_Pages.Components)
+      (function To_Component)
+      (not-found Unknown_Component)
+      (nodes
+         (Elements   elements)
+         (Index_Elements   index-elements)
+         (No_Slash_Index   no-slash no-slash-index)
+         (No_Slash_Redirect   no-slash-redirect)
+         (No_Slashless_Index   no-slashless no-slashless-index)
+         (No_Slashless_Redirect   no-slashless-redirect)
+         (Root   root root-tag)
+         (Slash_Index_Elements slash-elements slash-index-elements)
+         (Slash_Redirect   slash-redirect redirect-slash-index redirect-index-to-slashless redirect-to-slashless)
+         (Slashless_Index_Elements   slashless-elements slashless-index-elements)
+         (Slashless_Redirect   slashless-redirect redirect-slashless-index redirect-index-to-slash redirect-to-slash)
+         (Tag_Elements   tag-elements))))

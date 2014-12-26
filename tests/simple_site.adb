@@ -22,6 +22,7 @@ with AWS.Server;
 with Common;
 with Natools.Web.Simple_Pages;
 with Natools.Web.Sites;
+with Natools.Web.Tag_Pages;
 with Syslog.Guess.App_Name;
 with Syslog.Guess.Hostname;
 with Syslog.Transport.Send_Task;
@@ -44,6 +45,7 @@ begin
    end if;
 
    Natools.Web.Simple_Pages.Register_Loader (Common.Site);
+   Natools.Web.Tag_Pages.Register_Loader (Common.Site);
 
    if Ada.Command_Line.Argument_Count >= 1 then
       Natools.Web.Sites.Reset (Common.Site, Ada.Command_Line.Argument (1));
