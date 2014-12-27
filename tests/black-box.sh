@@ -50,3 +50,6 @@ check /style.css ../data/static/style.css
 check /non-existant 404.html
 check /first 405.html -d ''
 check /index index.html
+check /tags/topic1 tags-topic1.html
+check /tags/topic2 tags-topic2.html
+check /tags/topic3 tags-topic3.html

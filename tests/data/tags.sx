@@ -1,0 +1,8 @@
+(root tags)
+(tag-elements
+   (title "Tag " (current (name (2))))
+   (main-text "<p>Pages:</p>\n"
+      (current "<ul>\n"
+         (all-elements (render "<li>" (element title) "</li>\n"))
+         "</ul>\n"))
+   (sidebar ""))

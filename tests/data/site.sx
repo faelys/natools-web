@@ -5,3 +5,4 @@
 (static-paths data/maintenance data/static)
 (template-file data/templates.sx)
 (simple-pages index first second third)
+(tag-page tags)
