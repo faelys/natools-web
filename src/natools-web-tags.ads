@@ -71,7 +71,7 @@ package Natools.Web.Tags is
      (Exchange : in out Sites.Exchange;
       DB : in Tag_DB;
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
-      Parent_Tags : in Tag_List := Empty_Tag_List);
+      Caller_Tags : in Tag_List := Empty_Tag_List);
       --  Render Expression as 'tag_name tag_template' or a list of such expr
 
    procedure Render
@@ -94,7 +94,7 @@ package Natools.Web.Tags is
    function Get_Tag
      (DB : in Tag_DB;
       Name : in S_Expressions.Atom;
-      Parent_Tags : in Tag_List := Empty_Tag_List)
+      Caller_Tags : in Tag_List := Empty_Tag_List)
      return Tag_Contents;
       --  Obtain tags contents from its name.
       --  Return an empty object when there is no tag with Name.
@@ -158,9 +158,11 @@ private
    end record;
 
    type Tag_Contents is record
-      Current_Element : Page_Maps.Cursor;
+      Caller_Tags : Tag_List;
       Position : Tag_Maps.Cursor;
    end record;
+
+   function Current_Element (Tag : Tag_Contents) return Page_Maps.Cursor;
 
    function Is_Empty (Tag : Tag_Contents) return Boolean
      is (not Tag_Maps.Has_Element (Tag.Position));
