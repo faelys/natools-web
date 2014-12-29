@@ -4,7 +4,10 @@
    (extra-decl "\
    type List_Command is
      (Unknown_List_Command,
+      All_Children,
+      All_Descendants,
       All_Elements,
+      All_Leaves,
       Current_Element,
       Greater_Elements,
       Full_Name,
@@ -16,7 +19,10 @@
       (function To_List_Command)
       (not-found Unknown_List_Command)
       (nodes
+         (All_Children   all-children)
+         (All_Descendants   all-descendants)
          (All_Elements   all-elements)
+         (All_Leaves   all-leaves)
          (Current_Element   current-element)
          (Greater_Elements   greater-elements)
          (Full_Name   full-name)

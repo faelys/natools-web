@@ -99,8 +99,9 @@ package Natools.Web.Tags is
       --  Obtain tags contents from its name.
       --  Return an empty object when there is no tag with Name.
 
+   function Has_Element (Tag : Tag_Contents) return Boolean;
    function Is_Empty (Tag : Tag_Contents) return Boolean;
-      --  Return whether Tag is empty
+      --  Return whether Tag is empty or has an element
 
    procedure Render
      (Exchange : in out Sites.Exchange;
@@ -158,11 +159,15 @@ private
    end record;
 
    type Tag_Contents is record
+      DB : Tag_DB;
       Caller_Tags : Tag_List;
       Position : Tag_Maps.Cursor;
    end record;
 
    function Current_Element (Tag : Tag_Contents) return Page_Maps.Cursor;
+
+   function Has_Element (Tag : Tag_Contents) return Boolean
+     is (Tag_Maps.Has_Element (Tag.Position));
 
    function Is_Empty (Tag : Tag_Contents) return Boolean
      is (not Tag_Maps.Has_Element (Tag.Position));
@@ -217,6 +222,33 @@ private
      (Iterator : Tag_List_Iterator;
       Position : Tag_List_Cursor)
      return Tag_List_Cursor;
+
+
+   type Recursion_Kind is (Children, Descendants, Leaves);
+
+   package Tag_Iterators is new Ada.Iterator_Interfaces
+     (Tag_Contents, Has_Element);
+
+   type Tag_Iterator is new Tag_Iterators.Reversible_Iterator with record
+      DB : Tag_DB;
+      Caller_Tags : Tag_List;
+      First : Tag_Maps.Cursor;
+      Last : Tag_Maps.Cursor;
+      Prefix_Length : S_Expressions.Count;
+      Recursion : Recursion_Kind;
+   end record;
+
+   overriding function First (Iterator : Tag_Iterator) return Tag_Contents;
+
+   overriding function Last (Iterator : Tag_Iterator) return Tag_Contents;
+
+   overriding function Next
+     (Iterator : Tag_Iterator; Position : Tag_Contents) return Tag_Contents;
+
+   overriding function Previous
+     (Iterator : Tag_Iterator; Position : Tag_Contents) return Tag_Contents;
+
+
 
    Empty_Description : constant Tag_Description := (Tag | Key => <>);
 

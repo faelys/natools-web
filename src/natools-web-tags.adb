@@ -48,6 +48,16 @@ package body Natools.Web.Tags is
    Path_Separator : constant S_Expressions.Octet := Character'Pos ('/');
 
 
+   function Is_Child (Name : S_Expressions.Atom; Iterator : Tag_Iterator)
+     return Boolean
+     is (Name'First + Iterator.Prefix_Length in Name'Range
+         and then Name (Name'First + Iterator.Prefix_Length) = Path_Separator
+         and then (for all I
+                   in Name'First + Iterator.Prefix_Length + 1 .. Name'Last
+                   => Name (I) /= Path_Separator));
+      --  Check whether Name represents a direct child of the parent tag
+      --  of Iterator.
+
    function Is_Prefix (Small, Large : S_Expressions.Atom) return Boolean
      is (Small'Length <= Large'Length
      and then Small = Large (Large'First .. Large'First + Small'Length - 1));
@@ -73,6 +83,16 @@ package body Natools.Web.Tags is
       Proceed : not null access procedure (Pos : in out Tag_List_Cursor))
      return Tag_List_Cursor;
       --  Repeatedly apply Proceed to Position until it has the correct prefix
+
+   procedure Adjust_Backward
+     (Position : in out Tag_Contents;
+      Iterator : in Tag_Iterator);
+      --  Update Position backwards until it is allowed by Iterator
+
+   procedure Adjust_Forward
+     (Position : in out Tag_Contents;
+      Iterator : in Tag_Iterator);
+      --  Update Position forwards until it is allowed by Iterator
 
    procedure Append
      (List : in out Tag_List;
@@ -101,6 +121,21 @@ package body Natools.Web.Tags is
      return S_Expressions.Atom_Refs.Immutable_Reference
      renames S_Expressions.Atom_Ref_Constructors.Create;
       --  Create an atom reference
+
+   function First_Descendant (Tag : Tag_Contents) return Tag_Maps.Cursor;
+      --  Return the smallest descendant of Tag
+
+   function Is_Allowed
+     (Position : in Tag_Contents;
+      Iterator : in Tag_Iterator)
+     return Boolean;
+      --  Check whether Position is allowed by Iterator or should be skipped
+
+   function Is_Leaf (Name : S_Expressions.Atom; DB : Tag_DB) return Boolean;
+      --  Return whether Name designates a leaf tag in DB
+
+   function Last_Descendant (Tag : Tag_Contents) return Tag_Maps.Cursor;
+      --  Return the greatest descendant of Tag
 
    function Name_Components
      (Name : Processed_Name;
@@ -165,6 +200,9 @@ package body Natools.Web.Tags is
    procedure Render_List is new List_Templates.Render
      (Tag_List_Iterators);
 
+   procedure Render_Tags is new List_Templates.Render
+     (Tag_Iterators);
+
 
 
    ------------------------------
@@ -209,6 +247,42 @@ package body Natools.Web.Tags is
 
       return Result;
    end Adjust;
+
+
+   procedure Adjust_Backward
+     (Position : in out Tag_Contents;
+      Iterator : in Tag_Iterator) is
+   begin
+      loop
+         if Tag_Maps.Has_Element (Position.Position)
+           and then Tag_Maps."<" (Position.Position, Iterator.First)
+         then
+            Tag_Maps.Clear (Position.Position);
+         end if;
+
+         exit when Is_Allowed (Position, Iterator);
+
+         Tag_Maps.Previous (Position.Position);
+      end loop;
+   end Adjust_Backward;
+
+
+   procedure Adjust_Forward
+     (Position : in out Tag_Contents;
+      Iterator : in Tag_Iterator) is
+   begin
+      loop
+         if Tag_Maps.Has_Element (Position.Position)
+           and then Tag_Maps."<" (Iterator.Last, Position.Position)
+         then
+            Tag_Maps.Clear (Position.Position);
+         end if;
+
+         exit when Is_Allowed (Position, Iterator);
+
+         Tag_Maps.Next (Position.Position);
+      end loop;
+   end Adjust_Forward;
 
 
    procedure Append
@@ -273,6 +347,73 @@ package body Natools.Web.Tags is
    end Create;
 
 
+   function First_Descendant (Tag : Tag_Contents) return Tag_Maps.Cursor is
+      Prefix : constant S_Expressions.Atom
+        := Tag_Maps.Key (Tag.Position) & (1 => Path_Separator);
+      Result : constant Tag_Maps.Cursor := Tag.DB.Internal.Ceiling (Prefix);
+   begin
+      if Tag_Maps.Has_Element (Result)
+        and then Is_Prefix (Prefix, Tag_Maps.Key (Result))
+      then
+         return Result;
+      else
+         return Tag_Maps.No_Element;
+      end if;
+   end First_Descendant;
+
+
+   function Is_Allowed
+     (Position : in Tag_Contents;
+      Iterator : in Tag_Iterator)
+     return Boolean is
+   begin
+      if not Tag_Maps.Has_Element (Position.Position) then
+         return True;
+      end if;
+
+      case Iterator.Recursion is
+         when Children =>
+            return Is_Child (Tag_Maps.Key (Position.Position), Iterator);
+
+         when Descendants =>
+            return True;
+
+         when Leaves =>
+            return Is_Leaf (Tag_Maps.Key (Position.Position), Iterator.DB);
+      end case;
+   end Is_Allowed;
+
+
+   function Is_Leaf (Name : S_Expressions.Atom; DB : Tag_DB) return Boolean is
+      Expanded : constant S_Expressions.Atom := Name & (1 => Path_Separator);
+      Cursor : constant Tag_Maps.Cursor := DB.Internal.Ceiling (Expanded);
+   begin
+      return (not Tag_Maps.Has_Element (Cursor))
+        or else not Is_Prefix (Expanded, Tag_Maps.Key (Cursor));
+   end Is_Leaf;
+
+
+   function Last_Descendant (Tag : Tag_Contents) return Tag_Maps.Cursor is
+      Prefix : S_Expressions.Atom
+        := Tag_Maps.Key (Tag.Position) & (1 => Path_Separator + 1);
+      Result : Tag_Maps.Cursor := Tag.DB.Internal.Floor (Prefix);
+   begin
+      if Tag_Maps.Key (Result) = Prefix then
+         Tag_Maps.Previous (Result);
+      end if;
+
+      Prefix (Prefix'Last) := Path_Separator;
+
+      if Tag_Maps.Has_Element (Result)
+        and then Is_Prefix (Prefix, Tag_Maps.Key (Result))
+      then
+         return Result;
+      else
+         return Tag_Maps.No_Element;
+      end if;
+   end Last_Descendant;
+
+
    function Name_Components
      (Name : Processed_Name;
       First_Component, Last_Component : S_Expressions.Offset)
@@ -331,10 +472,46 @@ package body Natools.Web.Tags is
             Log (Severities.Error, "Unknown tag template element """
               & S_Expressions.To_String (Name) & '"');
 
+         when Commands.All_Children =>
+            Render_Tags
+              (Exchange,
+               Tag_Iterator'
+                 (DB => Tag.DB,
+                  Caller_Tags => Tag.Caller_Tags,
+                  First => First_Descendant (Tag),
+                  Last => Last_Descendant (Tag),
+                  Prefix_Length => Tag_Maps.Key (Tag.Position)'Length,
+                  Recursion => Children),
+               List_Templates.Read_Parameters (Arguments));
+
+         when Commands.All_Descendants =>
+            Render_Tags
+              (Exchange,
+               Tag_Iterator'
+                 (DB => Tag.DB,
+                  Caller_Tags => Tag.Caller_Tags,
+                  First => First_Descendant (Tag),
+                  Last => Last_Descendant (Tag),
+                  Prefix_Length => Tag_Maps.Key (Tag.Position)'Length,
+                  Recursion => Descendants),
+               List_Templates.Read_Parameters (Arguments));
+
          when Commands.All_Elements =>
             Render_Pages
               (Exchange,
                Tag_Maps.Element (Tag.Position).Iterate,
+               List_Templates.Read_Parameters (Arguments));
+
+         when Commands.All_Leaves =>
+            Render_Tags
+              (Exchange,
+               Tag_Iterator'
+                 (DB => Tag.DB,
+                  Caller_Tags => Tag.Caller_Tags,
+                  First => First_Descendant (Tag),
+                  Last => Last_Descendant (Tag),
+                  Prefix_Length => Tag_Maps.Key (Tag.Position)'Length,
+                  Recursion => Leaves),
                List_Templates.Read_Parameters (Arguments));
 
          when Commands.Current_Element =>
@@ -885,6 +1062,17 @@ package body Natools.Web.Tags is
    end Current_Element;
 
 
+   overriding function First (Iterator : Tag_Iterator) return Tag_Contents is
+      Result : Tag_Contents
+        := (DB => Iterator.DB,
+            Caller_Tags => Iterator.Caller_Tags,
+            Position => Iterator.First);
+   begin
+      Adjust_Forward (Result, Iterator);
+      return Result;
+   end First;
+
+
    function Get_Tag
      (DB : in Tag_DB;
       Name : in S_Expressions.Atom;
@@ -893,8 +1081,44 @@ package body Natools.Web.Tags is
    begin
       return
         (Position => DB.Internal.Find (Name),
+         DB => DB,
          Caller_Tags => Caller_Tags);
    end Get_Tag;
+
+
+   overriding function Last (Iterator : Tag_Iterator) return Tag_Contents is
+      Result : Tag_Contents
+        := (DB => Iterator.DB,
+            Caller_Tags => Iterator.Caller_Tags,
+            Position => Iterator.Last);
+   begin
+      Adjust_Backward (Result, Iterator);
+      return Result;
+   end Last;
+
+
+   overriding function Next
+     (Iterator : Tag_Iterator; Position : Tag_Contents) return Tag_Contents
+   is
+      Result : Tag_Contents := Position;
+   begin
+      pragma Assert (Tag_Maps.Has_Element (Result.Position));
+      Tag_Maps.Next (Result.Position);
+      Adjust_Forward (Result, Iterator);
+      return Result;
+   end Next;
+
+
+   overriding function Previous
+     (Iterator : Tag_Iterator; Position : Tag_Contents) return Tag_Contents
+   is
+      Result : Tag_Contents := Position;
+   begin
+      pragma Assert (Tag_Maps.Has_Element (Result.Position));
+      Tag_Maps.Previous (Result.Position);
+      Adjust_Backward (Result, Iterator);
+      return Result;
+   end Previous;
 
 
    procedure Render
