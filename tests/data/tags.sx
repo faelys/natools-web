@@ -6,3 +6,17 @@
          (all-elements (render "<li>" (element title) "</li>\n"))
          "</ul>\n"))
    (sidebar ""))
+(index-elements
+   (title "All tags")
+   (main-text
+      (current
+         (all-children
+            (render
+               "<h2>" (name (2)) "</h2>\n<ul>\n"
+               (all-elements (render "<li>" (element title) "<li>\n"))
+               "</ul>\n"))))
+   (sidebar
+      (current
+         "<ul>\n"
+         (all-leaves (render "<li>" (name (2 last)) "</li>\n"))
+         "</ul>\n")))
