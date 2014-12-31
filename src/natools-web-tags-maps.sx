@@ -9,10 +9,16 @@
       All_Elements,
       All_Leaves,
       Current_Element,
+      Greater_Children,
+      Greater_Descendants,
       Greater_Elements,
+      Greater_Leaves,
       Full_Name,
       Last_Name,
+      Lesser_Children,
+      Lesser_Descendants,
       Lesser_Elements,
+      Lesser_Leaves,
       Name);")
    (List_Command
       (hash-package Natools.Static_Maps.Web.Tags.Commands)
@@ -24,8 +30,14 @@
          (All_Elements   all-elements)
          (All_Leaves   all-leaves)
          (Current_Element   current-element)
+         (Greater_Children   greater-children)
+         (Greater_Descendants   greater-descendants)
          (Greater_Elements   greater-elements)
+         (Greater_Leaves   greater-leaves)
          (Full_Name   full-name)
          (Last_Name   last-name)
+         (Lesser_Children   lesser-children)
+         (Lesser_Descendants   lesser-descendants)
          (Lesser_Elements   lesser-elements)
+         (Lesser_Leaves   lesser-leaves)
          (Name   name))))

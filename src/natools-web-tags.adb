@@ -145,6 +145,9 @@ package body Natools.Web.Tags is
          and then Last_Component in 0 .. Name.Separator_Count + 1;
       --  Return the selected path components from Name
 
+   function Parent (Tag : Tag_Contents) return Tag_Contents;
+      --  Return the parent tag of Tag
+
    procedure Render_Components
      (Exchange : in out Sites.Exchange;
       Name : in Processed_Name;
@@ -438,6 +441,34 @@ package body Natools.Web.Tags is
    end Name_Components;
 
 
+   function Parent (Tag : Tag_Contents) return Tag_Contents is
+      Result : Tag_Contents := Tag;
+   begin
+      if Is_Empty (Tag) then
+         return Result;
+      end if;
+
+      declare
+         Name : constant S_Expressions.Atom := Tag_Maps.Key (Tag.Position);
+         Separator : S_Expressions.Offset := Name'Last;
+      begin
+         while Name (Separator) /= Path_Separator loop
+            Separator := Separator - 1;
+
+            if Separator - 1 not in Name'Range then
+               Tag_Maps.Clear (Result.Position);
+               return Result;
+            end if;
+         end loop;
+
+         Result.Position
+           := Result.DB.Internal.Find (Name (Name'First .. Separator - 1));
+      end;
+
+      return Result;
+   end Parent;
+
+
    procedure Render_Components
      (Exchange : in out Sites.Exchange;
       Name : in Processed_Name;
@@ -529,6 +560,30 @@ package body Natools.Web.Tags is
                end if;
             end;
 
+         when Commands.Greater_Children =>
+            Render_Tags
+              (Exchange,
+               Tag_Iterator'
+                 (DB => Tag.DB,
+                  Caller_Tags => Tag.Caller_Tags,
+                  First => Tag_Maps.Next (Tag.Position),
+                  Last => Last_Descendant (Parent (Tag)),
+                  Prefix_Length => Tag_Maps.Key (Parent (Tag).Position)'Length,
+                  Recursion => Children),
+               List_Templates.Read_Parameters (Arguments));
+
+         when Commands.Greater_Descendants =>
+            Render_Tags
+              (Exchange,
+               Tag_Iterator'
+                 (DB => Tag.DB,
+                  Caller_Tags => Tag.Caller_Tags,
+                  First => Tag_Maps.Next (Tag.Position),
+                  Last => Last_Descendant (Parent (Tag)),
+                  Prefix_Length => Tag_Maps.Key (Parent (Tag).Position)'Length,
+                  Recursion => Descendants),
+               List_Templates.Read_Parameters (Arguments));
+
          when Commands.Greater_Elements =>
             declare
                Element : constant Page_Maps.Cursor := Current_Element (Tag);
@@ -551,6 +606,18 @@ package body Natools.Web.Tags is
                end if;
             end;
 
+         when Commands.Greater_Leaves =>
+            Render_Tags
+              (Exchange,
+               Tag_Iterator'
+                 (DB => Tag.DB,
+                  Caller_Tags => Tag.Caller_Tags,
+                  First => Tag_Maps.Next (Tag.Position),
+                  Last => Last_Descendant (Parent (Tag)),
+                  Prefix_Length => Tag_Maps.Key (Parent (Tag).Position)'Length,
+                  Recursion => Leaves),
+               List_Templates.Read_Parameters (Arguments));
+
          when Commands.Full_Name =>
             Exchange.Append (Tag_Maps.Key (Tag.Position));
 
@@ -568,6 +635,30 @@ package body Natools.Web.Tags is
 
                Exchange.Append (Full_Name (I + 1 .. Full_Name'Last));
             end;
+
+         when Commands.Lesser_Children =>
+            Render_Tags
+              (Exchange,
+               Tag_Iterator'
+                 (DB => Tag.DB,
+                  Caller_Tags => Tag.Caller_Tags,
+                  First => First_Descendant (Parent (Tag)),
+                  Last => Tag_Maps.Previous (Tag.Position),
+                  Prefix_Length => Tag_Maps.Key (Parent (Tag).Position)'Length,
+                  Recursion => Children),
+               List_Templates.Read_Parameters (Arguments));
+
+         when Commands.Lesser_Descendants =>
+            Render_Tags
+              (Exchange,
+               Tag_Iterator'
+                 (DB => Tag.DB,
+                  Caller_Tags => Tag.Caller_Tags,
+                  First => First_Descendant (Parent (Tag)),
+                  Last => Tag_Maps.Previous (Tag.Position),
+                  Prefix_Length => Tag_Maps.Key (Parent (Tag).Position)'Length,
+                  Recursion => Descendants),
+               List_Templates.Read_Parameters (Arguments));
 
          when Commands.Lesser_Elements =>
             declare
@@ -590,6 +681,18 @@ package body Natools.Web.Tags is
                     "Lesser_Elements called without current element");
                end if;
             end;
+
+         when Commands.Lesser_Leaves =>
+            Render_Tags
+              (Exchange,
+               Tag_Iterator'
+                 (DB => Tag.DB,
+                  Caller_Tags => Tag.Caller_Tags,
+                  First => First_Descendant (Parent (Tag)),
+                  Last => Tag_Maps.Previous (Tag.Position),
+                  Prefix_Length => Tag_Maps.Key (Parent (Tag).Position)'Length,
+                  Recursion => Leaves),
+               List_Templates.Read_Parameters (Arguments));
 
          when Commands.Name =>
             Render (Arguments, Exchange, Create (Tag_Maps.Key (Tag.Position)));
