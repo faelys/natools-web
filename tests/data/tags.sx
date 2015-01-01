@@ -5,7 +5,12 @@
       (current "<ul>\n"
          (all-elements (render "<li>" (element title) "</li>\n"))
          "</ul>\n"))
-   (sidebar ""))
+   (sidebar
+      "<ul>\n"
+      (current (lesser-children (render "<li>" (name (2)) "</li>\n")))
+      "<li style=\"current\">" (current (name (2))) "</li>\n"
+      (current (greater-children (render "<li>" (name (2)) "</li>\n")))
+      "<ul>\n"))
 (index-elements
    (title "All tags")
    (main-text
