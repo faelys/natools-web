@@ -405,7 +405,7 @@ package body Natools.Web.Sites is
       Get_Page (Object.Pages, Path, Cursor, Extra_Path_First);
 
       if not Page_Maps.Has_Element (Cursor) then
-         Error_Pages.Not_Found (Exchange, Object'Access);
+         Error_Pages.Not_Found (Extended_Exchange);
          return;
       end if;
 
@@ -434,7 +434,7 @@ package body Natools.Web.Sites is
       end loop Response_Loop;
 
       if not Exchanges.Has_Response (Exchange) then
-         Error_Pages.Not_Found (Exchange, Object'Access);
+         Error_Pages.Not_Found (Extended_Exchange);
       end if;
    end Respond;
 

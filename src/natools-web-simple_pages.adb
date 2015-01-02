@@ -244,7 +244,6 @@ package body Natools.Web.Simple_Pages is
          begin
             Error_Pages.Check_Method
               (Exchange,
-               Exchange.Site,
                (GET, HEAD),
                Allowed);
 

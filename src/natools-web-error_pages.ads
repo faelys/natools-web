@@ -28,29 +28,23 @@ private with Natools.S_Expressions;
 package Natools.Web.Error_Pages is
 
    procedure Method_Not_Allowed
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site;
+     (Exchange : in out Sites.Exchange;
       Allow : in Exchanges.Method_Set);
 
-   procedure Not_Found
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site);
+   procedure Not_Found (Exchange : in out Sites.Exchange);
 
 
 
    procedure Check_Method
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site;
+     (Exchange : in out Sites.Exchange;
       Allowed_Set : in Exchanges.Method_Set;
       Allowed : out Boolean);
    procedure Check_Method
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site;
+     (Exchange : in out Sites.Exchange;
       Allowed_Methods : in Exchanges.Method_Array;
       Allowed : out Boolean);
    procedure Check_Method
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site;
+     (Exchange : in out Sites.Exchange;
       Allowed_Method : in Exchanges.Known_Method;
       Allowed : out Boolean);
       --  Check whether the method of Exchange is allowed, and if not
@@ -59,12 +53,12 @@ package Natools.Web.Error_Pages is
 
 private
 
-   type Error_Context (Site : access constant Sites.Site) is record
+   type Error_Context is record
       Code : S_Expressions.Atom (1 .. 3);
    end record;
 
    procedure Main_Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Error_Context);
 
 end Natools.Web.Error_Pages;

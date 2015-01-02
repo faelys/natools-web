@@ -336,7 +336,6 @@ package body Natools.Web.Tag_Pages is
       begin
          Error_Pages.Check_Method
            (Exchange,
-            Exchange.Site,
             (GET, HEAD),
             Allowed);
 

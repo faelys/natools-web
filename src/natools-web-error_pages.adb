@@ -22,16 +22,16 @@ with Natools.Static_Maps.Web.Error_Pages;
 package body Natools.Web.Error_Pages is
 
    procedure Append
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Error_Context;
       Data : in S_Expressions.Atom);
 
    procedure Default_Page
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Error_Context);
 
    procedure Execute
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Error_Context;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
@@ -43,7 +43,7 @@ package body Natools.Web.Error_Pages is
    -------------------------
 
    procedure Append
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Error_Context;
       Data : in S_Expressions.Atom)
    is
@@ -54,7 +54,7 @@ package body Natools.Web.Error_Pages is
 
 
    procedure Default_Page
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Error_Context)
    is
    begin
@@ -73,7 +73,7 @@ package body Natools.Web.Error_Pages is
 
 
    procedure Execute
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Error_Context;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
@@ -101,7 +101,7 @@ package body Natools.Web.Error_Pages is
 
 
    procedure Render is new S_Expressions.Interpreter_Loop
-     (Exchanges.Exchange, Error_Context, Execute, Append);
+     (Sites.Exchange, Error_Context, Execute, Append);
 
 
 
@@ -110,23 +110,21 @@ package body Natools.Web.Error_Pages is
    -----------------------
 
    procedure Main_Render
-     (Exchange : in out Exchanges.Exchange;
+     (Exchange : in out Sites.Exchange;
       Context : in Error_Context)
    is
       use type S_Expressions.Atom;
       Template : S_Expressions.Caches.Cursor;
       Found : Boolean;
    begin
-      Sites.Get_Template
-        (Context.Site.all,
-         S_Expressions.To_Atom ("error-page-") & Context.Code,
+      Exchange.Site.Get_Template
+        (S_Expressions.To_Atom ("error-page-") & Context.Code,
          Template,
          Found);
 
       if not Found then
-         Sites.Get_Template
-           (Context.Site.all,
-            S_Expressions.To_Atom ("error-page"),
+         Exchange.Site.Get_Template
+           (S_Expressions.To_Atom ("error-page"),
             Template,
             Found);
 
@@ -146,61 +144,51 @@ package body Natools.Web.Error_Pages is
    ----------------------
 
    procedure Check_Method
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site;
+     (Exchange : in out Sites.Exchange;
       Allowed_Set : in Exchanges.Method_Set;
       Allowed : out Boolean) is
    begin
       Allowed := Exchanges.Is_In (Exchanges.Method (Exchange), Allowed_Set);
 
       if not Allowed then
-         Method_Not_Allowed (Exchange, Site, Allowed_Set);
+         Method_Not_Allowed (Exchange, Allowed_Set);
       end if;
    end Check_Method;
 
 
    procedure Check_Method
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site;
+     (Exchange : in out Sites.Exchange;
       Allowed_Methods : in Exchanges.Method_Array;
       Allowed : out Boolean) is
    begin
-      Check_Method
-        (Exchange, Site, Exchanges.To_Set (Allowed_Methods), Allowed);
+      Check_Method (Exchange, Exchanges.To_Set (Allowed_Methods), Allowed);
    end Check_Method;
 
 
    procedure Check_Method
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site;
+     (Exchange : in out Sites.Exchange;
       Allowed_Method : in Exchanges.Known_Method;
       Allowed : out Boolean) is
    begin
-      Check_Method (Exchange, Site, (1 => Allowed_Method), Allowed);
+      Check_Method (Exchange, (1 => Allowed_Method), Allowed);
    end Check_Method;
 
 
    procedure Method_Not_Allowed
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site;
+     (Exchange : in out Sites.Exchange;
       Allow : in Exchanges.Method_Set)
    is
       Context : constant Error_Context
-        := (Site => Site,
-            Code => S_Expressions.To_Atom ("405"));
+        := (Code => S_Expressions.To_Atom ("405"));
    begin
       Exchanges.Method_Not_Allowed (Exchange, Allow);
       Main_Render (Exchange, Context);
    end Method_Not_Allowed;
 
 
-   procedure Not_Found
-     (Exchange : in out Exchanges.Exchange;
-      Site : not null access constant Sites.Site)
-   is
+   procedure Not_Found (Exchange : in out Sites.Exchange) is
       Context : constant Error_Context
-        := (Site => Site,
-            Code => S_Expressions.To_Atom ("404"));
+        := (Code => S_Expressions.To_Atom ("404"));
    begin
       Exchanges.Not_Found (Exchange);
       Main_Render (Exchange, Context);
