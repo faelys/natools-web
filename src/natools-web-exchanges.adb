@@ -16,8 +16,11 @@
 
 with AWS.Response.Set;
 with AWS.MIME;
+with Natools.S_Expressions.Atom_Ref_Constructors;
 
 package body Natools.Web.Exchanges is
+
+   package Constructors renames Natools.S_Expressions.Atom_Ref_Constructors;
 
    procedure Ensure_Kind
      (Object : in out Exchange;
@@ -160,6 +163,24 @@ package body Natools.Web.Exchanges is
    end Send_File;
 
 
+   procedure Permanent_Redirect
+     (Object : in out Exchange;
+      Target : in S_Expressions.Atom) is
+   begin
+      Object.Status_Code := AWS.Messages.S301;
+      Object.Location := Constructors.Create (Target);
+   end Permanent_Redirect;
+
+
+   procedure Permanent_Redirect
+     (Object : in out Exchange;
+      Target : in S_Expressions.Atom_Refs.Immutable_Reference) is
+   begin
+      Object.Status_Code := AWS.Messages.S301;
+      Object.Location := Target;
+   end Permanent_Redirect;
+
+
    ---------------------
    -- Response Export --
    ---------------------
@@ -208,6 +229,13 @@ package body Natools.Web.Exchanges is
            (Result,
             AWS.Messages.Allow_Token,
             Image (Object.Allow));
+      end if;
+
+      if not Object.Location.Is_Empty then
+         AWS.Response.Set.Add_Header
+           (Result,
+            AWS.Messages.Location_Token,
+            S_Expressions.To_String (Object.Location.Query));
       end if;
 
       return Result;

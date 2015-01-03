@@ -24,11 +24,10 @@
 
 with AWS.Response;
 with AWS.Status;
-with Natools.S_Expressions;
+with Natools.S_Expressions.Atom_Refs;
 
 private with AWS.Messages;
 private with Natools.S_Expressions.Atom_Buffers;
-private with Natools.S_Expressions.Atom_Refs;
 
 package Natools.Web.Exchanges is
 
@@ -81,6 +80,14 @@ package Natools.Web.Exchanges is
    procedure Not_Found (Object : in out Exchange);
       --  Set internal state to HTTP 404 Not Found
 
+   procedure Permanent_Redirect
+     (Object : in out Exchange;
+      Target : in S_Expressions.Atom);
+   procedure Permanent_Redirect
+     (Object : in out Exchange;
+      Target : in S_Expressions.Atom_Refs.Immutable_Reference);
+      --  Set internal state to HTTP 301 Moved Permanently
+
 private
 
    type Method_Set is array (Known_Method) of Boolean with Pack;
@@ -96,6 +103,7 @@ private
      is tagged limited record
       Allow : Method_Set := (others => False);
       Kind : Responses.Kind := Responses.Empty;
+      Location : S_Expressions.Atom_Refs.Immutable_Reference;
       MIME_Type : S_Expressions.Atom_Refs.Immutable_Reference;
       Response_Body : S_Expressions.Atom_Buffers.Atom_Buffer;
       Status_Code : AWS.Messages.Status_Code := AWS.Messages.S200;
