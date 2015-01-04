@@ -20,10 +20,11 @@
 -- HTTP error code, then "error-page", then a hardcoded fallback.           --
 ------------------------------------------------------------------------------
 
+with Natools.S_Expressions;
 with Natools.Web.Exchanges;
 with Natools.Web.Sites;
 
-private with Natools.S_Expressions;
+private with Natools.S_Expressions.Atom_Refs;
 
 package Natools.Web.Error_Pages is
 
@@ -32,6 +33,10 @@ package Natools.Web.Error_Pages is
       Allow : in Exchanges.Method_Set);
 
    procedure Not_Found (Exchange : in out Sites.Exchange);
+
+   procedure Permanent_Redirect
+     (Exchange : in out Sites.Exchange;
+      Location : in S_Expressions.Atom);
 
 
 
@@ -54,6 +59,7 @@ package Natools.Web.Error_Pages is
 private
 
    type Error_Context is record
+      Location : S_Expressions.Atom_Refs.Immutable_Reference;
       Code : S_Expressions.Atom (1 .. 3);
    end record;
 

@@ -4,6 +4,7 @@
    (extra-decl "\
    type Command is
      (Unknown_Command,
+      Location,
       Message,
       Path,
       Status_Code);")
@@ -12,6 +13,7 @@
       (function To_Command)
       (not-found Unknown_Command)
       (nodes
+         (Location     location)
          (Message      message)
          (Path         path)
          (Status_Code  code status status-code)))
@@ -20,6 +22,7 @@
       (hash-package Natools.Static_Maps.Web.Error_Pages.Messages)
       (function To_Message)
       (nodes
+         ("\"Moved Permanently\"" 301)
          ("\"Not Found\"" 404)
          ("\"Method Not Allowed\"" 405)
          ("\"Gone\""      410))))

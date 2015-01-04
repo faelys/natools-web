@@ -14,6 +14,7 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
 with Natools.S_Expressions.Interpreter_Loop;
@@ -84,6 +85,11 @@ package body Natools.Web.Error_Pages is
       case To_Command (S_Expressions.To_String (Name)) is
          when Unknown_Command =>
             null;
+
+         when Location =>
+            if not Context.Location.Is_Empty then
+               Exchange.Append (Context.Location.Query);
+            end if;
 
          when Message =>
             Exchange.Append
@@ -179,7 +185,8 @@ package body Natools.Web.Error_Pages is
       Allow : in Exchanges.Method_Set)
    is
       Context : constant Error_Context
-        := (Code => S_Expressions.To_Atom ("405"));
+        := (Code => S_Expressions.To_Atom ("405"),
+            Location => <>);
    begin
       Exchanges.Method_Not_Allowed (Exchange, Allow);
       Main_Render (Exchange, Context);
@@ -188,10 +195,24 @@ package body Natools.Web.Error_Pages is
 
    procedure Not_Found (Exchange : in out Sites.Exchange) is
       Context : constant Error_Context
-        := (Code => S_Expressions.To_Atom ("404"));
+        := (Code => S_Expressions.To_Atom ("404"),
+            Location => <>);
    begin
       Exchanges.Not_Found (Exchange);
       Main_Render (Exchange, Context);
    end Not_Found;
+
+
+   procedure Permanent_Redirect
+     (Exchange : in out Sites.Exchange;
+      Location : in S_Expressions.Atom)
+   is
+      Context : constant Error_Context
+        := (Code => S_Expressions.To_Atom ("301"),
+            Location => S_Expressions.Atom_Ref_Constructors.Create (Location));
+   begin
+      Exchange.Permanent_Redirect (Context.Location);
+      Main_Render (Exchange, Context);
+   end Permanent_Redirect;
 
 end Natools.Web.Error_Pages;
