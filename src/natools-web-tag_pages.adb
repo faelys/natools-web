@@ -310,10 +310,29 @@ package body Natools.Web.Tag_Pages is
          Context.Mode := Slashless_Index;
          Context.Current := Tags.Get_Tag
            (Exchange.Site.Get_Tags, Object.Root_Tag.Query);
+
+         if Object.Redirect (Slashless_Index) then
+            Error_Pages.Permanent_Redirect
+              (Exchange,
+               S_Expressions.To_Atom (Exchange.Path & '/'));
+            return;
+         end if;
       elsif Extra_Path'Length = 1 then
          Context.Mode := Slash_Index;
          Context.Current := Tags.Get_Tag
            (Exchange.Site.Get_Tags, Object.Root_Tag.Query);
+
+         if Object.Redirect (Slash_Index) then
+            declare
+               Path : constant String := Exchange.Path;
+            begin
+               pragma Assert (Path (Path'Last) = '/');
+               Error_Pages.Permanent_Redirect
+                 (Exchange,
+                  S_Expressions.To_Atom (Path (Path'First .. Path'Last - 1)));
+            end;
+            return;
+         end if;
       else
          Context.Mode := Child;
          Context.Current := Tags.Get_Tag
