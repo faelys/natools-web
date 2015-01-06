@@ -25,3 +25,4 @@
          "<ul>\n"
          (all-leaves (render "<li>" (name (2 last)) "</li>\n"))
          "</ul>\n")))
+(slashless-redirect)

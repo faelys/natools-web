@@ -34,6 +34,17 @@
   </body>
 </html>\n")
 
+(error-page-301 "\
+<html>
+  <head>
+    <title>Error " (code) "</title>
+  </head>
+  <body>
+    <h1>Error " (code) " - " (message) "</h1>
+    <p>" (path) " has moved to <a href=\"" (location) "\">" (location) "</p>
+  </body>
+</html>\n")
+
 (error-page-404 "\
 <html>
   <head>
