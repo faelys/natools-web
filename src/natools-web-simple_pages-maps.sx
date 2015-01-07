@@ -1,4 +1,4 @@
-(Natools.Static_Maps.Web.Pages
+(Natools.Static_Maps.Web.Simple_Pages
    pure
    (test-function T)
    (extra-decl "\
@@ -15,7 +15,7 @@
       Elements,
       Tags);")
    (Command
-      (hash-package Natools.Static_Maps.Web.Pages.Commands)
+      (hash-package Natools.Static_Maps.Web.Simple_Pages.Commands)
       (function To_Command)
       (not-found Unknown_Command)
       (nodes
@@ -25,7 +25,7 @@
          (Tags  pagelist page-list tag tags)
          (Template  template)))
    (Component
-      (hash-package Natools.Static_Maps.Web.Pages.Components)
+      (hash-package Natools.Static_Maps.Web.Simple_Pages.Components)
       (function To_Component)
       (not-found Error)
       (nodes
