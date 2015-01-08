@@ -33,6 +33,25 @@ package body Natools.Web.Containers is
       Value : in out S_Expressions.Lockable.Descriptor'Class);
       --  Insert a new node (Name -> Cache (Value)) in Map
 
+   procedure Add_Expression_Map
+     (Map : in out Expression_Map_Maps.Unsafe_Maps.Map;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Value : in out S_Expressions.Lockable.Descriptor'Class);
+      --  Insert a new node (Name -> Expression_Map (Value)) in Map
+
+
+   procedure List_Reader is new S_Expressions.Interpreter_Loop
+     (Unsafe_Atom_Lists.List, Meaningless_Type,
+      Dispatch_Without_Argument => Add_Atom);
+
+   procedure Map_Map_Reader is new S_Expressions.Interpreter_Loop
+     (Expression_Map_Maps.Unsafe_Maps.Map, Meaningless_Type,
+      Add_Expression_Map);
+
+   procedure Map_Reader is new S_Expressions.Interpreter_Loop
+     (Expression_Maps.Unsafe_Maps.Map, Meaningless_Type, Add_Expression);
+
 
    ------------------------------
    -- Local Helper Subprograms --
@@ -63,13 +82,25 @@ package body Natools.Web.Containers is
    end Add_Expression;
 
 
-   procedure List_Reader is new S_Expressions.Interpreter_Loop
-     (Unsafe_Atom_Lists.List, Meaningless_Type,
-      Dispatch_Without_Argument => Add_Atom);
+   procedure Add_Expression_Map
+     (Map : in out Expression_Map_Maps.Unsafe_Maps.Map;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Value : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      pragma Unreferenced (Context);
+      Expression_Map : Expression_Maps.Constant_Map;
+   begin
+      if Map.Contains (Name) then
+         Log (Severities.Error,
+           "Duplicate name """ & S_Expressions.To_String (Name)
+           & """ in expression map map");
+         return;
+      end if;
 
-
-   procedure Map_Reader is new S_Expressions.Interpreter_Loop
-     (Expression_Maps.Unsafe_Maps.Map, Meaningless_Type, Add_Expression);
+      Set_Expressions (Expression_Map, Value);
+      Map.Insert (Name, Expression_Map);
+   end Add_Expression_Map;
 
 
 
@@ -86,6 +117,17 @@ package body Natools.Web.Containers is
       Map_Reader (Expression_List, New_Map, Meaningless_Value);
       Map.Replace (New_Map);
    end Set_Expressions;
+
+
+   procedure Set_Expression_Maps
+     (Map : in out Expression_Map_Maps.Constant_Map;
+      Expression_Map_List : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      New_Map : Expression_Map_Maps.Unsafe_Maps.Map;
+   begin
+      Map_Map_Reader (Expression_Map_List, New_Map, Meaningless_Value);
+      Map.Replace (New_Map);
+   end Set_Expression_Maps;
 
 
 

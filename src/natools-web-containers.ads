@@ -42,6 +42,18 @@ package Natools.Web.Containers is
       --  (Re)initialize expression database with the given list
 
 
+   package Expression_Map_Maps is new Constant_Indefinite_Ordered_Maps
+     (S_Expressions.Atom,
+      Expression_Maps.Constant_Map,
+      S_Expressions.Less_Than,
+      Expression_Maps."=");
+
+   procedure Set_Expression_Maps
+     (Map : in out Expression_Map_Maps.Constant_Map;
+      Expression_Map_List : in out S_Expressions.Lockable.Descriptor'Class);
+      --  (Re)initialize expression map database with the given list
+
+
 
    package Unsafe_Atom_Lists is
      new Ada.Containers.Indefinite_Doubly_Linked_Lists
