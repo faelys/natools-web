@@ -232,6 +232,21 @@ package body Natools.Web.Sites is
          when Commands.Set_File_Suffix =>
             Set_If_Possible (Builder.File_Suffix, Arguments);
 
+         when Commands.Set_Named_Element_File =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               declare
+                  Reader : S_Expressions.File_Readers.S_Reader
+                    := S_Expressions.File_Readers.Reader
+                       (S_Expressions.To_String (Arguments.Current_Atom));
+               begin
+                  Containers.Set_Expression_Maps
+                    (Builder.Named_Elements, Reader);
+               end;
+            end if;
+
+         when Commands.Set_Named_Elements =>
+            Containers.Set_Expression_Maps (Builder.Named_Elements, Arguments);
+
          when Commands.Set_Path_Prefix =>
             Set_If_Possible (Builder.Path_Prefix, Arguments);
 
@@ -319,12 +334,13 @@ package body Natools.Web.Sites is
             Old_Loaders => Object.Loaders,
             Path_Prefix => Empty_Atom,
             Path_Suffix => Empty_Atom,
-            Pages | Static | Tags | Templates => <>);
+            Named_Elements | Pages | Static | Tags | Templates => <>);
    begin
       Update (Builder, Reader);
 
       Object.Default_Template := Builder.Default_Template;
       Object.Loaders := Page_Loaders.Create (Builder.New_Loaders);
+      Object.Named_Elements := Builder.Named_Elements;
       Object.Pages := Page_Maps.Create (Builder.Pages);
       Object.Static := Containers.Create (Builder.Static);
       Object.Tags := Tags.Create (Builder.Tags);
@@ -523,6 +539,35 @@ package body Natools.Web.Sites is
       else
          return S_Expressions.Caches.Move (Expression);
       end if;
+   end Get_Template;
+
+
+   function Get_Template
+     (Object : in Site;
+      Element_Map_Name : in S_Expressions.Atom;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Name : in S_Expressions.Atom := S_Expressions.Null_Atom;
+      Lookup_Template : in Boolean := True;
+      Lookup_Element : in Boolean := True;
+      Lookup_Name : in Boolean := False)
+     return S_Expressions.Caches.Cursor
+   is
+      Elements : Containers.Expression_Maps.Constant_Map;
+      Cursor : constant Containers.Expression_Map_Maps.Cursor
+        := Object.Named_Elements.Find (Element_Map_Name);
+   begin
+      if Containers.Expression_Map_Maps.Has_Element (Cursor) then
+         Elements := Containers.Expression_Map_Maps.Element (Cursor);
+      end if;
+
+      return Get_Template
+        (Object,
+         Elements,
+         Expression,
+         Name,
+         Lookup_Template,
+         Lookup_Element,
+         Lookup_Name);
    end Get_Template;
 
 

@@ -69,6 +69,17 @@ package Natools.Web.Sites is
       --  If Name is empty and Lookup_Name is true, use the current atom in
       --  Expression as name.
 
+   function Get_Template
+     (Object : in Site;
+      Element_Map_Name : in S_Expressions.Atom;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Name : in S_Expressions.Atom := S_Expressions.Null_Atom;
+      Lookup_Template : in Boolean := True;
+      Lookup_Element : in Boolean := True;
+      Lookup_Name : in Boolean := False)
+     return S_Expressions.Caches.Cursor;
+      --  Same as previous Get_Template using internal named element map
+
    function Default_Template (Object : Site) return S_Expressions.Atom;
       --  Retrieve the default template name
 
@@ -149,6 +160,7 @@ private
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Loaders : Page_Loaders.Constant_Map;
+      Named_Elements : Containers.Expression_Map_Maps.Constant_Map;
       Pages : Page_Maps.Updatable_Map;
       Static : Containers.Atom_Array_Refs.Immutable_Reference;
       Tags : Web.Tags.Tag_DB;
@@ -165,6 +177,7 @@ private
       Old_Loaders : Page_Loaders.Constant_Map;
       Path_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       Path_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
+      Named_Elements : Containers.Expression_Map_Maps.Constant_Map;
       Pages : Page_Maps.Unsafe_Maps.Map;
       Static : Containers.Unsafe_Atom_Lists.List;
       Tags : Web.Tags.Tag_DB_Builder;
