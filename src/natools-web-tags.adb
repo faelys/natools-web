@@ -15,6 +15,7 @@
 ------------------------------------------------------------------------------
 
 with Natools.S_Expressions.Atom_Ref_Constructors;
+with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.Tags;
 with Natools.Web.List_Templates;
@@ -618,6 +619,27 @@ package body Natools.Web.Tags is
                   Recursion => Leaves),
                List_Templates.Read_Parameters (Arguments));
 
+         when Commands.Element =>
+            declare
+               Template : S_Expressions.Caches.Cursor
+                 := Exchange.Site.Get_Template
+                    (Tag_Maps.Key (Tag.Position),
+                     Arguments,
+                     Lookup_Template => False);
+            begin
+               Render (Template, Exchange, Tag);
+            end;
+
+         when Commands.Element_Or_Template =>
+            declare
+               Template : S_Expressions.Caches.Cursor
+                 := Exchange.Site.Get_Template
+                    (Tag_Maps.Key (Tag.Position),
+                     Arguments);
+            begin
+               Render (Template, Exchange, Tag);
+            end;
+
          when Commands.Full_Name =>
             Exchange.Append (Tag_Maps.Key (Tag.Position));
 
@@ -696,6 +718,17 @@ package body Natools.Web.Tags is
 
          when Commands.Name =>
             Render (Arguments, Exchange, Create (Tag_Maps.Key (Tag.Position)));
+
+         when Commands.Template =>
+            declare
+               Template : S_Expressions.Caches.Cursor
+                 := Exchange.Site.Get_Template
+                    (Tag_Maps.Key (Tag.Position),
+                     Arguments,
+                     Lookup_Element => False);
+            begin
+               Render (Template, Exchange, Tag);
+            end;
       end case;
    end Render_Contents;
 
