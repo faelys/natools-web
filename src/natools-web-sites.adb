@@ -23,6 +23,12 @@ with Natools.Web.Error_Pages;
 
 package body Natools.Web.Sites is
 
+   procedure Add_Backend
+     (Builder : in out Site_Builder;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class);
+
    procedure Add_Page
      (Builder : in out Site_Builder;
       Constructor : in Page_Constructor;
@@ -55,6 +61,16 @@ package body Natools.Web.Sites is
    procedure Set_If_Possible
      (Reference : in out S_Expressions.Atom_Refs.Immutable_Reference;
       Expression : in S_Expressions.Lockable.Descriptor'Class);
+
+
+   procedure Add_Backends is new S_Expressions.Interpreter_Loop
+     (Site_Builder, Meaningless_Type, Add_Backend);
+
+   procedure Add_Pages is new S_Expressions.Interpreter_Loop
+     (Site_Builder, Page_Constructor, Add_Page, Add_Page_Simple);
+
+   procedure Interpreter is new S_Expressions.Interpreter_Loop
+     (Site_Builder, Meaningless_Type, Execute);
 
 
    ------------------------------
@@ -119,6 +135,53 @@ package body Natools.Web.Sites is
    -- Site Interpreter --
    ----------------------
 
+   procedure Add_Backend
+     (Builder : in out Site_Builder;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      pragma Unreferenced (Context);
+      use type S_Expressions.Events.Event;
+   begin
+      if Arguments.Current_Event /= S_Expressions.Events.Add_Atom then
+         Log (Severities.Error, "Invalid syntax for backend """
+           & S_Expressions.To_String (Name) & '"');
+         return;
+      end if;
+
+      declare
+         Backend_Type : constant S_Expressions.Atom := Arguments.Current_Atom;
+         Constructor : constant Backend_Constructors.Cursor
+           := Builder.Constructors.Backend.Find (Backend_Type);
+      begin
+         if not Backend_Constructors.Has_Element (Constructor) then
+            Log (Severities.Error, "Unknown backend type """
+              & S_Expressions.To_String (Backend_Type)
+              & """ for backend """
+              & S_Expressions.To_String (Name) & '"');
+            return;
+         end if;
+
+         Arguments.Next;
+
+         declare
+            Backend : constant Backends.Backend'Class
+              := Backend_Constructors.Element (Constructor).all (Arguments);
+            Cursor : Backend_Maps.Unsafe_Maps.Cursor;
+            Inserted : Boolean;
+         begin
+            Builder.Backends.Insert (Name, Backend, Cursor, Inserted);
+
+            if not Inserted then
+               Log (Severities.Error, "Duplicate backend name """
+                 & S_Expressions.To_String (Name) & '"');
+            end if;
+         end;
+      end;
+   end Add_Backend;
+
+
    procedure Add_Page
      (Builder : in out Site_Builder;
       Constructor : in Page_Constructor;
@@ -181,10 +244,6 @@ package body Natools.Web.Sites is
    end Add_Page_Simple;
 
 
-   procedure Add_Pages is new S_Expressions.Interpreter_Loop
-     (Site_Builder, Page_Constructor, Add_Page, Add_Page_Simple);
-
-
    procedure Execute
      (Builder : in out Site_Builder;
       Context : in Meaningless_Type;
@@ -202,13 +261,13 @@ package body Natools.Web.Sites is
          when Commands.Error =>
             declare
                Cursor : Page_Constructors.Cursor
-                 := Builder.Constructors.Find (Name);
+                 := Builder.Constructors.Page.Find (Name);
             begin
                if not Page_Constructors.Has_Element (Cursor)
                  and then Name'Length > 1
                  and then Name (Name'Last) = Character'Pos ('s')
                then
-                  Cursor := Builder.Constructors.Find
+                  Cursor := Builder.Constructors.Page.Find
                     (Name (Name'First .. Name'Last - 1));
                end if;
 
@@ -222,6 +281,9 @@ package body Natools.Web.Sites is
                     & S_Expressions.To_String (Name) & '"');
                end if;
             end;
+
+         when Commands.Set_Backends =>
+            Add_Backends (Arguments, Builder, Meaningless_Value);
 
          when Commands.Set_Default_Template =>
             Set_If_Possible (Builder.Default_Template, Arguments);
@@ -273,8 +335,11 @@ package body Natools.Web.Sites is
    end Execute;
 
 
-   procedure Interpreter is new S_Expressions.Interpreter_Loop
-     (Site_Builder, Meaningless_Type, Execute);
+   function Get_Backend (From : Site_Builder; Name : S_Expressions.Atom)
+     return Backends.Backend'Class is
+   begin
+      return From.Backends.Element (Name);
+   end Get_Backend;
 
 
    procedure Insert
@@ -313,7 +378,18 @@ package body Natools.Web.Sites is
       Name : in String;
       Constructor : in Page_Constructor) is
    begin
-      Self.Constructors.Insert (S_Expressions.To_Atom (Name), Constructor);
+      Self.Constructors.Page.Insert
+        (S_Expressions.To_Atom (Name), Constructor);
+   end Register;
+
+
+   procedure Register
+     (Self : in out Site;
+      Name : in String;
+      Constructor : in Backend_Constructor) is
+   begin
+      Self.Constructors.Backend.Insert
+        (S_Expressions.To_Atom (Name), Constructor);
    end Register;
 
 
@@ -334,10 +410,12 @@ package body Natools.Web.Sites is
             Old_Loaders => Object.Loaders,
             Path_Prefix => Empty_Atom,
             Path_Suffix => Empty_Atom,
-            Named_Elements | Pages | Static | Tags | Templates => <>);
+            Backends | Named_Elements | Pages | Static | Tags | Templates
+              => <>);
    begin
       Update (Builder, Reader);
 
+      Object.Backends := Backend_Maps.Create (Builder.Backends);
       Object.Default_Template := Builder.Default_Template;
       Object.Loaders := Page_Loaders.Create (Builder.New_Loaders);
       Object.Named_Elements := Builder.Named_Elements;
@@ -459,6 +537,14 @@ package body Natools.Web.Sites is
    -------------------------
    -- Site Data Accessors --
    -------------------------
+
+
+   function Get_Backend (From : Site; Name : S_Expressions.Atom)
+     return Backends.Backend'Class is
+   begin
+      return From.Backends.Element (Name);
+   end Get_Backend;
+
 
    function Get_Tags (Object : Site) return Tags.Tag_DB is
    begin

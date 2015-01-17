@@ -4,6 +4,7 @@
    (extra-decl "\
    type Command is
      (Error,
+      Set_Backends,
       Set_Default_Template,
       Set_File_Prefix,
       Set_File_Suffix,
@@ -19,6 +20,7 @@
       (function To_Command)
       (not-found Error)
       (nodes
+         (Set_Backends          backends back-ends)
          (Set_Default_Template  default-template)
          (Set_File_Prefix       file-prefix)
          (Set_File_Suffix       file-suffix)

@@ -22,6 +22,7 @@
 with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
+with Natools.Web.Backends;
 with Natools.Web.Containers;
 with Natools.Web.Exchanges;
 with Natools.Web.Tags;
@@ -44,6 +45,10 @@ package Natools.Web.Sites is
       Exchange : aliased in out Exchanges.Exchange);
       --  Look up internal data to provide a response in Exchange
 
+
+   function Get_Backend (From : Site; Name : S_Expressions.Atom)
+     return Backends.Backend'Class;
+      --  Return a backend from its name, or raise Constraint_Error
 
    function Get_Tags (Object : Site) return Tags.Tag_DB;
       --  Return the whole tag database
@@ -107,6 +112,10 @@ package Natools.Web.Sites is
    type Site_Builder (<>) is limited private;
       --  Temporary representation of Site objects while they are being built
 
+   function Get_Backend (From : Site_Builder; Name : S_Expressions.Atom)
+     return Backends.Backend'Class;
+      --  Return a backend from its name, or raise Constraint_Error
+
    procedure Insert
      (Builder : in out Site_Builder;
       Path : in S_Expressions.Atom;
@@ -142,6 +151,18 @@ package Natools.Web.Sites is
       --  Regeister Constructor for Name in Self.
       --  WARNING: it is not safe to call this procedure concurrently
 
+
+   type Backend_Constructor is not null access function
+     (Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+     return Backends.Backend'Class;
+
+   procedure Register
+     (Self : in out Site;
+      Name : in String;
+      Constructor : in Backend_Constructor);
+      --  Register Constructor for Name in Self
+      --  WARNING: it is not safe to call this procedure concurrently
+
 private
 
    type Exchange
@@ -149,14 +170,27 @@ private
       Site : not null access Sites.Site)
      is limited null record;
 
+   package Backend_Maps is new Constant_Indefinite_Ordered_Maps
+     (S_Expressions.Atom,      Backends.Backend'Class,
+      S_Expressions.Less_Than, Backends."=");
+
+   package Backend_Constructors is new Ada.Containers.Indefinite_Ordered_Maps
+     (S_Expressions.Atom, Backend_Constructor, S_Expressions.Less_Than);
+
    package Page_Loaders is new Constant_Indefinite_Ordered_Maps
      (S_Expressions.Atom, Page_Loader'Class, S_Expressions.Less_Than);
 
    package Page_Constructors is new Ada.Containers.Indefinite_Ordered_Maps
      (S_Expressions.Atom, Page_Constructor, S_Expressions.Less_Than);
 
+   type Constructors_In_Site is record
+      Backend : Backend_Constructors.Map;
+      Page : Page_Constructors.Map;
+   end record;
+
    type Site is tagged limited record
-      Constructors : aliased Page_Constructors.Map;
+      Backends : Backend_Maps.Updatable_Map;
+      Constructors : aliased Constructors_In_Site;
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Loaders : Page_Loaders.Constant_Map;
@@ -168,8 +202,9 @@ private
    end record;
 
    type Site_Builder
-     (Constructors : not null access Page_Constructors.Map)
+     (Constructors : not null access Constructors_In_Site)
    is limited record
+      Backends : Backend_Maps.Unsafe_Maps.Map;
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;

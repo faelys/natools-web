@@ -2,18 +2,18 @@ with Interfaces; use Interfaces;
 
 package body Natools.Static_Maps.Web.Sites.Commands is
 
-   P : constant array (0 .. 3) of Natural :=
-     (1, 7, 12, 14);
+   P : constant array (0 .. 4) of Natural :=
+     (1, 6, 9, 12, 14);
 
-   T1 : constant array (0 .. 3) of Unsigned_8 :=
-     (20, 4, 8, 3);
+   T1 : constant array (0 .. 4) of Unsigned_8 :=
+     (3, 19, 10, 24, 26);
 
-   T2 : constant array (0 .. 3) of Unsigned_8 :=
-     (4, 22, 3, 16);
+   T2 : constant array (0 .. 4) of Unsigned_8 :=
+     (17, 24, 18, 22, 17);
 
-   G : constant array (0 .. 24) of Unsigned_8 :=
-     (0, 0, 0, 0, 4, 8, 4, 0, 2, 11, 7, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9, 1, 4,
-      10, 0);
+   G : constant array (0 .. 28) of Unsigned_8 :=
+     (0, 0, 0, 0, 8, 0, 0, 5, 4, 0, 9, 8, 0, 4, 0, 0, 10, 0, 0, 13, 0, 0, 0,
+      3, 2, 0, 0, 0, 1);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -24,10 +24,10 @@ package body Natools.Static_Maps.Web.Sites.Commands is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 25;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 25;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 29;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 29;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 12;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 14;
    end Hash;
 
 end Natools.Static_Maps.Web.Sites.Commands;
