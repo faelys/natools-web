@@ -22,6 +22,7 @@
 -- should be easy to built for other HTTP backends.                         --
 ------------------------------------------------------------------------------
 
+with Ada.Streams;
 with AWS.Response;
 with AWS.Status;
 with Natools.S_Expressions.Atom_Refs;
@@ -45,7 +46,12 @@ package Natools.Web.Exchanges is
 
 
    type Exchange (Request : access constant AWS.Status.Data)
-     is tagged limited private;
+     is limited new Ada.Streams.Root_Stream_Type with private;
+
+   overriding procedure Read
+     (Stream : in out Exchange;
+      Item : out Ada.Streams.Stream_Element_Array;
+      Last : out Ada.Streams.Stream_Element_Offset);
 
    function Method (Object : Exchange) return Request_Method;
       --  Method requested by client
@@ -65,6 +71,11 @@ package Natools.Web.Exchanges is
      (Object : in out Exchange;
       Data : in S_Expressions.Atom);
       --  Append Data to internal memory buffer in Object
+
+   overriding procedure Write
+     (Stream : in out Exchange;
+      Data : in Ada.Streams.Stream_Element_Array)
+     renames Append;
 
    procedure Send_File
      (Object : in out Exchange;
@@ -100,7 +111,7 @@ private
    end Responses;
 
    type Exchange (Request : access constant AWS.Status.Data)
-     is tagged limited record
+     is limited new Ada.Streams.Root_Stream_Type with record
       Allow : Method_Set := (others => False);
       Kind : Responses.Kind := Responses.Empty;
       Location : S_Expressions.Atom_Refs.Immutable_Reference;

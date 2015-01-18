@@ -118,6 +118,17 @@ package body Natools.Web.Exchanges is
    end Method;
 
 
+   overriding procedure Read
+     (Stream : in out Exchange;
+      Item : out Ada.Streams.Stream_Element_Array;
+      Last : out Ada.Streams.Stream_Element_Offset)
+   is
+      pragma Unreferenced (Stream, Item, Last);
+   begin
+      raise Program_Error with "Reading exchange stream is not implemented";
+   end Read;
+
+
    function Path (Object : Exchange) return String is
    begin
       return AWS.Status.URI (Object.Request.all);
