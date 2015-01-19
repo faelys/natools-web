@@ -22,6 +22,7 @@
 with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Lockable;
+with Natools.Web.Containers;
 
 limited with Natools.Web.Sites;
 
@@ -47,6 +48,12 @@ package Natools.Web.Tags is
 
    procedure Clear (List : in out Tag_List);
       --  Delete everything in List
+
+   function Create
+     (Tag_Names : Containers.Atom_Array;
+      Common_Key : S_Expressions.Atom_Refs.Immutable_Reference)
+     return Tag_List;
+      --  Create a tag list using all the names associated with the same key
 
    procedure Append
      (List : in out Tag_List;

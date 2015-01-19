@@ -831,6 +831,29 @@ package body Natools.Web.Tags is
    end Clear;
 
 
+   function Create
+     (Tag_Names : Containers.Atom_Array;
+      Common_Key : S_Expressions.Atom_Refs.Immutable_Reference)
+     return Tag_List
+   is
+      function Create_Array return Tag_Array;
+
+      function Create_Array return Tag_Array is
+      begin
+         return Result : Tag_Array (1 .. Natural (Tag_Names'Length)) do
+            for I in Result'Range loop
+               Result (I) :=
+                 (Tag => Tag_Names
+                           (S_Expressions.Offset (I) - 1 + Tag_Names'First),
+                  Key => Common_Key);
+            end loop;
+         end return;
+      end Create_Array;
+   begin
+      return (Internal => Tag_Lists.Create (Create_Array'Access));
+   end Create;
+
+
    procedure Append
      (List : in out Tag_List;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
