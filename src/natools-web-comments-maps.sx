@@ -1,0 +1,50 @@
+(Natools.Static_Maps.Web.Comments
+   pure
+   (test-function T)
+   (extra-decl "\
+   package Item is
+      package Command is
+         type Enum is (Unknown, Date, Name, Mail, Link, Text);
+      end Command;
+
+--    package Element is
+--       type Enum is (Unknown, Date, Name, Mail, Link, Text);
+--    end Element;
+   end Item;
+
+   package List is
+      package Command is
+         type Enum is (Unknown, List, Size);
+      end Command;
+
+      package Element is
+         type Enum is (Unknown, Backend, Tags);
+      end Element;
+   end List;")
+
+   (Item.Command.Enum
+      (hash-package Natools.Static_Maps.Web.Comments.Item_Commands)
+      (function To_Item_Command)
+      (not-found Item.Command.Unknown)
+      (nodes
+         (Item.Command.Date  date)
+         (Item.Command.Name  name)
+         (Item.Command.Mail  mail e-mail)
+         (Item.Command.Link  link www site website)
+         (Item.Command.Text  text)))
+
+   (List.Command.Enum
+      (hash-package Natools.Static_Maps.Web.Comments.List_Commands)
+      (function To_List_Command)
+      (not-found List.Command.Unknown)
+      (nodes
+         (List.Command.List  list)
+         (List.Command.Size  size length)))
+
+   (List.Element.Enum
+      (hash-package Natools.Static_Maps.Web.Comments.List_Elements)
+      (function To_List_Element)
+      (not-found List.Element.Unknown)
+      (nodes
+         (List.Element.Backend  backend)
+         (List.Element.Tags  Tags))))
