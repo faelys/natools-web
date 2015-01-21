@@ -29,6 +29,7 @@ private with Natools.References;
 private with Natools.S_Expressions.Caches;
 private with Natools.Storage_Pools;
 private with Natools.Web.Containers;
+private with Natools.Web.Comments;
 
 package Natools.Web.Simple_Pages is
 
@@ -70,6 +71,7 @@ private
       Web_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Elements : Containers.Expression_Maps.Constant_Map;
       Tags : Web.Tags.Tag_List;
+      Comment_List : Comments.Comment_List;
    end record;
 
    procedure Get_Element

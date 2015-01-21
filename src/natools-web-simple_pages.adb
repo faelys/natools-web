@@ -66,6 +66,9 @@ package body Natools.Web.Simple_Pages is
             Log (Severities.Error, "Unknown page component """
               & S_Expressions.To_String (Name) & '"');
 
+         when Components.Comment_List =>
+            Data.Comment_List.Set (Arguments);
+
          when Components.Elements =>
             Containers.Set_Expressions (Data.Elements, Arguments);
 
@@ -103,6 +106,9 @@ package body Natools.Web.Simple_Pages is
       case Commands.To_Command (S_Expressions.To_String (Name)) is
          when Commands.Unknown_Command =>
             null;
+
+         when Commands.Comment_List =>
+            Comments.Render (Exchange, Page.Comment_List, Arguments);
 
          when Commands.Element =>
             declare
@@ -202,7 +208,7 @@ package body Natools.Web.Simple_Pages is
            := (File_Path => File_Path,
                Web_Path => Web_Path,
                Tags => <>,
-               Elements => <>)
+               Comment_List | Elements => <>)
          do
             Read_Page (Reader, Result, Meaningless_Value);
          end return;
@@ -289,6 +295,7 @@ package body Natools.Web.Simple_Pages is
    begin
       Sites.Insert (Builder, Path, Page);
       Sites.Insert (Builder, Page.Get_Tags, Page);
+      Page.Ref.Update.Comment_List.Load (Builder);
    end Load;
 
 
