@@ -20,6 +20,7 @@ with Ada.Text_IO;
 with AWS.Config;
 with AWS.Server;
 with Common;
+with Natools.Web.Backends.Filesystem;
 with Natools.Web.Simple_Pages;
 with Natools.Web.Sites;
 with Natools.Web.Tag_Pages;
@@ -46,6 +47,8 @@ begin
 
    Natools.Web.Simple_Pages.Register_Loader (Common.Site);
    Natools.Web.Tag_Pages.Register_Loader (Common.Site);
+   Common.Site.Register
+     ("directory", Natools.Web.Backends.Filesystem.Create'Access);
 
    if Ada.Command_Line.Argument_Count >= 1 then
       Natools.Web.Sites.Reset (Common.Site, Ada.Command_Line.Argument (1));
