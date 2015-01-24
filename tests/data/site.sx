@@ -1,3 +1,5 @@
+(backends
+   (comments directory data/comments/))
 (default-template html)
 (file-prefix data/)
 (file-suffix .sx)

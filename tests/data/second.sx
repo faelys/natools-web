@@ -1,6 +1,8 @@
 (elements
    (main-text "\
-<p>Data in the second page.</p>\n")
+<p>Data in the second page.</p>\n"
+(render page-comments))
    (footer "<p>Special footer</p>\n")
    (title "Second Page"))
 (tags (2 pages/news tags/topic2 tags/topic3))
+(comments (backend comments 2))

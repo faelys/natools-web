@@ -8,6 +8,7 @@
 (render html-body)
 "    <div class=\"sidebar\">\n"
 (render sidebar
+   "<h1>Side bar</h1>\n"
    "<p>Tags:" (tag-list tags/ (render " " (name (2)))) "</p>\n"
    (tags pages/news
       (lesser-elements reverse (limit 1) (render "<p>Previous: " (element title) "</p>\n"))
@@ -22,6 +23,26 @@
 (html-body
 "<h1>" (element title) "</h1>\n"
 (element main-text))
+
+(page-comments (comments
+   "<h1>Comments</h1>\n<ol>\n"
+   (list (render
+      "<li><p>On "
+      (date
+         (month January February March April May June July
+            August September October November December)
+         " "
+         (day (suffix (th (4 31)) (st 1 21 31) (nd 2 22) (rd 3 23)))
+         " "
+         (year)
+         " at "
+         (hour) ":" (padded-minute))
+      ", "
+      (name)
+      " wrote:</p>\n<blockquote>\n"
+      (text)
+      "</blockquote></li>\n"))
+   "</ol>\n"))
 
 (error-page "\
 <html>
