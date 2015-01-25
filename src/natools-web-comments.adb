@@ -19,7 +19,7 @@
 -- like is commonly found on blogs.                                         --
 ------------------------------------------------------------------------------
 
-with Ada.Containers.Indefinite_Ordered_Sets;
+with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Streams;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
@@ -35,8 +35,8 @@ package body Natools.Web.Comments is
 
    package Static_Maps renames Natools.Static_Maps.Web.Comments;
 
-   package Comment_Sets is new Ada.Containers.Indefinite_Ordered_Sets
-     (Comment_Data);
+   package Comment_Maps is new Ada.Containers.Indefinite_Ordered_Maps
+     (S_Expressions.Atom, Comment_Data, S_Expressions."<");
 
 
    procedure Append
@@ -405,19 +405,19 @@ package body Natools.Web.Comments is
            := Sites.Get_Backend (Builder, Object.Backend_Name.Query);
          Directory : constant S_Expressions.Atom_Refs.Accessor
            := Object.Backend_Path.Query;
-         Set : Comment_Sets.Set;
+         Map : Comment_Maps.Map;
 
          function Create return Comment_Array is
-            Cursor : Comment_Sets.Cursor := Set.First;
+            Cursor : Comment_Maps.Cursor := Map.First;
          begin
             return Result : Comment_Array
-              (1 .. S_Expressions.Offset (Set.Length))
+              (1 .. S_Expressions.Offset (Map.Length))
             do
                for I in Result'Range loop
-                  Result (I) := Comment_Sets.Element (Cursor);
-                  Comment_Sets.Next (Cursor);
+                  Result (I) := Comment_Maps.Element (Cursor);
+                  Comment_Maps.Next (Cursor);
                end loop;
-               pragma Assert (not Comment_Sets.Has_Element (Cursor));
+               pragma Assert (not Comment_Maps.Has_Element (Cursor));
             end return;
          end Create;
 
@@ -426,14 +426,14 @@ package body Natools.Web.Comments is
               := Backend.Read (Directory, Name);
             Reader : S_Expressions.Parsers.Stream_Parser (Input_Stream'Access);
             Comment : Comment_Data;
-            Position : Comment_Sets.Cursor;
+            Position : Comment_Maps.Cursor;
             Inserted : Boolean;
          begin
             Reader.Next;
             Update (Reader, Comment, Meaningless_Value);
             Comment.Id := Create (Name);
 
-            Set.Insert (Comment, Position, Inserted);
+            Map.Insert (Name, Comment, Position, Inserted);
 
             if not Inserted then
                Log (Severities.Error, "Duplicate comment id """

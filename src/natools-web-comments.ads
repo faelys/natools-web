@@ -71,9 +71,6 @@ private
       Text : S_Expressions.Atom_Refs.Immutable_Reference;
    end record;
 
-   function "<" (Left, Right : Comment_Data) return Boolean
-     is (S_Expressions."<" (Left.Id.Query, Right.Id.Query));
-
    procedure Write
      (Comment : in Comment_Data;
       Output : in out S_Expressions.Printers.Printer'Class);
