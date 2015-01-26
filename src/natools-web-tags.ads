@@ -35,6 +35,9 @@ package Natools.Web.Tags is
 
    type Visible is interface;
 
+   type Visible_Access is access constant Visible'Class;
+      --  For weak backward references, use with caution
+
    procedure Render
      (Exchange : in out Sites.Exchange;
       Object : in Visible;
