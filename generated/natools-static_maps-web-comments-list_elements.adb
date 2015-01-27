@@ -12,7 +12,7 @@ package body Natools.Static_Maps.Web.Comments.List_Elements is
      (0 .. 0 => 3);
 
    G : constant array (0 .. 4) of Unsigned_8 :=
-     (0, 1, 0, 0, 0);
+     (0, 0, 0, 1, 0);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;

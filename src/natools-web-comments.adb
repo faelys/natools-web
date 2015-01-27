@@ -41,13 +41,13 @@ package body Natools.Web.Comments is
 
    procedure Append
      (Exchange : in out Sites.Exchange;
-      Context : in Comment_Data;
+      Context : in Comment_List;
       Data : in S_Expressions.Atom);
       --  Append Data to Exchange, ignoring Context
 
    procedure Append
      (Exchange : in out Sites.Exchange;
-      Context : in Comment_List;
+      Context : in Comment_Ref;
       Data : in S_Expressions.Atom);
       --  Append Data to Exchange, ignoring Context
 
@@ -62,12 +62,11 @@ package body Natools.Web.Comments is
       --  Escape '<', '>' and '"', but not '&' since entities are sent by
       --  some clients.
 
-   procedure Render_Comment_Element
+   procedure Render_Comment_Position
      (Exchange : in out Sites.Exchange;
-      Comment : in Comment_Data;
+      Context : in Comment_Ref;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
-      --  Render a command
 
    procedure Render_List_Element
      (Exchange : in out Sites.Exchange;
@@ -92,10 +91,10 @@ package body Natools.Web.Comments is
 
 
    procedure Render is new S_Expressions.Interpreter_Loop
-     (Sites.Exchange, Comment_Data, Render_Comment_Element, Append);
+     (Sites.Exchange, Comment_List, Render_List_Element, Append);
 
    procedure Render is new S_Expressions.Interpreter_Loop
-     (Sites.Exchange, Comment_List, Render_List_Element, Append);
+     (Sites.Exchange, Comment_Ref, Render_Comment_Position, Append);
 
    procedure Render_List is new List_Templates.Render (Comment_Iterators);
 
@@ -113,7 +112,7 @@ package body Natools.Web.Comments is
 
    procedure Append
      (Exchange : in out Sites.Exchange;
-      Context : in Comment_Data;
+      Context : in Comment_List;
       Data : in S_Expressions.Atom)
    is
       pragma Unreferenced (Context);
@@ -124,7 +123,7 @@ package body Natools.Web.Comments is
 
    procedure Append
      (Exchange : in out Sites.Exchange;
-      Context : in Comment_List;
+      Context : in Comment_Ref;
       Data : in S_Expressions.Atom)
    is
       pragma Unreferenced (Context);
@@ -192,17 +191,20 @@ package body Natools.Web.Comments is
    end HTML_Escape;
 
 
-   procedure Render_Comment_Element
+   procedure Render_Comment_Position
      (Exchange : in out Sites.Exchange;
-      Comment : in Comment_Data;
+      Context : in Comment_Ref;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
+      use type Tags.Visible_Access;
       use Static_Maps.Item.Command;
+      Accessor : constant Comment_Array_Refs.Accessor := Context.List.Query;
+      Comment : Comment_Data renames Accessor.Data.Data (Context.Position);
    begin
       case Static_Maps.To_Item_Command (S_Expressions.To_String (Name)) is
          when Unknown =>
-            Log (Severities.Error, "Unknown comment list command """
+            Log (Severities.Error, "Unknown comment command """
               & S_Expressions.To_String (Name) & '"');
 
          when Date =>
@@ -218,10 +220,15 @@ package body Natools.Web.Comments is
          when Link =>
             HTML_Escape (Exchange, Comment.Link.Query);
 
+         when Parent =>
+            if Accessor.Parent /= null then
+               Tags.Render (Exchange, Accessor.Parent.all, Arguments);
+            end if;
+
          when Text =>
             HTML_Escape (Exchange, Comment.Text.Query);
       end case;
-   end Render_Comment_Element;
+   end Render_Comment_Position;
 
 
    procedure Render_List_Element
@@ -247,7 +254,7 @@ package body Natools.Web.Comments is
             S_Expressions.Templates.Integers.Render
               (Exchange,
                Arguments,
-               Integer (List.Comments.Query.Data.all'Length));
+               Integer (List.Comments.Query.Data.Data'Length));
       end case;
    end Render_List_Element;
 
@@ -264,14 +271,14 @@ package body Natools.Web.Comments is
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
       pragma Unreferenced (Context);
-      use Static_Maps.Item.Command;
+      use Static_Maps.Item.Element;
       use type S_Expressions.Events.Event;
    begin
       if Arguments.Current_Event /= S_Expressions.Events.Add_Atom then
          return;
       end if;
 
-      case Static_Maps.To_Item_Command (S_Expressions.To_String (Name)) is
+      case Static_Maps.To_Item_Element (S_Expressions.To_String (Name)) is
          when Unknown =>
             Log (Severities.Error,
               "Unknown comment element """
@@ -290,7 +297,7 @@ package body Natools.Web.Comments is
                     & S_Expressions.To_String (Comment.Id.Query));
             end;
 
-         when Static_Maps.Item.Command.Name =>
+         when Static_Maps.Item.Element.Name =>
             Comment.Name := Create (Arguments.Current_Atom);
 
          when Mail =>
@@ -353,10 +360,7 @@ package body Natools.Web.Comments is
       Object : in Comment_Ref;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
-      Render
-        (Expression,
-         Exchange,
-         Object.List.Query.Data.all (Object.Position));
+      Render (Expression, Exchange, Object);
    end Render;
 
 
@@ -389,16 +393,26 @@ package body Natools.Web.Comments is
    -- Comment List Subprograms --
    ------------------------------
 
+   overriding procedure Finalize (Object : in out Comment_List) is
+   begin
+      if not Object.Comments.Is_Empty then
+         Object.Comments.Update.Parent := null;
+         Object.Comments.Reset;
+      end if;
+   end Finalize;
+
+
    procedure Load
      (Object : in out Comment_List;
-      Builder : in out Sites.Site_Builder) is
+      Builder : in out Sites.Site_Builder;
+      Parent : in Tags.Visible_Access := null) is
    begin
       if Object.Backend_Name.Is_Empty or else Object.Backend_Path.Is_Empty then
          return;
       end if;
 
       declare
-         function Create return Comment_Array;
+         function Create return Comment_Container;
          procedure Process (Name : in S_Expressions.Atom);
 
          Backend : constant Backends.Backend'Class
@@ -407,14 +421,15 @@ package body Natools.Web.Comments is
            := Object.Backend_Path.Query;
          Map : Comment_Maps.Map;
 
-         function Create return Comment_Array is
+         function Create return Comment_Container is
             Cursor : Comment_Maps.Cursor := Map.First;
          begin
-            return Result : Comment_Array
-              (1 .. S_Expressions.Offset (Map.Length))
+            return Result : Comment_Container
+              (S_Expressions.Offset (Map.Length))
             do
-               for I in Result'Range loop
-                  Result (I) := Comment_Maps.Element (Cursor);
+               Result.Parent := Parent;
+               for I in Result.Data'Range loop
+                  Result.Data (I) := Comment_Maps.Element (Cursor);
                   Comment_Maps.Next (Cursor);
                end loop;
                pragma Assert (not Comment_Maps.Has_Element (Cursor));
@@ -450,10 +465,10 @@ package body Natools.Web.Comments is
             Accessor : constant Comment_Array_Refs.Accessor
               := Object.Comments.Query;
          begin
-            for I in Accessor.Data.all'Range loop
+            for I in Accessor.Data.Data'Range loop
                Sites.Insert
                  (Builder,
-                  Tags.Create (Object.Tags.Query, Accessor (I).Id),
+                  Tags.Create (Object.Tags.Query, Accessor.Data (I).Id),
                   Comment_Ref'(Object.Comments, I));
             end loop;
          end;
@@ -491,22 +506,19 @@ package body Natools.Web.Comments is
       Position : in Cursor;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
-      Render
-        (Expression,
-         Exchange,
-         Position.Value.List.Query.Data.all (Position.Value.Position));
+      Render (Expression, Exchange, Position.Value);
    end Render;
 
 
    overriding function First (Object : Comment_Range) return Cursor is
    begin
-      return (Value => (Object.List, Object.List.Query.Data.all'First));
+      return (Value => (Object.List, Object.List.Query.Data.Data'First));
    end First;
 
 
    overriding function Last (Object : Comment_Range) return Cursor is
    begin
-      return (Value => (Object.List, Object.List.Query.Data.all'Last));
+      return (Value => (Object.List, Object.List.Query.Data.Data'Last));
    end Last;
 
 

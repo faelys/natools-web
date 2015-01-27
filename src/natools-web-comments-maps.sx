@@ -4,12 +4,12 @@
    (extra-decl "\
    package Item is
       package Command is
-         type Enum is (Unknown, Date, Name, Mail, Link, Text);
+         type Enum is (Unknown, Date, Name, Mail, Link, Text, Parent);
       end Command;
 
---    package Element is
---       type Enum is (Unknown, Date, Name, Mail, Link, Text);
---    end Element;
+      package Element is
+         type Enum is (Unknown, Date, Name, Mail, Link, Text);
+      end Element;
    end Item;
 
    package List is
@@ -31,7 +31,19 @@
          (Item.Command.Name  name)
          (Item.Command.Mail  mail e-mail)
          (Item.Command.Link  link www site website)
+         (Item.Command.Parent  parent)
          (Item.Command.Text  text)))
+
+   (Item.Element.Enum
+      (hash-package Natools.Static_Maps.Web.Comments.Item_Elements)
+      (function To_Item_Element)
+      (not-found Item.Element.Unknown)
+      (nodes
+         (Item.Element.Date  date)
+         (Item.Element.Name  name)
+         (Item.Element.Mail  mail e-mail)
+         (Item.Element.Link  link www site website)
+         (Item.Element.Text  text)))
 
    (List.Command.Enum
       (hash-package Natools.Static_Maps.Web.Comments.List_Commands)
@@ -47,4 +59,4 @@
       (not-found List.Element.Unknown)
       (nodes
          (List.Element.Backend  backend)
-         (List.Element.Tags  Tags))))
+         (List.Element.Tags  tags))))
