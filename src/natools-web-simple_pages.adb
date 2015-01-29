@@ -171,7 +171,7 @@ package body Natools.Web.Simple_Pages is
    -- Page_Data Interface --
    -------------------------
 
-   procedure Get_Element
+   not overriding procedure Get_Element
      (Data : in Page_Data;
       Name : in S_Expressions.Atom;
       Element : out S_Expressions.Caches.Cursor;
@@ -197,24 +197,26 @@ package body Natools.Web.Simple_Pages is
      (File_Path, Web_Path : in S_Expressions.Atom_Refs.Immutable_Reference)
      return Page_Ref
    is
-      function Create_Page return Page_Data;
+      Page : constant Data_Refs.Data_Access := new Page_Data'
+        (File_Path => File_Path,
+         Web_Path => Web_Path,
+         Tags => <>,
+         Self => null,
+         Comment_List | Elements => <>);
+      Result : constant Page_Ref := (Ref => Data_Refs.Create (Page));
+   begin
+      Page.Self := Tags.Visible_Access (Page);
 
-      function Create_Page return Page_Data is
+      Create_Page :
+      declare
          Reader : Natools.S_Expressions.File_Readers.S_Reader
            := Natools.S_Expressions.File_Readers.Reader
               (S_Expressions.To_String (File_Path.Query));
       begin
-         return Result : Page_Data
-           := (File_Path => File_Path,
-               Web_Path => Web_Path,
-               Tags => <>,
-               Comment_List | Elements => <>)
-         do
-            Read_Page (Reader, Result, Meaningless_Value);
-         end return;
+         Read_Page (Reader, Page.all, Meaningless_Value);
       end Create_Page;
-   begin
-      return (Ref => Data_Refs.Create (Create_Page'Access));
+
+      return Result;
    end Create;
 
 
@@ -227,6 +229,15 @@ package body Natools.Web.Simple_Pages is
         (Expression,
          Exchange,
          Object.Ref.Query.Data.all);
+   end Render;
+
+
+   overriding procedure Render
+     (Exchange : in out Sites.Exchange;
+      Object : in Page_Data;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+   begin
+      Render_Page (Expression, Exchange, Object);
    end Render;
 
 
@@ -295,7 +306,7 @@ package body Natools.Web.Simple_Pages is
    begin
       Sites.Insert (Builder, Path, Page);
       Sites.Insert (Builder, Page.Get_Tags, Page);
-      Page.Ref.Update.Comment_List.Load (Builder);
+      Page.Ref.Update.Comment_List.Load (Builder, Page.Ref.Query.Self);
    end Load;
 
 

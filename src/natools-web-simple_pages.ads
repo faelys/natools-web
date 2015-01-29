@@ -66,7 +66,8 @@ package Natools.Web.Simple_Pages is
 
 private
 
-   type Page_Data is tagged limited record
+   type Page_Data is new Tags.Visible with record
+      Self : Tags.Visible_Access;
       File_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Web_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Elements : Containers.Expression_Maps.Constant_Map;
@@ -74,11 +75,16 @@ private
       Comment_List : Comments.Comment_List;
    end record;
 
-   procedure Get_Element
+   not overriding procedure Get_Element
      (Data : in Page_Data;
       Name : in S_Expressions.Atom;
       Element : out S_Expressions.Caches.Cursor;
       Found : out Boolean);
+
+   overriding procedure Render
+     (Exchange : in out Sites.Exchange;
+      Object : in Page_Data;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
 
 
    package Data_Refs is new References
