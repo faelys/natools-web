@@ -1,0 +1,9 @@
+(elements
+   (main-text (tags (comments
+      "<ul>\n"
+      (all-elements
+         (limit 10)
+         (render "<li>" (date (rfc-3339)) "</li>\n"))
+      "</ul>\n")))
+   (sidebar "")
+   (title "Comment List"))

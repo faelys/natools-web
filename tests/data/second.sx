@@ -5,4 +5,4 @@
    (footer "<p>Special footer</p>\n")
    (title "Second Page"))
 (tags (2 pages/news tags/topic2 tags/topic3))
-(comments (backend comments 2))
+(comments (backend comments 2) (tags comments))

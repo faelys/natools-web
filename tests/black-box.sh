@@ -55,3 +55,4 @@ check /tags/topic2 tags-topic2.html
 check /tags/topic3 tags-topic3.html
 check /tags/ tags.html
 check /tags tags-redirect.html
+check /comments comments.html
