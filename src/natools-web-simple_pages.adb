@@ -145,6 +145,9 @@ package body Natools.Web.Simple_Pages is
                end;
             end if;
 
+         when Commands.Path =>
+            Exchange.Append (Page.Web_Path.Query);
+
          when Commands.Tags =>
             Tags.Render
               (Exchange,

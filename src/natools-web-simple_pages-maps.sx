@@ -8,6 +8,7 @@
       Element,
       Element_Or_Template,
       My_Tags,
+      Path,
       Tags,
       Template);
 
@@ -25,6 +26,7 @@
          (Element   element)
          (Element_Or_Template  render element-or-template)
          (My_Tags  my-tags my-tag-list tag-list)
+         (Path  path)
          (Tags  pagelist page-list tag tags)
          (Template  template)))
    (Component
