@@ -3,7 +3,8 @@
       "<ul>\n"
       (all-elements
          (limit 10)
-         (render "<li>" (date (rfc-3339)) "</li>\n"))
+         (render "<li>" (date (rfc-3339))
+            " on " (parent (render href "???")) "</li>\n"))
       "</ul>\n")))
    (sidebar "")
    (title "Comment List"))

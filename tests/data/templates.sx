@@ -24,6 +24,8 @@
 "<h1>" (element title) "</h1>\n"
 (element main-text))
 
+(href "<a href=\"" (path) "\">" (element title) "</a>")
+
 (page-comments (comments
    "<h1>Comments</h1>\n<ol>\n"
    (list (render
