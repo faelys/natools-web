@@ -99,6 +99,14 @@ package Natools.Web.Exchanges is
       Target : in S_Expressions.Atom_Refs.Immutable_Reference);
       --  Set internal state to HTTP 301 Moved Permanently
 
+   procedure See_Other
+     (Object : in out Exchange;
+      Target : in S_Expressions.Atom);
+   procedure See_Other
+     (Object : in out Exchange;
+      Target : in S_Expressions.Atom_Refs.Immutable_Reference);
+      --  Set internal state to HTTP 303 See Other
+
 private
 
    type Method_Set is array (Known_Method) of Boolean with Pack;

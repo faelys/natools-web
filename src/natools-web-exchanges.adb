@@ -192,6 +192,28 @@ package body Natools.Web.Exchanges is
    end Permanent_Redirect;
 
 
+   procedure See_Other
+     (Object : in out Exchange;
+      Target : in S_Expressions.Atom) is
+   begin
+      See_Other (Object, Constructors.Create (Target));
+   end See_Other;
+
+
+   procedure See_Other
+     (Object : in out Exchange;
+      Target : in S_Expressions.Atom_Refs.Immutable_Reference) is
+   begin
+      if AWS.Status.HTTP_Version (Object.Request.all) = AWS.HTTP_10 then
+         Object.Status_Code := AWS.Messages.S302;
+      else
+         Object.Status_Code := AWS.Messages.S303;
+      end if;
+
+      Object.Location := Target;
+   end See_Other;
+
+
    ---------------------
    -- Response Export --
    ---------------------
