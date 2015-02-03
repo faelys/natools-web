@@ -38,6 +38,10 @@ package Natools.Web.Error_Pages is
      (Exchange : in out Sites.Exchange;
       Location : in S_Expressions.Atom);
 
+   procedure See_Other
+     (Exchange : in out Sites.Exchange;
+      Location : in S_Expressions.Atom);
+
 
 
    procedure Check_Method

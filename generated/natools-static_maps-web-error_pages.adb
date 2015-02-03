@@ -1,4 +1,4 @@
---  Generated at 2015-01-04 17:53:46 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-02-03 21:39:53 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-error_pages-maps.sx
 
 with Natools.Static_Maps.Web.Error_Pages.Commands;
@@ -25,10 +25,12 @@ package body Natools.Static_Maps.Web.Error_Pages is
          when 0 =>
             return "Moved Permanently";
          when 1 =>
-            return "Not Found";
+            return "See Other";
          when 2 =>
-            return "Method Not Allowed";
+            return "Not Found";
          when 3 =>
+            return "Method Not Allowed";
+         when 4 =>
             return "Gone";
       end case;
    end Map_2_Elements;

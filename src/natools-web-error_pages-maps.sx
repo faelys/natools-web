@@ -23,6 +23,7 @@
       (function To_Message)
       (nodes
          ("\"Moved Permanently\"" 301)
+         ("\"See Other\"" 303)
          ("\"Not Found\"" 404)
          ("\"Method Not Allowed\"" 405)
          ("\"Gone\""      410))))

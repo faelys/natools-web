@@ -215,4 +215,17 @@ package body Natools.Web.Error_Pages is
       Main_Render (Exchange, Context);
    end Permanent_Redirect;
 
+
+   procedure See_Other
+     (Exchange : in out Sites.Exchange;
+      Location : in S_Expressions.Atom)
+   is
+      Context : constant Error_Context
+        := (Code => S_Expressions.To_Atom ("303"),
+            Location => S_Expressions.Atom_Ref_Constructors.Create (Location));
+   begin
+      Exchange.See_Other (Context.Location);
+      Main_Render (Exchange, Context);
+   end See_Other;
+
 end Natools.Web.Error_Pages;
