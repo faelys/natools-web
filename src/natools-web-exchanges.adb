@@ -14,6 +14,7 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with AWS.Parameters;
 with AWS.Response.Set;
 with AWS.MIME;
 with Natools.S_Expressions.Atom_Ref_Constructors;
@@ -106,6 +107,21 @@ package body Natools.Web.Exchanges is
    -----------------------
    -- Request Accessors --
    -----------------------
+
+   procedure Iterate_Parameters
+     (Object : in Exchange;
+      Process : not null access procedure (Name, Value : String))
+   is
+      Parameters : constant AWS.Parameters.List
+        := AWS.Status.Parameters (Object.Request.all);
+   begin
+      for I in 1 .. AWS.Parameters.Count (Parameters) loop
+         Process.all
+           (AWS.Parameters.Get_Name (Parameters, I),
+            AWS.Parameters.Get_Value (Parameters, I));
+      end loop;
+   end Iterate_Parameters;
+
 
    function Method (Object : Exchange) return Request_Method is
    begin

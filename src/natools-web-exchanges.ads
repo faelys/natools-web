@@ -53,6 +53,11 @@ package Natools.Web.Exchanges is
       Item : out Ada.Streams.Stream_Element_Array;
       Last : out Ada.Streams.Stream_Element_Offset);
 
+   procedure Iterate_Parameters
+     (Object : in Exchange;
+      Process : not null access procedure (Name, Value : String));
+      --  Iterate over request parameters
+
    function Method (Object : Exchange) return Request_Method;
       --  Method requested by client
 
