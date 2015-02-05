@@ -10,6 +10,10 @@
       package Element is
          type Enum is (Unknown, Date, Name, Mail, Link, Text);
       end Element;
+
+      package Form is
+         type Enum is (Unknown, Name, Mail, Link, Text);
+      end Form;
    end Item;
 
    package List is
@@ -44,6 +48,16 @@
          (Item.Element.Mail  mail e-mail)
          (Item.Element.Link  link www site website)
          (Item.Element.Text  text)))
+
+   (Item.Form.Enum
+      (hash-package Natools.Static_Maps.Web.Comments.Item_Forms)
+      (function To_Item_Form)
+      (not-found Item.Form.Unknown)
+      (nodes
+         (Item.Form.Name  c_name)
+         (Item.Form.Mail  c_mail)
+         (Item.Form.Link  c_site)
+         (Item.Form.Text  c_text)))
 
    (List.Command.Enum
       (hash-package Natools.Static_Maps.Web.Comments.List_Commands)

@@ -1,8 +1,9 @@
---  Generated at 2015-01-27 19:24:23 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-02-05 18:20:56 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 with Natools.Static_Maps.Web.Comments.Item_Commands;
 with Natools.Static_Maps.Web.Comments.Item_Elements;
+with Natools.Static_Maps.Web.Comments.Item_Forms;
 with Natools.Static_Maps.Web.Comments.List_Commands;
 with Natools.Static_Maps.Web.Comments.List_Elements;
 
@@ -32,12 +33,24 @@ package body Natools.Static_Maps.Web.Comments is
    end To_Item_Element;
 
 
+   function To_Item_Form (Key : String) return Item.Form.Enum is
+      N : constant Natural
+        := Natools.Static_Maps.Web.Comments.Item_Forms.Hash (Key);
+   begin
+      if Map_3_Keys (N).all = Key then
+         return Map_3_Elements (N);
+      else
+         return Item.Form.Unknown;
+      end if;
+   end To_Item_Form;
+
+
    function To_List_Command (Key : String) return List.Command.Enum is
       N : constant Natural
         := Natools.Static_Maps.Web.Comments.List_Commands.Hash (Key);
    begin
-      if Map_3_Keys (N).all = Key then
-         return Map_3_Elements (N);
+      if Map_4_Keys (N).all = Key then
+         return Map_4_Elements (N);
       else
          return List.Command.Unknown;
       end if;
@@ -48,8 +61,8 @@ package body Natools.Static_Maps.Web.Comments is
       N : constant Natural
         := Natools.Static_Maps.Web.Comments.List_Elements.Hash (Key);
    begin
-      if Map_4_Keys (N).all = Key then
-         return Map_4_Elements (N);
+      if Map_5_Keys (N).all = Key then
+         return Map_5_Elements (N);
       else
          return List.Element.Unknown;
       end if;

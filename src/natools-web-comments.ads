@@ -19,6 +19,7 @@
 -- like is commonly found on blogs.                                         --
 ------------------------------------------------------------------------------
 
+with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Lockable;
 with Natools.S_Expressions.Printers;
 with Natools.Web.Sites;
@@ -28,7 +29,6 @@ private with Ada.Calendar;
 private with Ada.Finalization;
 private with Ada.Iterator_Interfaces;
 private with Natools.References;
-private with Natools.S_Expressions.Atom_Refs;
 private with Natools.Storage_Pools;
 private with Natools.Web.Containers;
 
@@ -48,7 +48,9 @@ package Natools.Web.Comments is
    procedure Load
      (Object : in out Comment_List;
       Builder : in out Sites.Site_Builder;
-      Parent : in Tags.Visible_Access := null);
+      Parent : in Tags.Visible_Access := null;
+      Parent_Path : in S_Expressions.Atom_Refs.Immutable_Reference
+        := S_Expressions.Atom_Refs.Null_Immutable_Reference);
       --  Load comment list from Builder back-end and register all comments
 
    procedure Render
@@ -56,6 +58,12 @@ package Natools.Web.Comments is
       Object : in Comment_List;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
       --  Render a comment list
+
+   procedure Respond
+     (List : in out Comment_List;
+      Exchange : in out Sites.Exchange;
+      Extra_Path : in S_Expressions.Atom);
+      --  Respond to a request for the comment list
 
    procedure Set
      (List : out Comment_List;
@@ -101,6 +109,7 @@ private
    type Comment_List is new Ada.Finalization.Controlled with record
       Backend_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Backend_Path : S_Expressions.Atom_Refs.Immutable_Reference;
+      Parent_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Comments : Comment_Array_Refs.Reference;
       Tags : Containers.Atom_Array_Refs.Immutable_Reference;
    end record;
@@ -145,6 +154,7 @@ private
      := (Ada.Finalization.Controlled with
          Backend_Name => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Backend_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
+         Parent_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Comments => Comment_Array_Refs.Null_Reference,
          Tags => Containers.Atom_Array_Refs.Null_Immutable_Reference);
 

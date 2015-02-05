@@ -28,7 +28,10 @@ with Natools.S_Expressions.Templates.Dates;
 with Natools.S_Expressions.Templates.Integers;
 with Natools.Static_Maps.Web.Comments;
 with Natools.Time_IO.RFC_3339;
+with Natools.Time_Keys;
 with Natools.Web.Backends;
+with Natools.Web.Error_Pages;
+with Natools.Web.Exchanges;
 with Natools.Web.List_Templates;
 
 package body Natools.Web.Comments is
@@ -37,6 +40,15 @@ package body Natools.Web.Comments is
 
    package Comment_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (S_Expressions.Atom, Comment_Data, S_Expressions."<");
+
+   package String_Maps is new Ada.Containers.Indefinite_Ordered_Maps
+     (String, String);
+
+
+   type Comment_Builder is record
+      Core : Comment_Data;
+      Extra_Fields : String_Maps.Map;
+   end record;
 
 
    procedure Append
@@ -61,6 +73,11 @@ package body Natools.Web.Comments is
       Data : in S_Expressions.Atom);
       --  Escape '<', '>' and '"', but not '&' since entities are sent by
       --  some clients.
+
+   procedure Process_Form
+     (Data : in out Comment_Builder;
+      Exchange : in Sites.Exchange);
+      --  Read form data in Exchange to fill Data
 
    procedure Render_Comment_Position
      (Exchange : in out Sites.Exchange;
@@ -355,6 +372,37 @@ package body Natools.Web.Comments is
    -- Comment Suprograms --
    ------------------------
 
+   procedure Process_Form
+     (Data : in out Comment_Builder;
+      Exchange : in Sites.Exchange)
+   is
+      procedure Process (Field, Value : String);
+
+      procedure Process (Field, Value : String) is
+         use Static_Maps.Item.Form;
+      begin
+         case Static_Maps.To_Item_Form (Field) is
+            when Unknown =>
+               Data.Extra_Fields.Insert (Field, Value);
+
+            when Name =>
+               Data.Core.Name := Create (S_Expressions.To_Atom (Value));
+
+            when Mail =>
+               Data.Core.Mail := Create (S_Expressions.To_Atom (Value));
+
+            when Link =>
+               Data.Core.Link := Create (S_Expressions.To_Atom (Value));
+
+            when Text =>
+               Data.Core.Text := Create (S_Expressions.To_Atom (Value));
+         end case;
+      end Process;
+   begin
+      Exchange.Iterate_Parameters (Process'Access);
+   end Process_Form;
+
+
    overriding procedure Render
      (Exchange : in out Sites.Exchange;
       Object : in Comment_Ref;
@@ -405,11 +453,15 @@ package body Natools.Web.Comments is
    procedure Load
      (Object : in out Comment_List;
       Builder : in out Sites.Site_Builder;
-      Parent : in Tags.Visible_Access := null) is
+      Parent : in Tags.Visible_Access := null;
+      Parent_Path : in S_Expressions.Atom_Refs.Immutable_Reference
+        := S_Expressions.Atom_Refs.Null_Immutable_Reference) is
    begin
       if Object.Backend_Name.Is_Empty or else Object.Backend_Path.Is_Empty then
          return;
       end if;
+
+      Object.Parent_Path := Parent_Path;
 
       declare
          function Create return Comment_Container;
@@ -485,6 +537,52 @@ package body Natools.Web.Comments is
          Render (Expression, Exchange, Object);
       end if;
    end Render;
+
+
+   procedure Respond
+     (List : in out Comment_List;
+      Exchange : in out Sites.Exchange;
+      Extra_Path : in S_Expressions.Atom)
+   is
+      Builder : Comment_Builder;
+   begin
+      if Extra_Path'Length > 0
+        or else List.Backend_Name.Is_Empty
+        or else List.Backend_Path.Is_Empty
+        or else List.Parent_Path.Is_Empty
+      then
+         return;
+      end if;
+
+      Check_Method :
+      declare
+         Allowed : Boolean;
+      begin
+         Error_Pages.Check_Method (Exchange, Exchanges.POST, Allowed);
+
+         if not Allowed then
+            return;
+         end if;
+      end Check_Method;
+
+      Builder.Core.Date := Ada.Calendar.Clock;
+      Builder.Core.Id := Create (S_Expressions.To_Atom
+                           (Time_Keys.To_Key (Builder.Core.Date)));
+      Process_Form (Builder, Exchange);
+
+      Write_Comment :
+      declare
+         Backend : Backends.Backend'Class
+           := Exchange.Site.Get_Backend (List.Backend_Name.Query);
+         Stream : aliased Ada.Streams.Root_Stream_Type'Class
+           := Backend.Create (List.Backend_Path.Query, Builder.Core.Id.Query);
+         Printer : S_Expressions.Printers.Canonical (Stream'Access);
+      begin
+         Write (Builder.Core, Printer);
+      end Write_Comment;
+
+      Error_Pages.See_Other (Exchange, List.Parent_Path.Query);
+   end Respond;
 
 
    procedure Set
