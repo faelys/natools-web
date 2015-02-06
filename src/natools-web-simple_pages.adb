@@ -247,8 +247,18 @@ package body Natools.Web.Simple_Pages is
    overriding procedure Respond
      (Object : in out Page_Ref;
       Exchange : in out Sites.Exchange;
-      Extra_Path : in S_Expressions.Atom) is
+      Extra_Path : in S_Expressions.Atom)
+   is
+      use type S_Expressions.Offset;
    begin
+      if Extra_Path'Length = 9
+        and then S_Expressions.To_String (Extra_Path) = "/comments"
+      then
+         Object.Ref.Update.Comment_List.Respond
+           (Exchange, Extra_Path (Extra_Path'First + 9 .. Extra_Path'Last));
+         return;
+      end if;
+
       if Extra_Path'Length > 0 then
          return;
       end if;
@@ -309,7 +319,12 @@ package body Natools.Web.Simple_Pages is
    begin
       Sites.Insert (Builder, Path, Page);
       Sites.Insert (Builder, Page.Get_Tags, Page);
-      Page.Ref.Update.Comment_List.Load (Builder, Page.Ref.Query.Self);
+
+      declare
+         Mutator : constant Data_Refs.Mutator := Page.Ref.Update;
+      begin
+         Mutator.Comment_List.Load (Builder, Mutator.Self, Mutator.Web_Path);
+      end;
    end Load;
 
 
