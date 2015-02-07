@@ -1,0 +1,16 @@
+(elements
+   (main-text "\
+<p>Data in the fourth page.</p>\n"
+(comments
+   "<h1>Timeless Comments</h1>\n<ol>\n"
+   (list (render
+      "<li><p>"
+      (name)
+      " wrote:</p>\n<blockquote>\n"
+      (text)
+      "</blockquote></li>\n"))
+   "</ol>\n")
+(render comment-form))
+   (title "Fourth Page"))
+(tags (4 pages/news tags/topic3))
+(comments (backend comments 4) (tags comments))

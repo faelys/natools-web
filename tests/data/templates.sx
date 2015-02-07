@@ -46,6 +46,30 @@
       "</blockquote></li>\n"))
    "</ol>\n"))
 
+(comment-form "\
+<form class=\"mainform\" method=\"post\" action=\"" (path) "/comments\">
+  <p><label>Name or nick:
+    <input name=\"c_name\" value=\"\" type=\"text\">
+  </label></p>
+  <p><label>E-mail address:
+    <input name=\"c_mail\" value=\"\" type=\"text\">
+  </label></p>
+  <p><label>Web site:
+    <input name=\"c_site\" value=\"\" type=\"text\">
+  </label></p><!--
+  <p><label>Very special field:
+    <input name=\"address\" value=\"http://\" type=\"text\">
+  </label></p>-->
+  <p><label>Comment text:
+    <textarea name=\"c_text\" cols=\"80\" rows=\"10\"></textarea>
+  </label></p>
+  <p class=\"buttons\">
+    <input value=\"Preview\" name=\"preview\" type=\"submit\">
+    <input value=\"Submit\" name=\"submit\" type=\"submit\">
+  </p>
+</form>
+")
+
 (error-page "\
 <html>
   <head>
@@ -65,6 +89,17 @@
   <body>
     <h1>Error " (code) " - " (message) "</h1>
     <p>" (path) " has moved to <a href=\"" (location) "\">" (location) "</p>
+  </body>
+</html>\n")
+
+(error-page-303 "\
+<html>
+  <head>
+    <title>Error " (code) "</title>
+  </head>
+  <body>
+    <h1>Error " (code) " - " (message) "</h1>
+    <p>Please proceed to <a href=\"" (location) "\">" (location) "</p>
   </body>
 </html>\n")
 

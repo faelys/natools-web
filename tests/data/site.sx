@@ -6,7 +6,7 @@
 (path-prefix /)
 (static-paths data/maintenance data/static)
 (template-file data/templates.sx)
-(simple-pages index comments first second third)
+(simple-pages index comments first second third fourth)
 (tag-page tags)
 (named-elements
    (tags/topic1/subtopic

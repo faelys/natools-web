@@ -56,3 +56,10 @@ check /tags/topic3 tags-topic3.html
 check /tags/ tags.html
 check /tags tags-redirect.html
 check /comments comments.html
+
+check /fourth fourth.html
+check /fourth/comments 405.html
+check /fourth fourth.html
+check /fourth/comments fourth-303.html -F 'c_name=Nobody' -F 'c_mail=' \
+    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_text=Brand new comment posted during the test suite'
