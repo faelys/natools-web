@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -20,6 +20,7 @@ with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.Sites;
 with Natools.Web.Error_Pages;
+with Natools.Web.Sites.Updaters;
 
 package body Natools.Web.Sites is
 
@@ -373,6 +374,16 @@ package body Natools.Web.Sites is
    -- Site Public Interface --
    ---------------------------
 
+   procedure Queue_Update
+     (Object : in Site;
+      Update : in Updates.Site_Update'Class) is
+   begin
+      if Object.Updater /= null then
+         Object.Updater.Queue (Update);
+      end if;
+   end Queue_Update;
+
+
    procedure Register
      (Self : in out Site;
       Name : in String;
@@ -531,6 +542,14 @@ package body Natools.Web.Sites is
          Error_Pages.Not_Found (Extended_Exchange);
       end if;
    end Respond;
+
+
+   procedure Set_Updater
+     (Object : in out Site;
+      Updater : in Updaters.Updater_Access) is
+   begin
+      Object.Updater := Updater;
+   end Set_Updater;
 
 
 

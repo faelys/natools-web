@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -27,12 +27,25 @@ with Natools.Web.Containers;
 with Natools.Web.Exchanges;
 with Natools.Web.Tags;
 
+limited with Natools.Web.Sites.Updaters;
+limited with Natools.Web.Sites.Updates;
+
 private with Ada.Containers.Indefinite_Ordered_Maps;
 private with Natools.S_Expressions.Atom_Refs;
 
 package Natools.Web.Sites is
 
    type Site is tagged limited private;
+
+   procedure Queue_Update
+     (Object : in Site;
+      Update : in Updates.Site_Update'Class);
+      --  Enqueue a pending update for Object
+
+   procedure Set_Updater
+     (Object : in out Site;
+      Updater : in Updaters.Updater_Access);
+      --  Register an updater to handle updates for Object
 
    procedure Reload (Object : in out Site);
       --  Reload Object data from its original file
@@ -199,6 +212,7 @@ private
       Static : Containers.Atom_Array_Refs.Immutable_Reference;
       Tags : Web.Tags.Tag_DB;
       Templates : Containers.Expression_Maps.Constant_Map;
+      Updater : access Updaters.Updater'Class := null;
    end record;
 
    type Site_Builder
