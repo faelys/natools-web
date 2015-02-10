@@ -16,6 +16,12 @@
 
 package body Natools.Web.Sites.Updates is
 
+   procedure Reload (Object : in Site) is
+   begin
+      Object.Queue_Update (Reloader'(null record));
+   end Reload;
+
+
    overriding procedure Update (Self : in Reloader; Object : in out Site) is
       pragma Unreferenced (Self);
    begin

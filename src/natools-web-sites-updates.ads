@@ -32,6 +32,9 @@ package Natools.Web.Sites.Updates is
    overriding procedure Update (Self : in Reloader; Object : in out Site);
       --  Reload site data
 
+   procedure Reload (Object : in Site);
+      --  Enqueue a reloader in Object
+
 
 private
 
