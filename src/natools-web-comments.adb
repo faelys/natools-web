@@ -33,6 +33,7 @@ with Natools.Web.Backends;
 with Natools.Web.Error_Pages;
 with Natools.Web.Exchanges;
 with Natools.Web.List_Templates;
+with Natools.Web.Sites.Updates;
 
 package body Natools.Web.Comments is
 
@@ -582,6 +583,7 @@ package body Natools.Web.Comments is
       end Write_Comment;
 
       Error_Pages.See_Other (Exchange, List.Parent_Path.Query);
+      Sites.Updates.Reload (Exchange.Site.all);
    end Respond;
 
 
