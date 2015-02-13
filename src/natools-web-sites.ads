@@ -22,6 +22,7 @@
 with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
+with Natools.S_Expressions.Printers.Pretty;
 with Natools.Web.Backends;
 with Natools.Web.Containers;
 with Natools.Web.Exchanges;
@@ -100,6 +101,11 @@ package Natools.Web.Sites is
 
    function Default_Template (Object : Site) return S_Expressions.Atom;
       --  Retrieve the default template name
+
+   procedure Set_Parameters
+     (Object : in Site;
+      Printer : in out S_Expressions.Printers.Pretty.Printer'Class);
+      --  Set pretty printer parameters to sitewide values
 
 
    type Exchange
@@ -209,6 +215,7 @@ private
       Loaders : Page_Loaders.Constant_Map;
       Named_Elements : Containers.Expression_Map_Maps.Constant_Map;
       Pages : Page_Maps.Updatable_Map;
+      Printer_Parameters : S_Expressions.Printers.Pretty.Parameters;
       Static : Containers.Atom_Array_Refs.Immutable_Reference;
       Tags : Web.Tags.Tag_DB;
       Templates : Containers.Expression_Maps.Constant_Map;
@@ -228,6 +235,7 @@ private
       Path_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Named_Elements : Containers.Expression_Map_Maps.Constant_Map;
       Pages : Page_Maps.Unsafe_Maps.Map;
+      Printer_Parameters : S_Expressions.Printers.Pretty.Parameters;
       Static : Containers.Unsafe_Atom_Lists.List;
       Tags : Web.Tags.Tag_DB_Builder;
       Templates : Containers.Expression_Maps.Constant_Map;

@@ -18,6 +18,7 @@ with Ada.Directories;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
+with Natools.S_Expressions.Printers.Pretty.Config;
 with Natools.Static_Maps.Web.Sites;
 with Natools.Web.Error_Pages;
 with Natools.Web.Sites.Updaters;
@@ -316,6 +317,10 @@ package body Natools.Web.Sites is
          when Commands.Set_Path_Suffix =>
             Set_If_Possible (Builder.Path_Suffix, Arguments);
 
+         when Commands.Set_Printer =>
+            S_Expressions.Printers.Pretty.Config.Update
+              (Builder.Printer_Parameters, Arguments);
+
          when Commands.Set_Static_Paths =>
             Containers.Append_Atoms (Builder.Static, Arguments);
 
@@ -422,6 +427,7 @@ package body Natools.Web.Sites is
             Path_Prefix => Empty_Atom,
             Path_Suffix => Empty_Atom,
             Backends | Named_Elements | Pages | Static | Tags | Templates
+              | Printer_Parameters
               => <>);
    begin
       Update (Builder, Reader);
@@ -431,6 +437,7 @@ package body Natools.Web.Sites is
       Object.Loaders := Page_Loaders.Create (Builder.New_Loaders);
       Object.Named_Elements := Builder.Named_Elements;
       Object.Pages := Page_Maps.Create (Builder.Pages);
+      Object.Printer_Parameters := Builder.Printer_Parameters;
       Object.Static := Containers.Create (Builder.Static);
       Object.Tags := Tags.Create (Builder.Tags);
       Object.Templates := Builder.Templates;
@@ -680,5 +687,13 @@ package body Natools.Web.Sites is
    begin
       return Object.Default_Template.Query.Data.all;
    end Default_Template;
+
+
+   procedure Set_Parameters
+     (Object : in Site;
+      Printer : in out S_Expressions.Printers.Pretty.Printer'Class) is
+   begin
+      Printer.Set_Parameters (Object.Printer_Parameters);
+   end Set_Parameters;
 
 end Natools.Web.Sites;

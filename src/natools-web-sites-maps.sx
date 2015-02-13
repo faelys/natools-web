@@ -12,6 +12,7 @@
       Set_Named_Elements,
       Set_Path_Prefix,
       Set_Path_Suffix,
+      Set_Printer,
       Set_Static_Paths,
       Set_Template_File,
       Set_Templates);")
@@ -28,6 +29,7 @@
          (Set_Named_Elements    named-elements)
          (Set_Path_Prefix       path-prefix)
          (Set_Path_Suffix       path-suffix)
+         (Set_Printer           printer printer-parameters)
          (Set_Static_Paths      static static-path static-paths)
          (Set_Template_File     template-file)
          (Set_Templates         templates))))

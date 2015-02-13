@@ -1,4 +1,4 @@
---  Generated at 2015-01-17 17:52:23 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-02-13 22:35:28 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-sites-maps.sx
 
 package Natools.Static_Maps.Web.Sites is
@@ -14,6 +14,7 @@ package Natools.Static_Maps.Web.Sites is
       Set_Named_Elements,
       Set_Path_Prefix,
       Set_Path_Suffix,
+      Set_Printer,
       Set_Static_Paths,
       Set_Template_File,
       Set_Templates);
@@ -31,12 +32,14 @@ private
    Map_1_Key_6 : aliased constant String := "named-elements";
    Map_1_Key_7 : aliased constant String := "path-prefix";
    Map_1_Key_8 : aliased constant String := "path-suffix";
-   Map_1_Key_9 : aliased constant String := "static";
-   Map_1_Key_10 : aliased constant String := "static-path";
-   Map_1_Key_11 : aliased constant String := "static-paths";
-   Map_1_Key_12 : aliased constant String := "template-file";
-   Map_1_Key_13 : aliased constant String := "templates";
-   Map_1_Keys : constant array (0 .. 13) of access constant String
+   Map_1_Key_9 : aliased constant String := "printer";
+   Map_1_Key_10 : aliased constant String := "printer-parameters";
+   Map_1_Key_11 : aliased constant String := "static";
+   Map_1_Key_12 : aliased constant String := "static-path";
+   Map_1_Key_13 : aliased constant String := "static-paths";
+   Map_1_Key_14 : aliased constant String := "template-file";
+   Map_1_Key_15 : aliased constant String := "templates";
+   Map_1_Keys : constant array (0 .. 15) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -50,8 +53,10 @@ private
          Map_1_Key_10'Access,
          Map_1_Key_11'Access,
          Map_1_Key_12'Access,
-         Map_1_Key_13'Access);
-   Map_1_Elements : constant array (0 .. 13) of Command
+         Map_1_Key_13'Access,
+         Map_1_Key_14'Access,
+         Map_1_Key_15'Access);
+   Map_1_Elements : constant array (0 .. 15) of Command
      := (Set_Backends,
          Set_Backends,
          Set_Default_Template,
@@ -61,6 +66,8 @@ private
          Set_Named_Elements,
          Set_Path_Prefix,
          Set_Path_Suffix,
+         Set_Printer,
+         Set_Printer,
          Set_Static_Paths,
          Set_Static_Paths,
          Set_Static_Paths,
