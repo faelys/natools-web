@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -22,7 +22,6 @@ with AWS.Server;
 with Common;
 with Natools.Web.Backends.Filesystem;
 with Natools.Web.Simple_Pages;
-with Natools.Web.Sites;
 with Natools.Web.Tag_Pages;
 with Syslog.Guess.App_Name;
 with Syslog.Guess.Hostname;
@@ -45,15 +44,17 @@ begin
       Natools.Web.Log := Common.Syslog_Log'Access;
    end if;
 
-   Natools.Web.Simple_Pages.Register_Loader (Common.Site);
-   Natools.Web.Tag_Pages.Register_Loader (Common.Site);
+   Common.Site.Register
+     ("simple-page", Natools.Web.Simple_Pages.Create'Access);
+   Common.Site.Register
+     ("tag-page", Natools.Web.Tag_Pages.Create'Access);
    Common.Site.Register
      ("directory", Natools.Web.Backends.Filesystem.Create'Access);
 
    if Ada.Command_Line.Argument_Count >= 1 then
-      Natools.Web.Sites.Reset (Common.Site, Ada.Command_Line.Argument (1));
+      Common.Site.Load (Ada.Command_Line.Argument (1));
    else
-      Natools.Web.Sites.Reset (Common.Site, "site.sx");
+      Common.Site.Load ("site.sx");
    end if;
 
    AWS.Server.Start (WS, Common.Respond'Access, AWS.Config.Get_Current);

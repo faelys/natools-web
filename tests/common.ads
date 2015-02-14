@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -21,11 +21,11 @@
 
 with AWS.Response;
 with AWS.Status;
-with Natools.Web.Sites;
+with Natools.Web.Sites.Holders;
 
 package Common is
 
-   Site : Natools.Web.Sites.Site;
+   Site : Natools.Web.Sites.Holders.Holder;
 
    function Respond (Request : AWS.Status.Data) return AWS.Response.Data;
 
