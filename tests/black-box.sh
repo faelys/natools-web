@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2014, Natacha Porté
+# Copyright (c) 2014-2015, Natacha Porté
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -63,3 +63,4 @@ check /fourth fourth.html
 check /fourth/comments fourth-303.html -F 'c_name=Nobody' -F 'c_mail=' \
     -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Brand new comment posted during the test suite'
+check /fourth fourth-commented.html
