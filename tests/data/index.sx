@@ -5,6 +5,6 @@
          (pages
             "<ul>\n"
             (all-elements
-               (render "<li>" (element title) "</li>\n"))
+               (render "<li>" (render href) "</li>\n"))
             "</ul>\n")))
    (sidebar ""))

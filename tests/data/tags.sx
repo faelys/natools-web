@@ -3,13 +3,16 @@
    (title "Tag " (current (name (2))))
    (main-text "<p>Pages:</p>\n"
       (current "<ul>\n"
-         (all-elements (render "<li>" (element title) "</li>\n"))
+         (all-elements (render "<li>" (render href) "</li>\n"))
          "</ul>\n"))
    (sidebar
       "<ul>\n"
-      (current (lesser-children (render "<li>" (name (2)) "</li>\n")))
-      "<li style=\"current\">" (current (name (2))) "</li>\n"
-      (current (greater-children (render "<li>" (name (2)) "</li>\n")))
+      (current
+         (lesser-children (render
+            "<li><a href=\"/tags/" (name (2)) "\">" (name (2)) "</a></li>\n"))
+         "<li style=\"current\">" (name (2)) "</li>\n"
+         (greater-children (render
+            "<li><a href=\"/tags/" (name (2)) "\">" (name (2)) "</a></li>\n")))
       "<ul>\n"))
 (index-elements
    (title "All tags")
@@ -18,7 +21,7 @@
          (all-children
             (render
                "<h2>" (name (2)) "</h2>\n<ul>\n"
-               (all-elements (render "<li>" (element title) "<li>\n"))
+               (all-elements (render "<li>" (render href) "</li>\n"))
                "</ul>\n"))))
    (sidebar
       (current

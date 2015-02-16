@@ -10,6 +10,7 @@
       (text)
       "</blockquote></li>\n"))
    "</ol>\n")
+"<h1>Post a Comment</h1>\n"
 (render comment-form))
    (title "Fourth Page"))
 (tags (4 pages/news tags/topic3))
