@@ -24,6 +24,7 @@ with Ada.Streams;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Parsers;
+with Natools.S_Expressions.Printers.Pretty;
 with Natools.S_Expressions.Templates.Dates;
 with Natools.S_Expressions.Templates.Integers;
 with Natools.Static_Maps.Web.Comments;
@@ -577,8 +578,10 @@ package body Natools.Web.Comments is
            := Exchange.Site.Get_Backend (List.Backend_Name.Query);
          Stream : aliased Ada.Streams.Root_Stream_Type'Class
            := Backend.Create (List.Backend_Path.Query, Builder.Core.Id.Query);
-         Printer : S_Expressions.Printers.Canonical (Stream'Access);
+         Printer : S_Expressions.Printers.Pretty.Stream_Printer
+           (Stream'Access);
       begin
+         Exchange.Site.Set_Parameters (Printer);
          Write (Builder.Core, Printer);
       end Write_Comment;
 
