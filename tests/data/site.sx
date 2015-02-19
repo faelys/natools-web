@@ -17,3 +17,14 @@
       (description "Topic II"))
    (tags/topic3
       (description "Topic III")))
+(printer
+   (newline lf none atom-open close-open close-atom)
+   (space none)
+   (width 79)
+   (indentation 3 spaces)
+   quoted-string-when-shorter
+   (escape octal)
+   (token standard)
+   utf-8
+   upper-case
+   hexadecimal)
