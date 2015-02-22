@@ -20,6 +20,7 @@ with Ada.Text_IO;
 with AWS.Config;
 with AWS.Server;
 with Common;
+with Common.Pages;
 with Natools.Web.Backends.Filesystem;
 with Natools.Web.Simple_Pages;
 with Natools.Web.Tag_Pages;
@@ -48,6 +49,7 @@ begin
      ("simple-page", Natools.Web.Simple_Pages.Create'Access);
    Common.Site.Register
      ("tag-page", Natools.Web.Tag_Pages.Create'Access);
+   Common.Site.Register ("test-page", Common.Pages.Create'Access);
    Common.Site.Register
      ("directory", Natools.Web.Backends.Filesystem.Create'Access);
 

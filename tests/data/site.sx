@@ -8,6 +8,7 @@
 (template-file data/templates.sx)
 (simple-pages index comments first second third fourth)
 (tag-page tags)
+(test-page test)
 (named-elements
    (tags/topic1/subtopic
       (description "Subtopic of topic I"))

@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <title>Test Forms</title>
+  </head>
+  <body>
+    <h1>Test Forms</h1>
+    <h2>General</h2>
+    <form method="post" action="/test">
+      <p class="buttons"><input value="Reload" name="reload" type="submit"></p>
+    </form>
+    <h2>Update queue</h2>
+    <form method="post" action="/test">
+      <p><label>
+        Sleep for: <input name="sleep_update" value="" type="text">
+      </label></p>
+      <p class="buttons"><input value="Sleep" name="submit" type="submit"></p>
+    </form>
+    <form method="post" action="/test">
+      <p><label>
+        Wait for version: <input name="wait_version" value="" type="text">
+      </label></p>
+      <p class="buttons"><input value="Wait" name="submit" type="submit"></p>
+    </form>
+  </body>
+</html>

@@ -57,10 +57,14 @@ check /tags/ tags.html
 check /tags tags-redirect.html
 check /comments comments.html
 
+curl -s -F 'sleep_update=2' "${BASE_URL}/test" >/dev/null
 check /fourth fourth.html
-check /fourth/comments 405.html
-check /fourth fourth.html
-check /fourth/comments fourth-303.html -F 'c_name=Nobody' -F 'c_mail=' \
+chain /fourth/comments 405.html
+chain /fourth fourth.html
+chain /fourth/comments fourth-303.html -F 'c_name=Nobody' -F 'c_mail=' \
     -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Brand new comment posted during the test suite'
-check /fourth fourth-commented.html
+chain /fourth fourth.html
+test -z "${STOPPED}" \
+    && curl -s -F 'wait_version=2' "${BASE_URL}/test" >/dev/null
+chain /fourth fourth-commented.html
