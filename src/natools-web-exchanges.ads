@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -60,6 +60,12 @@ package Natools.Web.Exchanges is
 
    function Method (Object : Exchange) return Request_Method;
       --  Method requested by client
+
+   function Parameter
+     (Object : Exchange;
+      Name : String)
+     return String;
+      --  Access a specific parameter
 
    function Path (Object : Exchange) return String;
       --  Path part of the requested URL

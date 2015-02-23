@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -132,6 +132,16 @@ package body Natools.Web.Exchanges is
          when others          => return Unknown_Method;
       end case;
    end Method;
+
+
+   function Parameter
+     (Object : Exchange;
+      Name : String)
+     return String is
+   begin
+      return AWS.Parameters.Get
+        (AWS.Status.Parameters (Object.Request.all), Name);
+   end Parameter;
 
 
    overriding procedure Read
