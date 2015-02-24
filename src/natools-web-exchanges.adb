@@ -200,6 +200,22 @@ package body Natools.Web.Exchanges is
    end Send_File;
 
 
+   procedure Set_MIME_Type
+     (Object : in out Exchange;
+      MIME_Type : in S_Expressions.Atom)
+   is
+      use type S_Expressions.Count;
+   begin
+      if Object.Response_Body.Length /= 0 then
+         Log (Severities.Warning,
+           "Changing MIME type of partially-created response");
+      end if;
+
+      Object.MIME_Type
+        := S_Expressions.Atom_Ref_Constructors.Create (MIME_Type);
+   end Set_MIME_Type;
+
+
    procedure Permanent_Redirect
      (Object : in out Exchange;
       Target : in S_Expressions.Atom) is

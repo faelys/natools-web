@@ -93,6 +93,11 @@ package Natools.Web.Exchanges is
       File_Name : in S_Expressions.Atom);
       --  Send File_Name as a response in Object
 
+   procedure Set_MIME_Type
+     (Object : in out Exchange;
+      MIME_Type : in S_Expressions.Atom);
+      --  Set the MIME type for the response
+
 
    procedure Method_Not_Allowed
      (Object : in out Exchange;
