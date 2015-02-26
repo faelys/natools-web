@@ -32,6 +32,7 @@ with Natools.Time_IO.RFC_3339;
 with Natools.Time_Keys;
 with Natools.Web.Backends;
 with Natools.Web.Error_Pages;
+with Natools.Web.Escapes;
 with Natools.Web.Exchanges;
 with Natools.Web.List_Templates;
 with Natools.Web.Sites.Updates;
@@ -69,12 +70,6 @@ package body Natools.Web.Comments is
      return S_Expressions.Atom_Refs.Immutable_Reference
      renames S_Expressions.Atom_Ref_Constructors.Create;
       --  Atom expression constructor
-
-   procedure HTML_Escape
-     (Output : in out Sites.Exchange;
-      Data : in S_Expressions.Atom);
-      --  Escape '<', '>' and '"', but not '&' since entities are sent by
-      --  some clients.
 
    procedure Process_Form
      (Data : in out Comment_Builder;
@@ -151,65 +146,6 @@ package body Natools.Web.Comments is
    end Append;
 
 
-   procedure HTML_Escape
-     (Output : in out Sites.Exchange;
-      Data : in S_Expressions.Atom)
-   is
-      use type S_Expressions.Octet;
-      use type S_Expressions.Offset;
-
-      Less_Than : constant S_Expressions.Octet := Character'Pos ('<');
-      Greater_Than : constant S_Expressions.Octet := Character'Pos ('>');
-      Quote : constant S_Expressions.Octet := Character'Pos ('"');
-
-      subtype Octet_To_Escape is S_Expressions.Octet with Static_Predicate
-        => Octet_To_Escape in Less_Than | Greater_Than | Quote;
-
-      Last_Done : S_Expressions.Offset := Data'First - 1;
-      I : S_Expressions.Offset := Data'First;
-   begin
-      Process_All :
-      while I in Data'Range loop
-         Search_Escape :
-         while I in Data'Range and then Data (I) not in Octet_To_Escape loop
-            I := I + 1;
-         end loop Search_Escape;
-
-         if Last_Done + 1 <= I - 1 then
-            Output.Append (Data (Last_Done + 1 .. I - 1));
-            Last_Done := I - 1;
-         end if;
-
-         Perform_Escape :
-         while I in Data'Range loop
-            case Data (I) is
-               when Less_Than =>
-                  Output.Append
-                    ((Character'Pos ('&'), Character'Pos ('l'),
-                      Character'Pos ('t'), Character'Pos (';')));
-
-               when Greater_Than =>
-                  Output.Append
-                    ((Character'Pos ('&'), Character'Pos ('g'),
-                      Character'Pos ('t'), Character'Pos (';')));
-
-               when Quote =>
-                  Output.Append
-                    ((Character'Pos ('&'), Character'Pos ('q'),
-                      Character'Pos ('u'), Character'Pos ('o'),
-                      Character'Pos ('t'), Character'Pos (';')));
-
-               when others =>
-                  exit Perform_Escape;
-            end case;
-
-            Last_Done := I;
-            I := I + 1;
-         end loop Perform_Escape;
-      end loop Process_All;
-   end HTML_Escape;
-
-
    procedure Render_Comment_Position
      (Exchange : in out Sites.Exchange;
       Context : in Comment_Ref;
@@ -231,13 +167,16 @@ package body Natools.Web.Comments is
               (Exchange, Arguments, Comment.Date);
 
          when Static_Maps.Item.Command.Name =>
-            HTML_Escape (Exchange, Comment.Name.Query);
+            Escapes.Write
+              (Exchange, Comment.Name.Query, Escapes.HTML_Attribute);
 
          when Mail =>
-            HTML_Escape (Exchange, Comment.Mail.Query);
+            Escapes.Write
+              (Exchange, Comment.Mail.Query, Escapes.HTML_Attribute);
 
          when Link =>
-            HTML_Escape (Exchange, Comment.Link.Query);
+            Escapes.Write
+              (Exchange, Comment.Link.Query, Escapes.HTML_Attribute);
 
          when Parent =>
             if Accessor.Parent /= null then
@@ -245,7 +184,8 @@ package body Natools.Web.Comments is
             end if;
 
          when Text =>
-            HTML_Escape (Exchange, Comment.Text.Query);
+            Escapes.Write
+              (Exchange, Comment.Text.Query, Escapes.HTML_Attribute);
       end case;
    end Render_Comment_Position;
 
