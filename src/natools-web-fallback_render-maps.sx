@@ -1,0 +1,17 @@
+(Natools.Static_Maps.Web.Fallback_Render
+   pure
+   (test-function T)
+   (extra-decl "\
+   type Command is
+     (Unknown,
+      Current_Time,
+      Parameter,
+      Set_MIME_Type);")
+   (Command
+      (hash-package Natools.Static_Maps.Web.Fallback_Render.Commands)
+      (function To_Command)
+      (not-found Unknown)
+      (nodes
+         (Current_Time   now today current-time current-date)
+         (Parameter   parameter)
+         (Set_MIME_Type   mime-type))))
