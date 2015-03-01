@@ -5,13 +5,19 @@
    type Command is
      (Unknown,
       Current_Time,
+      Element,
+      Element_Or_Template,
       Parameter,
-      Set_MIME_Type);")
+      Set_MIME_Type,
+      Template);")
    (Command
       (hash-package Natools.Static_Maps.Web.Fallback_Render.Commands)
       (function To_Command)
       (not-found Unknown)
       (nodes
          (Current_Time   now today current-time current-date)
+         (Element   element)
+         (Element_Or_Template   render element-or-template)
          (Parameter   parameter)
-         (Set_MIME_Type   mime-type))))
+         (Set_MIME_Type   mime-type)
+         (Template   template))))

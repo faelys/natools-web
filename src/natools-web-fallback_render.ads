@@ -23,6 +23,7 @@
 ------------------------------------------------------------------------------
 
 with Natools.S_Expressions.Lockable;
+with Natools.Web.Containers;
 with Natools.Web.Sites;
 
 procedure Natools.Web.Fallback_Render
@@ -30,4 +31,10 @@ procedure Natools.Web.Fallback_Render
    Name : in Natools.S_Expressions.Atom;
    Arguments : in out Natools.S_Expressions.Lockable.Descriptor'Class;
    Context : in String := "";
+   Re_Enter : access procedure
+     (Exchange : in out Natools.Web.Sites.Exchange;
+      Expression : in out Natools.S_Expressions.Lockable.Descriptor'Class)
+     := null;
+   Elements : in Natools.Web.Containers.Expression_Maps.Constant_Map
+     := Natools.Web.Containers.Expression_Maps.Empty_Constant_Map;
    Severity : in Severities.Code := Severities.Error);
