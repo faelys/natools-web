@@ -20,6 +20,7 @@ with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.Static_Maps.Web.Simple_Pages;
 with Natools.Web.Error_Pages;
 with Natools.Web.Exchanges;
+with Natools.Web.Fallback_Render;
 
 package body Natools.Web.Simple_Pages is
 
@@ -101,33 +102,29 @@ package body Natools.Web.Simple_Pages is
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
       use type S_Expressions.Events.Event;
+
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+      begin
+         Render_Page (Expression, Exchange, Page);
+      end Re_Enter;
+
       package Commands renames Natools.Static_Maps.Web.Simple_Pages;
    begin
       case Commands.To_Command (S_Expressions.To_String (Name)) is
          when Commands.Unknown_Command =>
-            null;
+            Fallback_Render
+              (Exchange, Name, Arguments,
+               "simple page",
+               Re_Enter'Access, Page.Elements);
 
          when Commands.Comment_List =>
             Comments.Render (Exchange, Page.Comment_List, Arguments);
-
-         when Commands.Element =>
-            declare
-               Template : S_Expressions.Caches.Cursor
-                 := Exchange.Site.Get_Template
-                    (Page.Elements,
-                     Arguments,
-                     Lookup_Template => False);
-            begin
-               Render_Page (Template, Exchange, Page);
-            end;
-
-         when Commands.Element_Or_Template =>
-            declare
-               Template : S_Expressions.Caches.Cursor
-                 := Exchange.Site.Get_Template (Page.Elements, Arguments);
-            begin
-               Render_Page (Template, Exchange, Page);
-            end;
 
          when Commands.My_Tags =>
             if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
@@ -154,17 +151,6 @@ package body Natools.Web.Simple_Pages is
                Exchange.Site.Get_Tags,
                Arguments,
                Page.Tags);
-
-         when Commands.Template =>
-            declare
-               Template : S_Expressions.Caches.Cursor
-                 := Exchange.Site.Get_Template
-                    (Page.Elements,
-                     Arguments,
-                     Lookup_Element => False);
-            begin
-               Render_Page (Template, Exchange, Page);
-            end;
       end case;
    end Render;
 

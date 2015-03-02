@@ -5,12 +5,9 @@
    type Command is
      (Unknown_Command,
       Comment_List,
-      Element,
-      Element_Or_Template,
       My_Tags,
       Path,
-      Tags,
-      Template);
+      Tags);
 
    type Component is
      (Error,
@@ -23,12 +20,9 @@
       (not-found Unknown_Command)
       (nodes
          (Comment_List comments comment-list)
-         (Element   element)
-         (Element_Or_Template  render element-or-template)
          (My_Tags  my-tags my-tag-list tag-list)
          (Path  path)
-         (Tags  pagelist page-list tag tags)
-         (Template  template)))
+         (Tags  pagelist page-list tag tags)))
    (Component
       (hash-package Natools.Static_Maps.Web.Simple_Pages.Components)
       (function To_Component)
