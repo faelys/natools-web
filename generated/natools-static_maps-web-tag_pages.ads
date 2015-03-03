@@ -1,4 +1,4 @@
---  Generated at 2014-12-26 20:59:31 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-03-03 23:00:05 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-tag_pages-maps.sx
 
 package Natools.Static_Maps.Web.Tag_Pages is
@@ -7,14 +7,11 @@ package Natools.Static_Maps.Web.Tag_Pages is
    type Command is
      (Unknown_Command,
       Current_Tag,
-      Element,
-      Element_Or_Template,
       If_Index,
       If_Slash_Index,
       If_Slashless_Index,
       If_Tag,
-      Root_Tag,
-      Template);
+      Root_Tag);
 
    type Component is
      (Unknown_Component,
@@ -36,20 +33,16 @@ package Natools.Static_Maps.Web.Tag_Pages is
 
 private
 
-   Map_1_Key_0 : aliased constant String := "element";
-   Map_1_Key_1 : aliased constant String := "current-tag";
-   Map_1_Key_2 : aliased constant String := "current";
-   Map_1_Key_3 : aliased constant String := "render";
-   Map_1_Key_4 : aliased constant String := "element-or-template";
-   Map_1_Key_5 : aliased constant String := "if-index";
-   Map_1_Key_6 : aliased constant String := "if-slash-index";
-   Map_1_Key_7 : aliased constant String := "if-slashless-index";
-   Map_1_Key_8 : aliased constant String := "if-tag";
-   Map_1_Key_9 : aliased constant String := "if-child";
-   Map_1_Key_10 : aliased constant String := "root-tag";
-   Map_1_Key_11 : aliased constant String := "root";
-   Map_1_Key_12 : aliased constant String := "template";
-   Map_1_Keys : constant array (0 .. 12) of access constant String
+   Map_1_Key_0 : aliased constant String := "current-tag";
+   Map_1_Key_1 : aliased constant String := "current";
+   Map_1_Key_2 : aliased constant String := "if-index";
+   Map_1_Key_3 : aliased constant String := "if-slash-index";
+   Map_1_Key_4 : aliased constant String := "if-slashless-index";
+   Map_1_Key_5 : aliased constant String := "if-tag";
+   Map_1_Key_6 : aliased constant String := "if-child";
+   Map_1_Key_7 : aliased constant String := "root-tag";
+   Map_1_Key_8 : aliased constant String := "root";
+   Map_1_Keys : constant array (0 .. 8) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -58,25 +51,17 @@ private
          Map_1_Key_5'Access,
          Map_1_Key_6'Access,
          Map_1_Key_7'Access,
-         Map_1_Key_8'Access,
-         Map_1_Key_9'Access,
-         Map_1_Key_10'Access,
-         Map_1_Key_11'Access,
-         Map_1_Key_12'Access);
-   Map_1_Elements : constant array (0 .. 12) of Command
-     := (Element,
+         Map_1_Key_8'Access);
+   Map_1_Elements : constant array (0 .. 8) of Command
+     := (Current_Tag,
          Current_Tag,
-         Current_Tag,
-         Element_Or_Template,
-         Element_Or_Template,
          If_Index,
          If_Slash_Index,
          If_Slashless_Index,
          If_Tag,
          If_Tag,
          Root_Tag,
-         Root_Tag,
-         Template);
+         Root_Tag);
 
    Map_2_Key_0 : aliased constant String := "elements";
    Map_2_Key_1 : aliased constant String := "index-elements";

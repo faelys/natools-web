@@ -5,14 +5,11 @@
    type Command is
      (Unknown_Command,
       Current_Tag,
-      Element,
-      Element_Or_Template,
       If_Index,
       If_Slash_Index,
       If_Slashless_Index,
       If_Tag,
-      Root_Tag,
-      Template);
+      Root_Tag);
 
    type Component is
      (Unknown_Component,
@@ -33,15 +30,12 @@
       (function To_Command)
       (not-found Unknown_Command)
       (nodes
-         (Element   element)
          (Current_Tag   current-tag current)
-         (Element_Or_Template   render element-or-template)
          (If_Index   if-index)
          (If_Slash_Index   if-slash-index)
          (If_Slashless_Index   if-slashless-index)
          (If_Tag   if-tag if-child)
-         (Root_Tag   root-tag root)
-         (Template   template)))
+         (Root_Tag   root-tag root)))
    (Component
       (hash-package Natools.Static_Maps.Web.Tag_Pages.Components)
       (function To_Component)

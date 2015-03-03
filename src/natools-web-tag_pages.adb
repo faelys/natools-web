@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -22,6 +22,7 @@ with Natools.S_Expressions.Lockable;
 with Natools.Static_Maps.Web.Tag_Pages;
 with Natools.Web.Error_Pages;
 with Natools.Web.Exchanges;
+with Natools.Web.Fallback_Render;
 with Natools.Web.Tags;
 
 package body Natools.Web.Tag_Pages is
@@ -221,33 +222,25 @@ package body Natools.Web.Tag_Pages is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+      begin
+         Render (Expression, Exchange, Context);
+      end Re_Enter;
    begin
       case Commands.To_Command (S_Expressions.To_String (Name)) is
          when Commands.Unknown_Command =>
-            Log (Severities.Error, "Unknown tag page command """
-              & S_Expressions.To_String (Name) & '"');
+            Fallback_Render
+              (Exchange, Name, Arguments,
+               "tag page", Re_Enter'Access, Context.Elements);
 
          when Commands.Current_Tag =>
             Tags.Render (Exchange, Context.Current, Arguments);
-
-         when Commands.Element =>
-            declare
-               Template : S_Expressions.Caches.Cursor
-                 := Exchange.Site.Get_Template
-                    (Context.Elements,
-                     Arguments,
-                     Lookup_Template => False);
-            begin
-               Render (Template, Exchange, Context);
-            end;
-
-         when Commands.Element_Or_Template =>
-            declare
-               Template : S_Expressions.Caches.Cursor
-                 := Exchange.Site.Get_Template (Context.Elements, Arguments);
-            begin
-               Render (Template, Exchange, Context);
-            end;
 
          when Commands.If_Index =>
             if Context.Mode in Slash_Index | Slashless_Index then
@@ -271,18 +264,6 @@ package body Natools.Web.Tag_Pages is
 
          when Commands.Root_Tag =>
             Exchange.Append (Context.Root_Tag.Query);
-
-         when Commands.Template =>
-            declare
-               Template : S_Expressions.Caches.Cursor
-                 := Exchange.Site.Get_Template
-                    (Context.Elements,
-                     Arguments,
-                     Lookup_Element => False);
-            begin
-               Render (Template, Exchange, Context);
-            end;
-
       end case;
    end Render_Command;
 
