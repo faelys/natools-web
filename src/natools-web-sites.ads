@@ -88,16 +88,11 @@ package Natools.Web.Sites is
       --  If Name is empty and Lookup_Name is true, use the current atom in
       --  Expression as name.
 
-   function Get_Template
+   function Named_Element_Map
      (Object : in Site;
-      Element_Map_Name : in S_Expressions.Atom;
-      Expression : in out S_Expressions.Lockable.Descriptor'Class;
-      Name : in S_Expressions.Atom := S_Expressions.Null_Atom;
-      Lookup_Template : in Boolean := True;
-      Lookup_Element : in Boolean := True;
-      Lookup_Name : in Boolean := False)
-     return S_Expressions.Caches.Cursor;
-      --  Same as previous Get_Template using internal named element map
+      Name : in S_Expressions.Atom)
+     return Containers.Expression_Maps.Constant_Map;
+      --  Return an element of the internal element map
 
    function Default_Template (Object : Site) return S_Expressions.Atom;
       --  Retrieve the default template name

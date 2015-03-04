@@ -654,33 +654,20 @@ package body Natools.Web.Sites is
    end Get_Template;
 
 
-   function Get_Template
+   function Named_Element_Map
      (Object : in Site;
-      Element_Map_Name : in S_Expressions.Atom;
-      Expression : in out S_Expressions.Lockable.Descriptor'Class;
-      Name : in S_Expressions.Atom := S_Expressions.Null_Atom;
-      Lookup_Template : in Boolean := True;
-      Lookup_Element : in Boolean := True;
-      Lookup_Name : in Boolean := False)
-     return S_Expressions.Caches.Cursor
+      Name : in S_Expressions.Atom)
+     return Containers.Expression_Maps.Constant_Map
    is
-      Elements : Containers.Expression_Maps.Constant_Map;
       Cursor : constant Containers.Expression_Map_Maps.Cursor
-        := Object.Named_Elements.Find (Element_Map_Name);
+        := Object.Named_Elements.Find (Name);
    begin
       if Containers.Expression_Map_Maps.Has_Element (Cursor) then
-         Elements := Containers.Expression_Map_Maps.Element (Cursor);
+         return Containers.Expression_Map_Maps.Element (Cursor);
+      else
+         return Containers.Expression_Maps.Empty_Constant_Map;
       end if;
-
-      return Get_Template
-        (Object,
-         Elements,
-         Expression,
-         Name,
-         Lookup_Template,
-         Lookup_Element,
-         Lookup_Name);
-   end Get_Template;
+   end Named_Element_Map;
 
 
    function Default_Template (Object : Site) return S_Expressions.Atom is

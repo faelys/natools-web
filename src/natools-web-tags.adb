@@ -623,7 +623,8 @@ package body Natools.Web.Tags is
             declare
                Template : S_Expressions.Caches.Cursor
                  := Exchange.Site.Get_Template
-                    (Tag_Maps.Key (Tag.Position),
+                    (Exchange.Site.Named_Element_Map
+                       (Tag_Maps.Key (Tag.Position)),
                      Arguments,
                      Lookup_Template => False);
             begin
@@ -634,7 +635,8 @@ package body Natools.Web.Tags is
             declare
                Template : S_Expressions.Caches.Cursor
                  := Exchange.Site.Get_Template
-                    (Tag_Maps.Key (Tag.Position),
+                    (Exchange.Site.Named_Element_Map
+                       (Tag_Maps.Key (Tag.Position)),
                      Arguments);
             begin
                Render (Template, Exchange, Tag);
@@ -723,7 +725,8 @@ package body Natools.Web.Tags is
             declare
                Template : S_Expressions.Caches.Cursor
                  := Exchange.Site.Get_Template
-                    (Tag_Maps.Key (Tag.Position),
+                    (Exchange.Site.Named_Element_Map
+                       (Tag_Maps.Key (Tag.Position)),
                      Arguments,
                      Lookup_Element => False);
             begin
