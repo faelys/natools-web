@@ -13,16 +13,13 @@
       Greater_Descendants,
       Greater_Elements,
       Greater_Leaves,
-      Element,
-      Element_Or_Template,
       Full_Name,
       Last_Name,
       Lesser_Children,
       Lesser_Descendants,
       Lesser_Elements,
       Lesser_Leaves,
-      Name,
-      Template);")
+      Name);")
    (List_Command
       (hash-package Natools.Static_Maps.Web.Tags.Commands)
       (function To_List_Command)
@@ -37,13 +34,10 @@
          (Greater_Descendants   greater-descendants)
          (Greater_Elements   greater-elements)
          (Greater_Leaves   greater-leaves)
-         (Element   element)
-         (Element_Or_Template render)
          (Full_Name   full-name)
          (Last_Name   last-name)
          (Lesser_Children   lesser-children)
          (Lesser_Descendants   lesser-descendants)
          (Lesser_Elements   lesser-elements)
          (Lesser_Leaves   lesser-leaves)
-         (Name   name)
-         (Template   template))))
+         (Name   name))))

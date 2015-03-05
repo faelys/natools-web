@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -15,9 +15,9 @@
 ------------------------------------------------------------------------------
 
 with Natools.S_Expressions.Atom_Ref_Constructors;
-with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.Tags;
+with Natools.Web.Fallback_Render;
 with Natools.Web.List_Templates;
 with Natools.Web.Sites;
 
@@ -497,12 +497,25 @@ package body Natools.Web.Tags is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+      begin
+         Render (Expression, Exchange, Tag);
+      end Re_Enter;
+
       package Commands renames Natools.Static_Maps.Web.Tags;
    begin
       case Commands.To_List_Command (S_Expressions.To_String (Name)) is
          when Commands.Unknown_List_Command =>
-            Log (Severities.Error, "Unknown tag template element """
-              & S_Expressions.To_String (Name) & '"');
+            Fallback_Render
+              (Exchange, Name, Arguments,
+               "tag container", Re_Enter'Access,
+               Exchange.Site.Named_Element_Map (Tag_Maps.Key (Tag.Position)));
 
          when Commands.All_Children =>
             Render_Tags
@@ -619,29 +632,6 @@ package body Natools.Web.Tags is
                   Recursion => Leaves),
                List_Templates.Read_Parameters (Arguments));
 
-         when Commands.Element =>
-            declare
-               Template : S_Expressions.Caches.Cursor
-                 := Exchange.Site.Get_Template
-                    (Exchange.Site.Named_Element_Map
-                       (Tag_Maps.Key (Tag.Position)),
-                     Arguments,
-                     Lookup_Template => False);
-            begin
-               Render (Template, Exchange, Tag);
-            end;
-
-         when Commands.Element_Or_Template =>
-            declare
-               Template : S_Expressions.Caches.Cursor
-                 := Exchange.Site.Get_Template
-                    (Exchange.Site.Named_Element_Map
-                       (Tag_Maps.Key (Tag.Position)),
-                     Arguments);
-            begin
-               Render (Template, Exchange, Tag);
-            end;
-
          when Commands.Full_Name =>
             Exchange.Append (Tag_Maps.Key (Tag.Position));
 
@@ -720,18 +710,6 @@ package body Natools.Web.Tags is
 
          when Commands.Name =>
             Render (Arguments, Exchange, Create (Tag_Maps.Key (Tag.Position)));
-
-         when Commands.Template =>
-            declare
-               Template : S_Expressions.Caches.Cursor
-                 := Exchange.Site.Get_Template
-                    (Exchange.Site.Named_Element_Map
-                       (Tag_Maps.Key (Tag.Position)),
-                     Arguments,
-                     Lookup_Element => False);
-            begin
-               Render (Template, Exchange, Tag);
-            end;
       end case;
    end Render_Contents;
 
