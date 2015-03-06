@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -19,6 +19,7 @@ with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.Error_Pages;
+with Natools.Web.Fallback_Render;
 
 package body Natools.Web.Error_Pages is
 
@@ -36,6 +37,10 @@ package body Natools.Web.Error_Pages is
       Context : in Error_Context;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
+
+
+   procedure Render is new S_Expressions.Interpreter_Loop
+     (Sites.Exchange, Error_Context, Execute, Append);
 
 
 
@@ -79,12 +84,24 @@ package body Natools.Web.Error_Pages is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
-      pragma Unreferenced (Arguments);
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+      begin
+         Render (Expression, Exchange, Context);
+      end Re_Enter;
+
       use Natools.Static_Maps.Web.Error_Pages;
    begin
       case To_Command (S_Expressions.To_String (Name)) is
          when Unknown_Command =>
-            null;
+            Fallback_Render
+              (Exchange, Name, Arguments,
+               "error page", Re_Enter'Access);
 
          when Location =>
             if not Context.Location.Is_Empty then
@@ -104,10 +121,6 @@ package body Natools.Web.Error_Pages is
             Exchange.Append (Context.Code);
       end case;
    end Execute;
-
-
-   procedure Render is new S_Expressions.Interpreter_Loop
-     (Sites.Exchange, Error_Context, Execute, Append);
 
 
 
