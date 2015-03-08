@@ -1,4 +1,4 @@
---  Generated at 2015-02-05 18:20:56 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-03-08 22:00:31 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -20,7 +20,7 @@ package Natools.Static_Maps.Web.Comments is
 
    package List is
       package Command is
-         type Enum is (Unknown, List, Size);
+         type Enum is (Unknown, List, Preview, Size);
       end Command;
 
       package Element is
@@ -115,14 +115,17 @@ private
          Item.Form.Text);
 
    Map_4_Key_0 : aliased constant String := "list";
-   Map_4_Key_1 : aliased constant String := "size";
-   Map_4_Key_2 : aliased constant String := "length";
-   Map_4_Keys : constant array (0 .. 2) of access constant String
+   Map_4_Key_1 : aliased constant String := "preview";
+   Map_4_Key_2 : aliased constant String := "size";
+   Map_4_Key_3 : aliased constant String := "length";
+   Map_4_Keys : constant array (0 .. 3) of access constant String
      := (Map_4_Key_0'Access,
          Map_4_Key_1'Access,
-         Map_4_Key_2'Access);
-   Map_4_Elements : constant array (0 .. 2) of List.Command.Enum
+         Map_4_Key_2'Access,
+         Map_4_Key_3'Access);
+   Map_4_Elements : constant array (0 .. 3) of List.Command.Enum
      := (List.Command.List,
+         List.Command.Preview,
          List.Command.Size,
          List.Command.Size);
 

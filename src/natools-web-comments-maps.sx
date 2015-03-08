@@ -18,7 +18,7 @@
 
    package List is
       package Command is
-         type Enum is (Unknown, List, Size);
+         type Enum is (Unknown, List, Preview, Size);
       end Command;
 
       package Element is
@@ -65,6 +65,7 @@
       (not-found List.Command.Unknown)
       (nodes
          (List.Command.List  list)
+         (List.Command.Preview  preview)
          (List.Command.Size  size length)))
 
    (List.Element.Enum
