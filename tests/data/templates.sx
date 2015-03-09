@@ -30,6 +30,22 @@
 (href "<a href=\"" (path) "\">" (element title) "</a>")
 
 (page-comments (comments
+   (preview
+      "<h1>Preview</h1>\n<ol>\n<li><p>On "
+      (date
+         (month January February March April May June July
+            August September October November December)
+         " "
+         (day (suffix (th (4 31)) (st 1 21 31) (nd 2 22) (rd 3 23)))
+         " "
+         (year)
+         " at "
+         (hour) ":" (padded-minute))
+      ", "
+      (name)
+      " wrote:</p>\n<blockquote>\n"
+      (text)
+      "</blockquote></li>\n</ol>\n")
    "<h1>Comments</h1>\n<ol>\n"
    (list (render
       "<li><p>On "
@@ -52,19 +68,19 @@
 (comment-form "\
 <form class=\"mainform\" method=\"post\" action=\"" (path) "/comments\">
   <p><label>Name or nick:
-    <input name=\"c_name\" value=\"\" type=\"text\">
+    <input name=\"c_name\" value=\"" (parameter c_name) "\" type=\"text\">
   </label></p>
   <p><label>E-mail address:
-    <input name=\"c_mail\" value=\"\" type=\"text\">
+    <input name=\"c_mail\" value=\"" (parameter c_mail) "\" type=\"text\">
   </label></p>
   <p><label>Web site:
-    <input name=\"c_site\" value=\"\" type=\"text\">
+    <input name=\"c_site\" value=\"" (parameter c_site) "\" type=\"text\">
   </label></p><!--
   <p><label>Very special field:
     <input name=\"address\" value=\"http://\" type=\"text\">
   </label></p>-->
   <p><label>Comment text:
-    <textarea name=\"c_text\" cols=\"80\" rows=\"10\"></textarea>
+    <textarea name=\"c_text\" cols=\"80\" rows=\"10\">" (parameter c_text) "</textarea>
   </label></p>
   <p class=\"buttons\">
     <input value=\"Preview\" name=\"preview\" type=\"submit\">

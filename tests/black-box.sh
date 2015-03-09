@@ -43,6 +43,14 @@ chain(){
 	test -z "${STOPPED}" && check "$@"
 }
 
+# chain_curl arguments
+#    Wrapper around raw curl with discarded output, but only if previous check
+#    didn't fail.
+chain_curl(){
+	test -z "${STOPPED}" && curl -s "$@" >/dev/null
+}
+
+
 check /first first.html
 check /second second.html
 check /third third.html
@@ -57,14 +65,19 @@ check /tags/ tags.html
 check /tags tags-redirect.html
 check /comments comments.html
 
-curl -s -F 'sleep_update=2' "${BASE_URL}/test" >/dev/null
 check /fourth fourth.html
 chain /fourth/comments 405.html
 chain /fourth fourth.html
+chain /fourth/comments fourth-preview.html -F 'c_name=nat' \
+    -F 'c_mail=' \
+    -F 'c_site=http://instinctive.eu/' -F 'preview=Preview' \
+    -F 'c_text=Preview comment that should not be written anywhere.'
+chain /fourth fourth.html
+chain /test base_version.txt
+chain_curl -F 'sleep_update=2' "${BASE_URL}/test"
 chain /fourth/comments fourth-303.html -F 'c_name=Nobody' -F 'c_mail=' \
     -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Brand new comment posted during the test suite'
 chain /fourth fourth.html
-test -z "${STOPPED}" \
-    && curl -s -F 'wait_version=2' "${BASE_URL}/test" >/dev/null
+chain_curl -F 'wait_version=2' "${BASE_URL}/test"
 chain /fourth fourth-commented.html

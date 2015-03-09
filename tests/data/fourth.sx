@@ -9,7 +9,15 @@
       " wrote:</p>\n<blockquote>\n"
       (text)
       "</blockquote></li>\n"))
-   "</ol>\n")
+   "</ol>\n"
+   (preview
+      "<h1>Preview</h1>\n<ol>\n"
+      "<li><p>"
+      (name)
+      " wrote:</p>\n<blockquote>\n"
+      (text)
+      "</blockquote></li>\n"
+      "</ol>\n"))
 "<h1>Post a Comment</h1>\n"
 (render comment-form))
    (title "Fourth Page"))
