@@ -68,15 +68,16 @@ check /comments comments.html
 check /fourth fourth.html
 chain /fourth/comments 405.html
 chain /fourth fourth.html
-chain /fourth/comments fourth-preview.html -F 'c_name=nat' \
-    -F 'c_mail=' \
-    -F 'c_site=http://instinctive.eu/' -F 'preview=Preview' \
+chain /fourth/comments fourth-preview.html -F 'c_mail=' \
+    --form-string 'c_name=<code>nat</code>' \
+    -F 'c_site=http://instinctive.eu/"' -F 'preview=Preview' \
     -F 'c_text=Preview comment that should not be written anywhere.'
 chain /fourth fourth.html
 chain /test base_version.txt
 chain_curl -F 'sleep_update=2' "${BASE_URL}/test"
-chain /fourth/comments fourth-303.html -F 'c_name=Nobody' -F 'c_mail=' \
-    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+chain /fourth/comments fourth-303.html -F 'c_mail=' \
+    --form-string 'c_name=<i>Nobody</i>' \
+    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Brand new comment posted during the test suite'
 chain /fourth fourth.html
 chain_curl -F 'wait_version=2' "${BASE_URL}/test"
