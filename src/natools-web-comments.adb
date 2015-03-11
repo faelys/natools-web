@@ -166,6 +166,8 @@ package body Natools.Web.Comments is
       Accessor : constant Comment_Array_Refs.Accessor := Context.List.Query;
       Comment : Comment_Data renames Accessor.Data.Data (Context.Position);
    begin
+      pragma Assert (Comment.Preprocessed);
+
       case Static_Maps.To_Item_Command (S_Expressions.To_String (Name)) is
          when Unknown =>
             Log (Severities.Error, "Unknown comment command """
@@ -176,16 +178,13 @@ package body Natools.Web.Comments is
               (Exchange, Arguments, Comment.Date);
 
          when Static_Maps.Item.Command.Name =>
-            Escapes.Write
-              (Exchange, Comment.Name.Query, Escapes.HTML_Attribute);
+            Exchange.Append (Comment.Name.Query);
 
          when Mail =>
-            Escapes.Write
-              (Exchange, Comment.Mail.Query, Escapes.HTML_Attribute);
+            Exchange.Append (Comment.Mail.Query);
 
          when Link =>
-            Escapes.Write
-              (Exchange, Comment.Link.Query, Escapes.HTML_Attribute);
+            Exchange.Append (Comment.Link.Query);
 
          when Parent =>
             if Accessor.Parent /= null then
@@ -235,6 +234,7 @@ package body Natools.Web.Comments is
                Meta : Comment_Metadata;
             begin
                Process_Form (Ref.List.Query.Data (1), Meta, Exchange);
+               Preprocess (Ref.List.Query.Data (1));
                Render (Arguments, Exchange, Ref);
             end;
 
@@ -262,6 +262,8 @@ package body Natools.Web.Comments is
       use Static_Maps.Item.Element;
       use type S_Expressions.Events.Event;
    begin
+      pragma Assert (not Comment.Preprocessed);
+
       if Arguments.Current_Event /= S_Expressions.Events.Add_Atom then
          return;
       end if;
@@ -343,6 +345,19 @@ package body Natools.Web.Comments is
    -- Comment Suprograms --
    ------------------------
 
+   procedure Preprocess (Comment : in out Comment_Data) is
+   begin
+      if Comment.Preprocessed then
+         return;
+      end if;
+
+      Comment.Name := Escapes.Escape (Comment.Name, Escapes.HTML_Attribute);
+      Comment.Mail := Escapes.Escape (Comment.Mail, Escapes.HTML_Attribute);
+      Comment.Link := Escapes.Escape (Comment.Link, Escapes.HTML_Attribute);
+      Comment.Preprocessed := True;
+   end Preprocess;
+
+
    function Preview_Id return S_Expressions.Atom_Refs.Immutable_Reference is
    begin
       if Preview_Id_Ref.Is_Empty then
@@ -399,6 +414,9 @@ package body Natools.Web.Comments is
       Output : in out S_Expressions.Printers.Printer'Class)
    is
       procedure Print (Key : in String; Value : in S_Expressions.Atom);
+      procedure Print
+        (Key : in String;
+         Value : in S_Expressions.Atom_Refs.Immutable_Reference);
 
       procedure Print (Key : in String; Value : in S_Expressions.Atom) is
       begin
@@ -407,14 +425,25 @@ package body Natools.Web.Comments is
          Output.Append_Atom (Value);
          Output.Close_List;
       end Print;
+
+      procedure Print
+        (Key : in String;
+         Value : in S_Expressions.Atom_Refs.Immutable_Reference) is
+      begin
+         if not Value.Is_Empty then
+            Print (Key, Value.Query);
+         end if;
+      end Print;
    begin
+      pragma Assert (not Comment.Preprocessed);
+
       Print ("date", S_Expressions.To_Atom
         (Time_IO.RFC_3339.Image (Comment.Date)));
 
-      Print ("name", Comment.Name.Query);
-      Print ("mail", Comment.Mail.Query);
-      Print ("link", Comment.Link.Query);
-      Print ("text", Comment.Text.Query);
+      Print ("name", Comment.Name);
+      Print ("mail", Comment.Mail);
+      Print ("link", Comment.Link);
+      Print ("text", Comment.Text);
    end Write;
 
 
@@ -481,6 +510,7 @@ package body Natools.Web.Comments is
             Reader.Next;
             Update (Reader, Comment, Meaningless_Value);
             Comment.Id := Create (Name);
+            Preprocess (Comment);
 
             Map.Insert (Name, Comment, Position, Inserted);
 
