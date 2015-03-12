@@ -19,7 +19,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Streams;
-with Natools.S_Expressions;
+with Natools.S_Expressions.Atom_Refs;
 
 package Natools.Web.Escapes is
    pragma Preelaborate;
@@ -56,7 +56,42 @@ package Natools.Web.Escapes is
       Set : in Escape_Set);
       --  Escape octets from Text in Set, and write them into Output
 
+
+   function Escape
+     (Data : in S_Expressions.Atom;
+      Set : in Escape_Set)
+     return S_Expressions.Atom;
+      --  Escape Data and return it directly as an atom
+
+   function Escape
+     (Data : in S_Expressions.Atom;
+      Set : in Escape_Set)
+     return S_Expressions.Atom_Refs.Immutable_Reference;
+      --  Escape Data and return it in a newly-created reference
+
+   function Escape
+     (Data : in S_Expressions.Atom_Refs.Immutable_Reference;
+      Set : in Escape_Set)
+     return S_Expressions.Atom_Refs.Immutable_Reference;
+      --  Escape Data if needed, otherwise duplicate the reference
+
 private
+
+   type Atom_Stream (Data : not null access S_Expressions.Atom)
+     is new Ada.Streams.Root_Stream_Type
+   with record
+      Last : S_Expressions.Offset;
+   end record;
+
+   overriding procedure Read
+     (Stream : in out Atom_Stream;
+      Item : out Ada.Streams.Stream_Element_Array;
+      Last : out Ada.Streams.Stream_Element_Offset);
+
+   overriding procedure Write
+     (Stream : in out Atom_Stream;
+      Item : in Ada.Streams.Stream_Element_Array);
+
 
    type Count_Stream is new Ada.Streams.Root_Stream_Type with record
       Count : S_Expressions.Count := 0;
