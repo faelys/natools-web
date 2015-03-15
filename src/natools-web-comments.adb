@@ -21,6 +21,7 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Streams;
+with Natools.S_Expressions.Atom_Buffers;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Parsers;
@@ -34,6 +35,7 @@ with Natools.Web.Backends;
 with Natools.Web.Error_Pages;
 with Natools.Web.Escapes;
 with Natools.Web.Exchanges;
+with Natools.Web.Filters.Text_Blocks;
 with Natools.Web.List_Templates;
 with Natools.Web.Render_Default;
 with Natools.Web.Sites.Updates;
@@ -192,8 +194,7 @@ package body Natools.Web.Comments is
             end if;
 
          when Text =>
-            Escapes.Write
-              (Exchange, Comment.Text.Query, Escapes.HTML_Attribute);
+            Exchange.Append (Comment.Text.Query);
       end case;
    end Render_Comment_Position;
 
@@ -355,6 +356,16 @@ package body Natools.Web.Comments is
       Comment.Mail := Escapes.Escape (Comment.Mail, Escapes.HTML_Attribute);
       Comment.Link := Escapes.Escape (Comment.Link, Escapes.HTML_Attribute);
       Comment.Preprocessed := True;
+
+      if not Comment.Text.Is_Empty then
+         declare
+            Buffer : S_Expressions.Atom_Buffers.Atom_Buffer;
+            Filter : Filters.Text_Blocks.Filter;
+         begin
+            Filter.Apply (Buffer, Comment.Text.Query);
+            Comment.Text := Create (Buffer.Data);
+         end;
+      end if;
    end Preprocess;
 
 
