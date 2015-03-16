@@ -2,4 +2,4 @@
 (name "Natasha Kerensikova")
 (mail "")
 (link "http://instinctive.eu/")
-(text "Two comments on the same page, w00t \\o/\n")
+(text "Two comments on the same page, w00t \\o/\r\n\r\nWith even a second paragraph!\r\n")
