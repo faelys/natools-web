@@ -42,6 +42,11 @@ package Natools.Web.Sites.Holders is
    not overriding procedure Register
      (Self : in out Holder;
       Name : in String;
+      Constructor : in Filters.Stores.Constructor);
+
+   not overriding procedure Register
+     (Self : in out Holder;
+      Name : in String;
       Constructor : in Page_Constructor);
 
    not overriding procedure Register
@@ -83,6 +88,7 @@ private
    type Holder is limited new Updaters.Updater with record
       Ref : Site_Refs.Reference;
       Constructors : Constructors_In_Site;
+      Filters : Web.Filters.Stores.Store;
       Worker : Worker_Task (Holder'Access);
       Queue : Update_Queue (Holder'Access);
    end record;

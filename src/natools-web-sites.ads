@@ -26,6 +26,7 @@ with Natools.S_Expressions.Printers.Pretty;
 with Natools.Web.Backends;
 with Natools.Web.Containers;
 with Natools.Web.Exchanges;
+with Natools.Web.Filters.Stores;
 with Natools.Web.Tags;
 
 limited with Natools.Web.Sites.Updaters;
@@ -48,6 +49,12 @@ package Natools.Web.Sites is
       Updater : in Updaters.Updater_Access);
       --  Register an updater to handle updates for Object
 
+   procedure Register
+     (Object : in out Site;
+      Name : in String;
+      Constructor : in Filters.Stores.Constructor);
+      --  Register a filter constructor
+
    procedure Reload (Object : in out Site);
       --  Reload Object data from its original file
 
@@ -63,6 +70,10 @@ package Natools.Web.Sites is
    function Get_Backend (From : Site; Name : S_Expressions.Atom)
      return Backends.Backend'Class;
       --  Return a backend from its name, or raise Constraint_Error
+
+   function Get_Filter (From : Site; Name : S_Expressions.Atom)
+     return Filters.Filter'Class;
+      --  Return a filter from its name, or raise Filters.Stores.No_Filter
 
    function Get_Tags (Object : Site) return Tags.Tag_DB;
       --  Return the whole tag database
@@ -207,6 +218,7 @@ private
       Constructors : aliased Constructors_In_Site;
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
+      Filters : Web.Filters.Stores.Store;
       Loaders : Page_Loaders.Constant_Map;
       Named_Elements : Containers.Expression_Map_Maps.Constant_Map;
       Pages : Page_Maps.Updatable_Map;
@@ -224,6 +236,7 @@ private
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
+      Filters : Web.Filters.Stores.Store;
       New_Loaders : Page_Loaders.Unsafe_Maps.Map;
       Old_Loaders : Page_Loaders.Constant_Map;
       Path_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;

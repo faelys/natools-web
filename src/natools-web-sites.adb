@@ -296,6 +296,9 @@ package body Natools.Web.Sites is
          when Commands.Set_File_Suffix =>
             Set_If_Possible (Builder.File_Suffix, Arguments);
 
+         when Commands.Set_Filters =>
+            Builder.Filters.Populate (Arguments);
+
          when Commands.Set_Named_Element_File =>
             if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
                declare
@@ -390,6 +393,15 @@ package body Natools.Web.Sites is
 
 
    procedure Register
+     (Object : in out Site;
+      Name : in String;
+      Constructor : in Filters.Stores.Constructor) is
+   begin
+      Object.Filters.Register (S_Expressions.To_Atom (Name), Constructor);
+   end Register;
+
+
+   procedure Register
      (Self : in out Site;
       Name : in String;
       Constructor : in Page_Constructor) is
@@ -422,6 +434,7 @@ package body Natools.Web.Sites is
               => S_Expressions.Atom_Refs.Null_Immutable_Reference,
             File_Prefix => Empty_Atom,
             File_Suffix => Empty_Atom,
+            Filters => Object.Filters.Duplicate,
             New_Loaders => <>,
             Old_Loaders => Object.Loaders,
             Path_Prefix => Empty_Atom,
@@ -434,6 +447,7 @@ package body Natools.Web.Sites is
 
       Object.Backends := Backend_Maps.Create (Builder.Backends);
       Object.Default_Template := Builder.Default_Template;
+      Object.Filters := Builder.Filters;
       Object.Loaders := Page_Loaders.Create (Builder.New_Loaders);
       Object.Named_Elements := Builder.Named_Elements;
       Object.Pages := Page_Maps.Create (Builder.Pages);
@@ -570,6 +584,13 @@ package body Natools.Web.Sites is
    begin
       return From.Backends.Element (Name);
    end Get_Backend;
+
+
+   function Get_Filter (From : Site; Name : S_Expressions.Atom)
+     return Filters.Filter'Class is
+   begin
+      return From.Filters.Get_Filter (Name);
+   end Get_Filter;
 
 
    function Get_Tags (Object : Site) return Tags.Tag_DB is

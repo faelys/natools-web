@@ -8,6 +8,7 @@
       Set_Default_Template,
       Set_File_Prefix,
       Set_File_Suffix,
+      Set_Filters,
       Set_Named_Element_File,
       Set_Named_Elements,
       Set_Path_Prefix,
@@ -25,6 +26,7 @@
          (Set_Default_Template  default-template)
          (Set_File_Prefix       file-prefix)
          (Set_File_Suffix       file-suffix)
+         (Set_Filters           filters)
          (Set_Named_Element_File named-element-file)
          (Set_Named_Elements    named-elements)
          (Set_Path_Prefix       path-prefix)

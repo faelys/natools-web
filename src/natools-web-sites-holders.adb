@@ -38,10 +38,20 @@ package body Natools.Web.Sites.Holders is
         := Site_Refs.Create (New_Site);
    begin
       New_Site.Constructors := Self.Constructors;
+      New_Site.Filters := Self.Filters;
       New_Site.Updater := Self'Unchecked_Access;
       New_Site.Reset (File_Name);
       Self.Ref := New_Ref;
    end Load;
+
+
+   not overriding procedure Register
+     (Self : in out Holder;
+      Name : in String;
+      Constructor : in Filters.Stores.Constructor) is
+   begin
+      Self.Filters.Register (S_Expressions.To_Atom (Name), Constructor);
+   end Register;
 
 
    not overriding procedure Register
@@ -135,6 +145,7 @@ package body Natools.Web.Sites.Holders is
                Constructors => Old_Site.Constructors,
                Default_Template => Old_Site.Default_Template,
                File_Name => Old_Site.File_Name,
+               Filters => Old_Site.Filters,
                Loaders => Old_Site.Loaders,
                Named_Elements => Old_Site.Named_Elements,
                Pages => Old_Site.Pages,
