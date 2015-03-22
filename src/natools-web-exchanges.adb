@@ -171,8 +171,17 @@ package body Natools.Web.Exchanges is
       Data : in S_Expressions.Atom) is
    begin
       Ensure_Kind (Object, Responses.Buffer);
-      Object.Response_Body.Append (Data);
+      Object.Filter.Apply (Object.Response_Body, Data);
    end Append;
+
+
+   procedure Insert_Filter
+     (Object : in out Exchange;
+      Filter : in Filters.Filter'Class;
+      Side : in Filters.Side := Filters.Top) is
+   begin
+      Object.Filter.Insert (Filter, Side);
+   end Insert_Filter;
 
 
    procedure Method_Not_Allowed
@@ -188,6 +197,15 @@ package body Natools.Web.Exchanges is
    begin
       Object.Status_Code := AWS.Messages.S404;
    end Not_Found;
+
+
+   procedure Remove_Filter
+     (Object : in out Exchange;
+      Filter : in Filters.Filter'Class;
+      Side : in Filters.Side := Filters.Top) is
+   begin
+      Object.Filter.Remove (Filter, Side);
+   end Remove_Filter;
 
 
    procedure Send_File

@@ -26,6 +26,7 @@ with Ada.Streams;
 with AWS.Response;
 with AWS.Status;
 with Natools.S_Expressions.Atom_Refs;
+with Natools.Web.Filters;
 
 private with AWS.Messages;
 private with Natools.S_Expressions.Atom_Buffers;
@@ -88,6 +89,16 @@ package Natools.Web.Exchanges is
       Data : in Ada.Streams.Stream_Element_Array)
      renames Append;
 
+   procedure Insert_Filter
+     (Object : in out Exchange;
+      Filter : in Filters.Filter'Class;
+      Side : in Filters.Side := Filters.Top);
+
+   procedure Remove_Filter
+     (Object : in out Exchange;
+      Filter : in Filters.Filter'Class;
+      Side : in Filters.Side := Filters.Top);
+
    procedure Send_File
      (Object : in out Exchange;
       File_Name : in S_Expressions.Atom);
@@ -137,6 +148,7 @@ private
    type Exchange (Request : access constant AWS.Status.Data)
      is limited new Ada.Streams.Root_Stream_Type with record
       Allow : Method_Set := (others => False);
+      Filter : Filters.Stack;
       Kind : Responses.Kind := Responses.Empty;
       Location : S_Expressions.Atom_Refs.Immutable_Reference;
       MIME_Type : S_Expressions.Atom_Refs.Immutable_Reference;
