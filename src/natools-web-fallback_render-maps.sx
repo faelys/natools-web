@@ -7,6 +7,7 @@
       Current_Time,
       Element,
       Element_Or_Template,
+      Filter,
       Parameter,
       Set_MIME_Type,
       Template);")
@@ -18,6 +19,7 @@
          (Current_Time   now today current-time current-date)
          (Element   element)
          (Element_Or_Template   render element-or-template)
+         (Filter   filter)
          (Parameter   parameter)
          (Set_MIME_Type   mime-type)
          (Template   template))))

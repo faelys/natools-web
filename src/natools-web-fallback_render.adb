@@ -19,6 +19,7 @@ with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Templates.Dates;
 with Natools.Static_Maps.Web.Fallback_Render;
 with Natools.Web.Escapes;
+with Natools.Web.Filters.Stores;
 
 procedure Natools.Web.Fallback_Render
   (Exchange : in out Natools.Web.Sites.Exchange;
@@ -80,6 +81,25 @@ begin
                  := Exchange.Site.Get_Template (Elements, Arguments);
             begin
                Re_Enter (Exchange, Template);
+            end;
+         end if;
+
+      when Commands.Filter =>
+         if Re_Enter = null then
+            Report_Unknown_Command;
+         elsif Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+            begin
+               declare
+                  Filter : Filters.Filter'Class
+                    := Exchange.Site.Get_Filter (Arguments.Current_Atom);
+               begin
+                  Arguments.Next;
+                  Exchange.Insert_Filter (Filter);
+                  Re_Enter (Exchange, Arguments);
+                  Exchange.Remove_Filter (Filter);
+               end;
+            exception
+               when Filters.Stores.No_Filter => null;
             end;
          end if;
 
