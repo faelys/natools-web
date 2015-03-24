@@ -1,4 +1,4 @@
---  Generated at 2015-03-08 22:00:31 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-03-24 22:19:59 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -6,7 +6,7 @@ package Natools.Static_Maps.Web.Comments is
 
    package Item is
       package Command is
-         type Enum is (Unknown, Date, Name, Mail, Link, Text, Parent);
+         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent);
       end Command;
 
       package Element is
@@ -37,16 +37,17 @@ package Natools.Static_Maps.Web.Comments is
 private
 
    Map_1_Key_0 : aliased constant String := "date";
-   Map_1_Key_1 : aliased constant String := "name";
-   Map_1_Key_2 : aliased constant String := "mail";
-   Map_1_Key_3 : aliased constant String := "e-mail";
-   Map_1_Key_4 : aliased constant String := "link";
-   Map_1_Key_5 : aliased constant String := "www";
-   Map_1_Key_6 : aliased constant String := "site";
-   Map_1_Key_7 : aliased constant String := "website";
-   Map_1_Key_8 : aliased constant String := "parent";
-   Map_1_Key_9 : aliased constant String := "text";
-   Map_1_Keys : constant array (0 .. 9) of access constant String
+   Map_1_Key_1 : aliased constant String := "id";
+   Map_1_Key_2 : aliased constant String := "name";
+   Map_1_Key_3 : aliased constant String := "mail";
+   Map_1_Key_4 : aliased constant String := "e-mail";
+   Map_1_Key_5 : aliased constant String := "link";
+   Map_1_Key_6 : aliased constant String := "www";
+   Map_1_Key_7 : aliased constant String := "site";
+   Map_1_Key_8 : aliased constant String := "website";
+   Map_1_Key_9 : aliased constant String := "parent";
+   Map_1_Key_10 : aliased constant String := "text";
+   Map_1_Keys : constant array (0 .. 10) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -56,9 +57,11 @@ private
          Map_1_Key_6'Access,
          Map_1_Key_7'Access,
          Map_1_Key_8'Access,
-         Map_1_Key_9'Access);
-   Map_1_Elements : constant array (0 .. 9) of Item.Command.Enum
+         Map_1_Key_9'Access,
+         Map_1_Key_10'Access);
+   Map_1_Elements : constant array (0 .. 10) of Item.Command.Enum
      := (Item.Command.Date,
+         Item.Command.Id,
          Item.Command.Name,
          Item.Command.Mail,
          Item.Command.Mail,

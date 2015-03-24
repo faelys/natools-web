@@ -35,6 +35,7 @@ with Natools.Web.Backends;
 with Natools.Web.Error_Pages;
 with Natools.Web.Escapes;
 with Natools.Web.Exchanges;
+with Natools.Web.Fallback_Render;
 with Natools.Web.Filters.Text_Blocks;
 with Natools.Web.List_Templates;
 with Natools.Web.Render_Default;
@@ -165,6 +166,18 @@ package body Natools.Web.Comments is
    is
       use type Tags.Visible_Access;
       use Static_Maps.Item.Command;
+
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+      begin
+         Render (Expression, Exchange, Context);
+      end Re_Enter;
+
       Accessor : constant Comment_Array_Refs.Accessor := Context.List.Query;
       Comment : Comment_Data renames Accessor.Data.Data (Context.Position);
    begin
@@ -172,12 +185,15 @@ package body Natools.Web.Comments is
 
       case Static_Maps.To_Item_Command (S_Expressions.To_String (Name)) is
          when Unknown =>
-            Log (Severities.Error, "Unknown comment command """
-              & S_Expressions.To_String (Name) & '"');
+            Fallback_Render
+              (Exchange, Name, Arguments, "comment", Re_Enter'Access);
 
          when Date =>
             S_Expressions.Templates.Dates.Render
               (Exchange, Arguments, Comment.Date);
+
+         when Id =>
+            Exchange.Append (Comment.Id.Query);
 
          when Static_Maps.Item.Command.Name =>
             Exchange.Append (Comment.Name.Query);
