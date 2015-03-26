@@ -64,6 +64,7 @@ check /tags/topic3 tags-topic3.html
 check /tags/ tags.html
 check /tags tags-redirect.html
 check /comments comments.html
+check /comment-feed comments.atom
 
 check /fourth fourth.html
 chain /fourth/comments 405.html

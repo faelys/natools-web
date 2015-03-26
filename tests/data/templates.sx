@@ -65,6 +65,8 @@
       "</blockquote></li>\n"))
    "</ol>\n"))
 
+(site-root "http://example.com")
+
 (comment-form "\
 <form class=\"mainform\" method=\"post\" action=\"" (path) "/comments\">
   <p><label>Name or nick:

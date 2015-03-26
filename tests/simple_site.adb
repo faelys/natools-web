@@ -22,6 +22,8 @@ with AWS.Server;
 with Common;
 with Common.Pages;
 with Natools.Web.Backends.Filesystem;
+with Natools.Web.Escapes.Filters;
+with Natools.Web.Filters.Text_Blocks;
 with Natools.Web.Simple_Pages;
 with Natools.Web.Tag_Pages;
 with Syslog.Guess.App_Name;
@@ -52,6 +54,10 @@ begin
    Common.Site.Register ("test-page", Common.Pages.Create'Access);
    Common.Site.Register
      ("directory", Natools.Web.Backends.Filesystem.Create'Access);
+   Common.Site.Register
+     ("html-escape", Natools.Web.Escapes.Filters.Create'Access);
+   Common.Site.Register
+     ("text-block", Natools.Web.Filters.Text_Blocks.Create'Access);
 
    if Ada.Command_Line.Argument_Count >= 1 then
       Common.Site.Load (Ada.Command_Line.Argument (1));

@@ -6,7 +6,7 @@
 (path-prefix /)
 (static-paths data/maintenance data/static)
 (template-file data/templates.sx)
-(simple-pages index comments first second third fourth)
+(simple-pages index comments comment-feed first second third fourth)
 (tag-page tags)
 (test-page test)
 (named-elements
@@ -29,3 +29,5 @@
    utf-8
    upper-case
    hexadecimal)
+(filters
+   (xml-escape html-escape "<>&"))

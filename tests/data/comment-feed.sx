@@ -1,0 +1,26 @@
+(elements
+   (html
+      (mime-type  application/atom+xml)
+      "\
+<?xml version=\"1.0\" encoding=\"utf-8\"?>
+<feed xmlns=\"http://www.w3.org/2005/Atom\">
+   <title>Test comments</title>
+   <author>
+      <name>Natacha Kerensikova</name>
+   </author>
+   <id>" (template site-root) (path) "</id>\n"
+   (tags (comments (all-elements reverse (max 1) (render
+      "   <updated>" (date (rfc-3339)) "</updated>\n"))))
+
+   (tags (comments (all-elements (render "\
+   <entry>
+      <id>" (parent (template site-root) (path)) "#" (id) "</id>
+      <author>
+         <name>" (name) "</name>
+      </author>
+      <updated>" (date (rfc-3339)) "</updated>
+      <content type=\"html\">\n"
+      (filter xml-escape (text)) "\
+      </content>
+   </entry>\n"))))
+"</feed>\n"))
