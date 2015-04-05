@@ -52,7 +52,8 @@ package body Natools.Web.Comments is
      (String, String);
 
 
-   type Comment_Metadata is record
+   type Comment_Builder is record
+      Core : Comment_Data;
       Extra_Fields : String_Maps.Map;
    end record;
 
@@ -83,8 +84,7 @@ package body Natools.Web.Comments is
       --  Return the comment id of temporary previews
 
    procedure Process_Form
-     (Comment : in out Comment_Data;
-      Meta : in out Comment_Metadata;
+     (Data : in out Comment_Builder;
       Exchange : in Sites.Exchange);
       --  Read form data in Exchange to fill Data
 
@@ -243,15 +243,16 @@ package body Natools.Web.Comments is
                Ref : constant Comment_Ref
                  := (List => Comment_Array_Refs.Create (new Comment_Container'
                        (Size => 1,
-                        Data => (1 => (Date => Ada.Calendar.Clock,
-                                       Id => Preview_Id,
-                                       others => <>)),
+                        Data => (1 => <>),
                         Parent => List.Comments.Query.Parent)),
                      Position => 1);
-               Meta : Comment_Metadata;
+               Builder : Comment_Builder;
             begin
-               Process_Form (Ref.List.Query.Data (1), Meta, Exchange);
-               Preprocess (Ref.List.Query.Data (1));
+               Builder.Core.Date := Ada.Calendar.Clock;
+               Builder.Core.Id := Preview_Id;
+               Process_Form (Builder, Exchange);
+               Preprocess (Builder.Core);
+               Ref.List.Update.Data (1) := Builder.Core;
                Render (Arguments, Exchange, Ref);
             end;
 
@@ -396,8 +397,7 @@ package body Natools.Web.Comments is
 
 
    procedure Process_Form
-     (Comment : in out Comment_Data;
-      Meta : in out Comment_Metadata;
+     (Data : in out Comment_Builder;
       Exchange : in Sites.Exchange)
    is
       procedure Process (Field, Value : String);
@@ -407,19 +407,19 @@ package body Natools.Web.Comments is
       begin
          case Static_Maps.To_Item_Form (Field) is
             when Unknown =>
-               Meta.Extra_Fields.Insert (Field, Value);
+               Data.Extra_Fields.Insert (Field, Value);
 
             when Name =>
-               Comment.Name := Create (S_Expressions.To_Atom (Value));
+               Data.Core.Name := Create (S_Expressions.To_Atom (Value));
 
             when Mail =>
-               Comment.Mail := Create (S_Expressions.To_Atom (Value));
+               Data.Core.Mail := Create (S_Expressions.To_Atom (Value));
 
             when Link =>
-               Comment.Link := Create (S_Expressions.To_Atom (Value));
+               Data.Core.Link := Create (S_Expressions.To_Atom (Value));
 
             when Text =>
-               Comment.Text := Create (S_Expressions.To_Atom (Value));
+               Data.Core.Text := Create (S_Expressions.To_Atom (Value));
          end case;
       end Process;
    begin
@@ -583,8 +583,7 @@ package body Natools.Web.Comments is
       Exchange : in out Sites.Exchange;
       Extra_Path : in S_Expressions.Atom)
    is
-      New_Comment : Comment_Data;
-      Meta : Comment_Metadata;
+      Builder : Comment_Builder;
    begin
       if Extra_Path'Length > 0
         or else List.Backend_Name.Is_Empty
@@ -614,22 +613,22 @@ package body Natools.Web.Comments is
          return;
       end if;
 
-      New_Comment.Date := Ada.Calendar.Clock;
-      New_Comment.Id := Create (S_Expressions.To_Atom
-                          (Time_Keys.To_Key (New_Comment.Date)));
-      Process_Form (New_Comment, Meta, Exchange);
+      Builder.Core.Date := Ada.Calendar.Clock;
+      Builder.Core.Id := Create (S_Expressions.To_Atom
+        (Time_Keys.To_Key (Builder.Core.Date)));
+      Process_Form (Builder, Exchange);
 
       Write_Comment :
       declare
          Backend : Backends.Backend'Class
            := Exchange.Site.Get_Backend (List.Backend_Name.Query);
          Stream : aliased Ada.Streams.Root_Stream_Type'Class
-           := Backend.Create (List.Backend_Path.Query, New_Comment.Id.Query);
+           := Backend.Create (List.Backend_Path.Query, Builder.Core.Id.Query);
          Printer : S_Expressions.Printers.Pretty.Stream_Printer
            (Stream'Access);
       begin
          Exchange.Site.Set_Parameters (Printer);
-         Write (New_Comment, Printer);
+         Write (Builder.Core, Printer);
       end Write_Comment;
 
       Error_Pages.See_Other (Exchange, List.Parent_Path.Query);
