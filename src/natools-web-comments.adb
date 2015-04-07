@@ -37,6 +37,7 @@ with Natools.Web.Escapes;
 with Natools.Web.Exchanges;
 with Natools.Web.Fallback_Render;
 with Natools.Web.Filters.Text_Blocks;
+with Natools.Web.Is_Valid_URL;
 with Natools.Web.List_Templates;
 with Natools.Web.Render_Default;
 with Natools.Web.Sites.Updates;
@@ -202,7 +203,9 @@ package body Natools.Web.Comments is
             Exchange.Append (Comment.Mail.Query);
 
          when Link =>
-            Exchange.Append (Comment.Link.Query);
+            if not Comment.Link.Is_Empty then
+               Exchange.Append (Comment.Link.Query);
+            end if;
 
          when Parent =>
             if Accessor.Parent /= null then
@@ -371,8 +374,13 @@ package body Natools.Web.Comments is
 
       Comment.Name := Escapes.Escape (Comment.Name, Escapes.HTML_Attribute);
       Comment.Mail := Escapes.Escape (Comment.Mail, Escapes.HTML_Attribute);
-      Comment.Link := Escapes.Escape (Comment.Link, Escapes.HTML_Attribute);
       Comment.Preprocessed := True;
+
+      if Is_Valid_URL (S_Expressions.To_String (Comment.Link.Query)) then
+         Comment.Link := Escapes.Escape (Comment.Link, Escapes.HTML_Attribute);
+      else
+         Comment.Link.Reset;
+      end if;
 
       if not Comment.Text.Is_Empty then
          declare
