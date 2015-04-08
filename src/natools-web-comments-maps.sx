@@ -4,7 +4,8 @@
    (extra-decl "\
    package Item is
       package Command is
-         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent);
+         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent,
+           If_Name, If_No_Name, If_Mail, If_No_Mail, If_Link, If_No_Link);
       end Command;
 
       package Element is
@@ -33,6 +34,12 @@
       (nodes
          (Item.Command.Date  date)
          (Item.Command.Id  id)
+         (Item.Command.If_Link  if-link)
+         (Item.Command.If_No_Link  if-no-link)
+         (Item.Command.If_No_Mail  if-no-mail)
+         (Item.Command.If_No_Name  if-no-name)
+         (Item.Command.If_Mail  if-mail)
+         (Item.Command.If_Name  if-name)
          (Item.Command.Name  name)
          (Item.Command.Mail  mail e-mail)
          (Item.Command.Link  link www site website)

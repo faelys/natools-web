@@ -1,4 +1,4 @@
---  Generated at 2015-03-24 22:19:59 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-04-08 17:20:37 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -6,7 +6,8 @@ package Natools.Static_Maps.Web.Comments is
 
    package Item is
       package Command is
-         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent);
+         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent,
+           If_Name, If_No_Name, If_Mail, If_No_Mail, If_Link, If_No_Link);
       end Command;
 
       package Element is
@@ -38,16 +39,22 @@ private
 
    Map_1_Key_0 : aliased constant String := "date";
    Map_1_Key_1 : aliased constant String := "id";
-   Map_1_Key_2 : aliased constant String := "name";
-   Map_1_Key_3 : aliased constant String := "mail";
-   Map_1_Key_4 : aliased constant String := "e-mail";
-   Map_1_Key_5 : aliased constant String := "link";
-   Map_1_Key_6 : aliased constant String := "www";
-   Map_1_Key_7 : aliased constant String := "site";
-   Map_1_Key_8 : aliased constant String := "website";
-   Map_1_Key_9 : aliased constant String := "parent";
-   Map_1_Key_10 : aliased constant String := "text";
-   Map_1_Keys : constant array (0 .. 10) of access constant String
+   Map_1_Key_2 : aliased constant String := "if-link";
+   Map_1_Key_3 : aliased constant String := "if-no-link";
+   Map_1_Key_4 : aliased constant String := "if-no-mail";
+   Map_1_Key_5 : aliased constant String := "if-no-name";
+   Map_1_Key_6 : aliased constant String := "if-mail";
+   Map_1_Key_7 : aliased constant String := "if-name";
+   Map_1_Key_8 : aliased constant String := "name";
+   Map_1_Key_9 : aliased constant String := "mail";
+   Map_1_Key_10 : aliased constant String := "e-mail";
+   Map_1_Key_11 : aliased constant String := "link";
+   Map_1_Key_12 : aliased constant String := "www";
+   Map_1_Key_13 : aliased constant String := "site";
+   Map_1_Key_14 : aliased constant String := "website";
+   Map_1_Key_15 : aliased constant String := "parent";
+   Map_1_Key_16 : aliased constant String := "text";
+   Map_1_Keys : constant array (0 .. 16) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -58,10 +65,22 @@ private
          Map_1_Key_7'Access,
          Map_1_Key_8'Access,
          Map_1_Key_9'Access,
-         Map_1_Key_10'Access);
-   Map_1_Elements : constant array (0 .. 10) of Item.Command.Enum
+         Map_1_Key_10'Access,
+         Map_1_Key_11'Access,
+         Map_1_Key_12'Access,
+         Map_1_Key_13'Access,
+         Map_1_Key_14'Access,
+         Map_1_Key_15'Access,
+         Map_1_Key_16'Access);
+   Map_1_Elements : constant array (0 .. 16) of Item.Command.Enum
      := (Item.Command.Date,
          Item.Command.Id,
+         Item.Command.If_Link,
+         Item.Command.If_No_Link,
+         Item.Command.If_No_Mail,
+         Item.Command.If_No_Name,
+         Item.Command.If_Mail,
+         Item.Command.If_Name,
          Item.Command.Name,
          Item.Command.Mail,
          Item.Command.Mail,

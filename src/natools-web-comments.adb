@@ -172,12 +172,27 @@ package body Natools.Web.Comments is
         (Exchange : in out Sites.Exchange;
          Expression : in out S_Expressions.Lockable.Descriptor'Class);
 
+      procedure Render_Ref
+        (Ref : in S_Expressions.Atom_Refs.Immutable_Reference);
+
       procedure Re_Enter
         (Exchange : in out Sites.Exchange;
          Expression : in out S_Expressions.Lockable.Descriptor'Class) is
       begin
          Render (Expression, Exchange, Context);
       end Re_Enter;
+
+      procedure Render_Ref
+        (Ref : in S_Expressions.Atom_Refs.Immutable_Reference) is
+      begin
+         if not Ref.Is_Empty then
+            Exchange.Append (Ref.Query);
+         elsif Arguments.Current_Event
+           in S_Expressions.Events.Add_Atom | S_Expressions.Events.Open_List
+         then
+            Render (Arguments, Exchange, Context);
+         end if;
+      end Render_Ref;
 
       Accessor : constant Comment_Array_Refs.Accessor := Context.List.Query;
       Comment : Comment_Data renames Accessor.Data.Data (Context.Position);
@@ -196,16 +211,44 @@ package body Natools.Web.Comments is
          when Id =>
             Exchange.Append (Comment.Id.Query);
 
+         when If_Link =>
+            if not Comment.Link.Is_Empty then
+               Render (Arguments, Exchange, Context);
+            end if;
+
+         when If_No_Link =>
+            if Comment.Link.Is_Empty then
+               Render (Arguments, Exchange, Context);
+            end if;
+
+         when If_No_Mail =>
+            if Comment.Mail.Is_Empty then
+               Render (Arguments, Exchange, Context);
+            end if;
+
+         when If_No_Name =>
+            if Comment.Name.Is_Empty then
+               Render (Arguments, Exchange, Context);
+            end if;
+
+         when If_Mail =>
+            if not Comment.Mail.Is_Empty then
+               Render (Arguments, Exchange, Context);
+            end if;
+
+         when If_Name =>
+            if not Comment.Name.Is_Empty then
+               Render (Arguments, Exchange, Context);
+            end if;
+
          when Static_Maps.Item.Command.Name =>
-            Exchange.Append (Comment.Name.Query);
+            Render_Ref (Comment.Name);
 
          when Mail =>
-            Exchange.Append (Comment.Mail.Query);
+            Render_Ref (Comment.Mail);
 
          when Link =>
-            if not Comment.Link.Is_Empty then
-               Exchange.Append (Comment.Link.Query);
-            end if;
+            Render_Ref (Comment.Link);
 
          when Parent =>
             if Accessor.Parent /= null then
@@ -213,7 +256,7 @@ package body Natools.Web.Comments is
             end if;
 
          when Text =>
-            Exchange.Append (Comment.Text.Query);
+            Render_Ref (Comment.Text);
       end case;
    end Render_Comment_Position;
 
@@ -372,11 +415,17 @@ package body Natools.Web.Comments is
          return;
       end if;
 
-      Comment.Name := Escapes.Escape (Comment.Name, Escapes.HTML_Attribute);
-      Comment.Mail := Escapes.Escape (Comment.Mail, Escapes.HTML_Attribute);
-      Comment.Preprocessed := True;
+      if not Comment.Name.Is_Empty then
+         Comment.Name := Escapes.Escape (Comment.Name, Escapes.HTML_Attribute);
+      end if;
 
-      if Is_Valid_URL (S_Expressions.To_String (Comment.Link.Query)) then
+      if not Comment.Mail.Is_Empty then
+         Comment.Mail := Escapes.Escape (Comment.Mail, Escapes.HTML_Attribute);
+      end if;
+
+      if not Comment.Link.Is_Empty
+        and then Is_Valid_URL (S_Expressions.To_String (Comment.Link.Query))
+      then
          Comment.Link := Escapes.Escape (Comment.Link, Escapes.HTML_Attribute);
       else
          Comment.Link.Reset;
@@ -391,6 +440,8 @@ package body Natools.Web.Comments is
             Comment.Text := Create (Buffer.Data);
          end;
       end if;
+
+      Comment.Preprocessed := True;
    end Preprocess;
 
 
