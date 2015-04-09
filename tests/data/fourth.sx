@@ -5,7 +5,9 @@
    "<h1>Timeless Comments</h1>\n<ol>\n"
    (list (render
       "<li><p>"
+      (if-link "<a href=\"" (link) "\">") (if-no-link "<strong>")
       (name)
+      (if-link "</a>") (if-no-link "</strong>")
       " wrote:</p>\n<blockquote>\n"
       (text)
       "</blockquote></li>\n"))
@@ -13,7 +15,9 @@
    (preview
       "<h1>Preview</h1>\n<ol>\n"
       "<li><p>"
+      (if-link "<a href=\"" (link) "\">") (if-no-link "<strong>")
       (name)
+      (if-link "</a>") (if-no-link "</strong>")
       " wrote:</p>\n<blockquote>\n"
       (text)
       "</blockquote></li>\n"

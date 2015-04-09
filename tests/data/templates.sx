@@ -29,41 +29,33 @@
 
 (href "<a href=\"" (path) "\">" (element title) "</a>")
 
+(comment-li
+   "<li><p>On "
+   (date
+      (month January February March April May June July
+         August September October November December)
+      " "
+      (day (suffix (th (4 31)) (st 1 21 31) (nd 2 22) (rd 3 23)))
+      " "
+      (year)
+      " at "
+      (hour) ":" (padded-minute))
+   ", "
+   (if-link "<a href=\"" (link) "\">")
+   (name "an anonymous")
+   (if-link "</a>")
+   " wrote:</p>\n<blockquote>\n"
+   (text)
+   "</blockquote></li>\n")
+
 (page-comments (comments
-   (preview
-      "<h1>Preview</h1>\n<ol>\n<li><p>On "
-      (date
-         (month January February March April May June July
-            August September October November December)
-         " "
-         (day (suffix (th (4 31)) (st 1 21 31) (nd 2 22) (rd 3 23)))
-         " "
-         (year)
-         " at "
-         (hour) ":" (padded-minute))
-      ", "
-      (name)
-      " wrote:</p>\n<blockquote>\n"
-      (text)
-      "</blockquote></li>\n</ol>\n")
    "<h1>Comments</h1>\n<ol>\n"
-   (list (render
-      "<li><p>On "
-      (date
-         (month January February March April May June July
-            August September October November December)
-         " "
-         (day (suffix (th (4 31)) (st 1 21 31) (nd 2 22) (rd 3 23)))
-         " "
-         (year)
-         " at "
-         (hour) ":" (padded-minute))
-      ", "
-      (name)
-      " wrote:</p>\n<blockquote>\n"
-      (text)
-      "</blockquote></li>\n"))
-   "</ol>\n"))
+   (list (render (render comment-li)))
+   "</ol>\n"
+   (preview
+      "<h1>Preview</h1>\n<ol>\n"
+      (render comment-li)
+      "</ol>\n")))
 
 (site-root "http://example.com")
 

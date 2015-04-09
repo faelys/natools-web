@@ -16,7 +16,7 @@
    <entry>
       <id>" (parent (template site-root) (path)) "#" (id) "</id>
       <author>
-         <name>" (name) "</name>
+         <name>" (name) (if-no-name Anonymous) "</name>
       </author>
       <updated>" (date (rfc-3339)) "</updated>
       <content type=\"html\">\n"

@@ -1,6 +1,5 @@
 (date 2015-01-01T08:00:00Z)
 (name "Natasha Kerensikova")
 (mail "")
-(link "http://instinctive.eu/")
 (text "Escaping to prevent HTML injection attacks:
 <script>alert(\"hello\");</script>\n")
