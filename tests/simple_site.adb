@@ -21,6 +21,7 @@ with AWS.Config;
 with AWS.Server;
 with Common;
 with Common.Pages;
+with Common.Test_Maps;
 with Natools.Web.Backends.Filesystem;
 with Natools.Web.Escapes.Filters;
 with Natools.Web.Filters.Text_Blocks;
@@ -35,6 +36,8 @@ procedure Simple_Site is
    WS : AWS.Server.HTTP;
    Debug : constant Boolean := Ada.Command_Line.Argument_Count >= 2;
 begin
+   pragma Assert (Common.Test_Maps);
+
    if Debug then
       Natools.Web.Log := Common.Text_IO_Log'Access;
    else
