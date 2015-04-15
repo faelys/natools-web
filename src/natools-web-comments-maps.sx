@@ -23,7 +23,7 @@
       end Command;
 
       package Element is
-         type Enum is (Unknown, Backend, Tags);
+         type Enum is (Unknown, Backend, Post_Filter, Tags);
       end Element;
    end List;")
 
@@ -82,4 +82,5 @@
       (not-found List.Element.Unknown)
       (nodes
          (List.Element.Backend  backend)
+         (List.Element.Post_Filter  post-filter filter)
          (List.Element.Tags  tags))))

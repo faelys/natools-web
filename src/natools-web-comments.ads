@@ -115,6 +115,7 @@ private
       Backend_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Parent_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Comments : Comment_Array_Refs.Reference;
+      Post_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
       Tags : Containers.Atom_Array_Refs.Immutable_Reference;
    end record;
 
@@ -160,6 +161,7 @@ private
          Backend_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Parent_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Comments => Comment_Array_Refs.Null_Reference,
+         Post_Filter => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Tags => Containers.Atom_Array_Refs.Null_Immutable_Reference);
 
 end Natools.Web.Comments;

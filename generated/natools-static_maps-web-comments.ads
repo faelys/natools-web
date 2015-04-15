@@ -1,4 +1,4 @@
---  Generated at 2015-04-08 17:20:37 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-04-15 19:12:58 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -25,7 +25,7 @@ package Natools.Static_Maps.Web.Comments is
       end Command;
 
       package Element is
-         type Enum is (Unknown, Backend, Tags);
+         type Enum is (Unknown, Backend, Post_Filter, Tags);
       end Element;
    end List;
 
@@ -152,12 +152,18 @@ private
          List.Command.Size);
 
    Map_5_Key_0 : aliased constant String := "backend";
-   Map_5_Key_1 : aliased constant String := "tags";
-   Map_5_Keys : constant array (0 .. 1) of access constant String
+   Map_5_Key_1 : aliased constant String := "post-filter";
+   Map_5_Key_2 : aliased constant String := "filter";
+   Map_5_Key_3 : aliased constant String := "tags";
+   Map_5_Keys : constant array (0 .. 3) of access constant String
      := (Map_5_Key_0'Access,
-         Map_5_Key_1'Access);
-   Map_5_Elements : constant array (0 .. 1) of List.Element.Enum
+         Map_5_Key_1'Access,
+         Map_5_Key_2'Access,
+         Map_5_Key_3'Access);
+   Map_5_Elements : constant array (0 .. 3) of List.Element.Enum
      := (List.Element.Backend,
+         List.Element.Post_Filter,
+         List.Element.Post_Filter,
          List.Element.Tags);
 
 end Natools.Static_Maps.Web.Comments;

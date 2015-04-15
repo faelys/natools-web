@@ -393,6 +393,9 @@ package body Natools.Web.Comments is
                List.Backend_Path := Create (Arguments.Current_Atom);
             end if;
 
+         when Post_Filter =>
+            List.Post_Filter := Create (Arguments.Current_Atom);
+
          when Static_Maps.List.Element.Tags =>
             declare
                List_Builder : Containers.Unsafe_Atom_Lists.List;
