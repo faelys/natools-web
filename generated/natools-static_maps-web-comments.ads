@@ -1,4 +1,4 @@
---  Generated at 2015-04-15 19:12:58 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-04-16 21:37:25 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -10,6 +10,10 @@ package Natools.Static_Maps.Web.Comments is
            If_Name, If_No_Name, If_Mail, If_No_Mail, If_Link, If_No_Link);
       end Command;
 
+      package Condition is
+         type Enum is (Unknown, Has_Extra_Fields, Name, Mail, Link, Text);
+      end Condition;
+
       package Element is
          type Enum is (Unknown, Date, Name, Mail, Link, Text);
       end Element;
@@ -17,6 +21,10 @@ package Natools.Static_Maps.Web.Comments is
       package Form is
          type Enum is (Unknown, Name, Mail, Link, Text);
       end Form;
+
+      package Post_Action is
+         type Enum is (Unknown, Save, Force_Preview);
+      end Post_Action;
    end Item;
 
    package List is
@@ -30,8 +38,10 @@ package Natools.Static_Maps.Web.Comments is
    end List;
 
    function To_Item_Command (Key : String) return Item.Command.Enum;
+   function To_Item_Condition (Key : String) return Item.Condition.Enum;
    function To_Item_Element (Key : String) return Item.Element.Enum;
    function To_Item_Form (Key : String) return Item.Form.Enum;
+   function To_Item_Action (Key : String) return Item.Post_Action.Enum;
    function To_List_Command (Key : String) return List.Command.Enum;
    function To_List_Element (Key : String) return List.Element.Enum;
 
@@ -91,16 +101,17 @@ private
          Item.Command.Parent,
          Item.Command.Text);
 
-   Map_2_Key_0 : aliased constant String := "date";
-   Map_2_Key_1 : aliased constant String := "name";
-   Map_2_Key_2 : aliased constant String := "mail";
-   Map_2_Key_3 : aliased constant String := "e-mail";
-   Map_2_Key_4 : aliased constant String := "link";
-   Map_2_Key_5 : aliased constant String := "www";
-   Map_2_Key_6 : aliased constant String := "site";
-   Map_2_Key_7 : aliased constant String := "website";
-   Map_2_Key_8 : aliased constant String := "text";
-   Map_2_Keys : constant array (0 .. 8) of access constant String
+   Map_2_Key_0 : aliased constant String := "has-extra-field";
+   Map_2_Key_1 : aliased constant String := "has-extra-fields";
+   Map_2_Key_2 : aliased constant String := "name";
+   Map_2_Key_3 : aliased constant String := "mail";
+   Map_2_Key_4 : aliased constant String := "e-mail";
+   Map_2_Key_5 : aliased constant String := "link";
+   Map_2_Key_6 : aliased constant String := "www";
+   Map_2_Key_7 : aliased constant String := "site";
+   Map_2_Key_8 : aliased constant String := "website";
+   Map_2_Key_9 : aliased constant String := "text";
+   Map_2_Keys : constant array (0 .. 9) of access constant String
      := (Map_2_Key_0'Access,
          Map_2_Key_1'Access,
          Map_2_Key_2'Access,
@@ -109,8 +120,40 @@ private
          Map_2_Key_5'Access,
          Map_2_Key_6'Access,
          Map_2_Key_7'Access,
-         Map_2_Key_8'Access);
-   Map_2_Elements : constant array (0 .. 8) of Item.Element.Enum
+         Map_2_Key_8'Access,
+         Map_2_Key_9'Access);
+   Map_2_Elements : constant array (0 .. 9) of Item.Condition.Enum
+     := (Item.Condition.Has_Extra_Fields,
+         Item.Condition.Has_Extra_Fields,
+         Item.Condition.Name,
+         Item.Condition.Mail,
+         Item.Condition.Mail,
+         Item.Condition.Link,
+         Item.Condition.Link,
+         Item.Condition.Link,
+         Item.Condition.Link,
+         Item.Condition.Text);
+
+   Map_3_Key_0 : aliased constant String := "date";
+   Map_3_Key_1 : aliased constant String := "name";
+   Map_3_Key_2 : aliased constant String := "mail";
+   Map_3_Key_3 : aliased constant String := "e-mail";
+   Map_3_Key_4 : aliased constant String := "link";
+   Map_3_Key_5 : aliased constant String := "www";
+   Map_3_Key_6 : aliased constant String := "site";
+   Map_3_Key_7 : aliased constant String := "website";
+   Map_3_Key_8 : aliased constant String := "text";
+   Map_3_Keys : constant array (0 .. 8) of access constant String
+     := (Map_3_Key_0'Access,
+         Map_3_Key_1'Access,
+         Map_3_Key_2'Access,
+         Map_3_Key_3'Access,
+         Map_3_Key_4'Access,
+         Map_3_Key_5'Access,
+         Map_3_Key_6'Access,
+         Map_3_Key_7'Access,
+         Map_3_Key_8'Access);
+   Map_3_Elements : constant array (0 .. 8) of Item.Element.Enum
      := (Item.Element.Date,
          Item.Element.Name,
          Item.Element.Mail,
@@ -121,46 +164,61 @@ private
          Item.Element.Link,
          Item.Element.Text);
 
-   Map_3_Key_0 : aliased constant String := "c_name";
-   Map_3_Key_1 : aliased constant String := "c_mail";
-   Map_3_Key_2 : aliased constant String := "c_site";
-   Map_3_Key_3 : aliased constant String := "c_text";
-   Map_3_Keys : constant array (0 .. 3) of access constant String
-     := (Map_3_Key_0'Access,
-         Map_3_Key_1'Access,
-         Map_3_Key_2'Access,
-         Map_3_Key_3'Access);
-   Map_3_Elements : constant array (0 .. 3) of Item.Form.Enum
-     := (Item.Form.Name,
-         Item.Form.Mail,
-         Item.Form.Link,
-         Item.Form.Text);
-
-   Map_4_Key_0 : aliased constant String := "list";
-   Map_4_Key_1 : aliased constant String := "preview";
-   Map_4_Key_2 : aliased constant String := "size";
-   Map_4_Key_3 : aliased constant String := "length";
+   Map_4_Key_0 : aliased constant String := "c_name";
+   Map_4_Key_1 : aliased constant String := "c_mail";
+   Map_4_Key_2 : aliased constant String := "c_site";
+   Map_4_Key_3 : aliased constant String := "c_text";
    Map_4_Keys : constant array (0 .. 3) of access constant String
      := (Map_4_Key_0'Access,
          Map_4_Key_1'Access,
          Map_4_Key_2'Access,
          Map_4_Key_3'Access);
-   Map_4_Elements : constant array (0 .. 3) of List.Command.Enum
-     := (List.Command.List,
-         List.Command.Preview,
-         List.Command.Size,
-         List.Command.Size);
+   Map_4_Elements : constant array (0 .. 3) of Item.Form.Enum
+     := (Item.Form.Name,
+         Item.Form.Mail,
+         Item.Form.Link,
+         Item.Form.Text);
 
-   Map_5_Key_0 : aliased constant String := "backend";
-   Map_5_Key_1 : aliased constant String := "post-filter";
-   Map_5_Key_2 : aliased constant String := "filter";
-   Map_5_Key_3 : aliased constant String := "tags";
+   Map_5_Key_0 : aliased constant String := "accept";
+   Map_5_Key_1 : aliased constant String := "save";
+   Map_5_Key_2 : aliased constant String := "preview";
+   Map_5_Key_3 : aliased constant String := "force-preview";
    Map_5_Keys : constant array (0 .. 3) of access constant String
      := (Map_5_Key_0'Access,
          Map_5_Key_1'Access,
          Map_5_Key_2'Access,
          Map_5_Key_3'Access);
-   Map_5_Elements : constant array (0 .. 3) of List.Element.Enum
+   Map_5_Elements : constant array (0 .. 3) of Item.Post_Action.Enum
+     := (Item.Post_Action.Save,
+         Item.Post_Action.Save,
+         Item.Post_Action.Force_Preview,
+         Item.Post_Action.Force_Preview);
+
+   Map_6_Key_0 : aliased constant String := "list";
+   Map_6_Key_1 : aliased constant String := "preview";
+   Map_6_Key_2 : aliased constant String := "size";
+   Map_6_Key_3 : aliased constant String := "length";
+   Map_6_Keys : constant array (0 .. 3) of access constant String
+     := (Map_6_Key_0'Access,
+         Map_6_Key_1'Access,
+         Map_6_Key_2'Access,
+         Map_6_Key_3'Access);
+   Map_6_Elements : constant array (0 .. 3) of List.Command.Enum
+     := (List.Command.List,
+         List.Command.Preview,
+         List.Command.Size,
+         List.Command.Size);
+
+   Map_7_Key_0 : aliased constant String := "backend";
+   Map_7_Key_1 : aliased constant String := "post-filter";
+   Map_7_Key_2 : aliased constant String := "filter";
+   Map_7_Key_3 : aliased constant String := "tags";
+   Map_7_Keys : constant array (0 .. 3) of access constant String
+     := (Map_7_Key_0'Access,
+         Map_7_Key_1'Access,
+         Map_7_Key_2'Access,
+         Map_7_Key_3'Access);
+   Map_7_Elements : constant array (0 .. 3) of List.Element.Enum
      := (List.Element.Backend,
          List.Element.Post_Filter,
          List.Element.Post_Filter,

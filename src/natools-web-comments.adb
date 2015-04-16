@@ -23,6 +23,9 @@ with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Streams;
 with Natools.S_Expressions.Atom_Buffers;
 with Natools.S_Expressions.Atom_Ref_Constructors;
+with Natools.S_Expressions.Caches;
+with Natools.S_Expressions.Conditionals.Generic_Evaluate;
+with Natools.S_Expressions.Conditionals.Strings;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Parsers;
 with Natools.S_Expressions.Printers.Pretty;
@@ -58,6 +61,11 @@ package body Natools.Web.Comments is
       Extra_Fields : String_Maps.Map;
    end record;
 
+   type Post_Action is (Save_Comment, Force_Preview);
+
+
+   Invalid_Condition : exception;
+
 
    Preview_Button : constant String := "preview";
    Preview_Id_Ref : S_Expressions.Atom_Refs.Immutable_Reference;
@@ -80,6 +88,47 @@ package body Natools.Web.Comments is
      return S_Expressions.Atom_Refs.Immutable_Reference
      renames S_Expressions.Atom_Ref_Constructors.Create;
       --  Atom expression constructor
+
+   function Evaluate_Parametric
+     (Builder : in Comment_Builder;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+     return Boolean;
+      --  Evaluate a condition on a comment builder with arguments
+
+   function Evaluate_Simple
+     (Builder : in Comment_Builder;
+      Name : in S_Expressions.Atom)
+     return Boolean;
+      --  Evaluate a condition on a comment builder without argument
+
+   function Parse_Action
+     (Builder : in Comment_Builder;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Default_Action : in Post_Action := Save_Comment)
+     return Post_Action;
+      --  Evaluate Expression to determine what action to take after POST req
+
+   function Parse_Action
+     (Builder : in Comment_Builder;
+      Site : in Sites.Site;
+      Filter_Name : in S_Expressions.Atom_Refs.Immutable_Reference;
+      Default_Action : in Post_Action := Save_Comment)
+     return Post_Action;
+      --  High-level evaluation, that extracts the expression from Site
+
+   procedure Parse_Action
+     (Result : in out Post_Action;
+      Builder : in Comment_Builder;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class);
+      --  Evluate action with parameter
+
+   procedure Parse_Action_Simple
+     (Result : in out Post_Action;
+      Builder : in Comment_Builder;
+      Name : in S_Expressions.Atom);
+      --  Evaluate parameterless action
 
    function Preview_Id return S_Expressions.Atom_Refs.Immutable_Reference;
       --  Return the comment id of temporary previews
@@ -116,6 +165,12 @@ package body Natools.Web.Comments is
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
       --  Update comment list with the given expression
 
+
+   function Evaluate is new S_Expressions.Conditionals.Generic_Evaluate
+     (Comment_Builder, Evaluate_Parametric, Evaluate_Simple);
+
+   procedure Parse is new S_Expressions.Interpreter_Loop
+     (Post_Action, Comment_Builder, Parse_Action, Parse_Action_Simple);
 
    procedure Render is new S_Expressions.Interpreter_Loop
      (Sites.Exchange, Comment_List, Render_List_Element, Append);
@@ -281,7 +336,9 @@ package body Natools.Web.Comments is
                List_Templates.Read_Parameters (Arguments));
 
          when Preview =>
-            if Exchange.Parameter (Preview_Button) = "" then
+            if Exchange.Parameter (Preview_Button) = ""
+              and then Exchange.Parameter (Submit_Button) = ""
+            then
                return;
             end if;
 
@@ -405,6 +462,182 @@ package body Natools.Web.Comments is
             end;
       end case;
    end Update_List;
+
+
+
+   --------------------------------
+   -- Conditionals and Filtering --
+   --------------------------------
+
+   function Evaluate_Parametric
+     (Builder : in Comment_Builder;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+     return Boolean
+   is
+      function String_Evaluate
+        (Ref : in S_Expressions.Atom_Refs.Immutable_Reference;
+         Arg : in out S_Expressions.Lockable.Descriptor'Class)
+        return Boolean;
+
+      function String_Evaluate
+        (Ref : in S_Expressions.Atom_Refs.Immutable_Reference;
+         Arg : in out S_Expressions.Lockable.Descriptor'Class)
+        return Boolean is
+      begin
+         if Ref.Is_Empty then
+            return S_Expressions.Conditionals.Strings.Evaluate ("", Arg);
+         else
+            return S_Expressions.Conditionals.Strings.Evaluate
+              (S_Expressions.To_String (Ref.Query), Arg);
+         end if;
+      end String_Evaluate;
+
+      use Static_Maps.Item.Condition;
+   begin
+      case Static_Maps.To_Item_Condition (S_Expressions.To_String (Name)) is
+         when Unknown =>
+            raise Invalid_Condition with "Unknown parametric conditional """
+              & S_Expressions.To_String (Name) & '"';
+
+         when Has_Extra_Fields =>
+            return not Builder.Extra_Fields.Is_Empty;
+
+         when Link =>
+            return String_Evaluate (Builder.Core.Link, Arguments);
+
+         when Mail =>
+            return String_Evaluate (Builder.Core.Mail, Arguments);
+
+         when Static_Maps.Item.Condition.Name =>
+            return String_Evaluate (Builder.Core.Name, Arguments);
+
+         when Text =>
+            return String_Evaluate (Builder.Core.Text, Arguments);
+      end case;
+   end Evaluate_Parametric;
+
+
+   function Evaluate_Simple
+     (Builder : in Comment_Builder;
+      Name : in S_Expressions.Atom)
+     return Boolean
+   is
+      use Static_Maps.Item.Condition;
+   begin
+      case Static_Maps.To_Item_Condition (S_Expressions.To_String (Name)) is
+         when Unknown =>
+            raise Invalid_Condition with "Unknown simple conditional """
+              & S_Expressions.To_String (Name) & '"';
+
+         when Has_Extra_Fields =>
+            return not Builder.Extra_Fields.Is_Empty;
+
+         when Link =>
+            return not Builder.Core.Link.Is_Empty;
+
+         when Mail =>
+            return not Builder.Core.Mail.Is_Empty;
+
+         when Static_Maps.Item.Condition.Name =>
+            return not Builder.Core.Name.Is_Empty;
+
+         when Text =>
+            return not Builder.Core.Text.Is_Empty;
+      end case;
+   end Evaluate_Simple;
+
+
+   function Parse_Action
+     (Builder : in Comment_Builder;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Default_Action : in Post_Action := Save_Comment)
+     return Post_Action
+   is
+      Result : Post_Action := Default_Action;
+   begin
+      Parse (Expression, Result, Builder);
+      return Result;
+   end Parse_Action;
+
+
+   function Parse_Action
+     (Builder : in Comment_Builder;
+      Site : in Sites.Site;
+      Filter_Name : in S_Expressions.Atom_Refs.Immutable_Reference;
+      Default_Action : in Post_Action := Save_Comment)
+     return Post_Action
+   is
+      Expression : S_Expressions.Caches.Cursor;
+      Found : Boolean;
+   begin
+      if Filter_Name.Is_Empty then
+         return Default_Action;
+      end if;
+
+      Site.Get_Template (Filter_Name.Query, Expression, Found);
+
+      if not Found then
+         return Default_Action;
+      end if;
+
+      return Parse_Action (Builder, Expression, Default_Action);
+   end Parse_Action;
+
+
+   procedure Parse_Action
+     (Result : in out Post_Action;
+      Builder : in Comment_Builder;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      use Static_Maps.Item.Post_Action;
+      S_Name : constant String := S_Expressions.To_String (Name);
+   begin
+      if S_Name = "if"
+        and then Arguments.Current_Event
+           in S_Expressions.Events.Add_Atom | S_Expressions.Events.Open_List
+      then
+         if Evaluate (Builder, Arguments) then
+            Arguments.Next;
+            Parse (Arguments, Result, Builder);
+         end if;
+         return;
+      end if;
+
+      case Static_Maps.To_Item_Action (S_Name) is
+         when Unknown =>
+            Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
+
+         when Save =>
+            Result := Save_Comment;
+
+         when Force_Preview =>
+            Result := Force_Preview;
+      end case;
+   end Parse_Action;
+
+
+   procedure Parse_Action_Simple
+     (Result : in out Post_Action;
+      Builder : in Comment_Builder;
+      Name : in S_Expressions.Atom)
+   is
+      pragma Unreferenced (Builder);
+      use Static_Maps.Item.Post_Action;
+      S_Name : constant String := S_Expressions.To_String (Name);
+   begin
+      case Static_Maps.To_Item_Action (S_Name) is
+         when Unknown =>
+            Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
+
+         when Save =>
+            Result := Save_Comment;
+
+         when Force_Preview =>
+            Result := Force_Preview;
+      end case;
+   end Parse_Action_Simple;
 
 
 
@@ -680,21 +913,31 @@ package body Natools.Web.Comments is
         (Time_Keys.To_Key (Builder.Core.Date)));
       Process_Form (Builder, Exchange);
 
-      Write_Comment :
-      declare
-         Backend : Backends.Backend'Class
-           := Exchange.Site.Get_Backend (List.Backend_Name.Query);
-         Stream : aliased Ada.Streams.Root_Stream_Type'Class
-           := Backend.Create (List.Backend_Path.Query, Builder.Core.Id.Query);
-         Printer : S_Expressions.Printers.Pretty.Stream_Printer
-           (Stream'Access);
-      begin
-         Exchange.Site.Set_Parameters (Printer);
-         Write (Builder.Core, Printer);
-      end Write_Comment;
+      case Parse_Action (Builder, Exchange.Site.all, List.Post_Filter) is
+         when Force_Preview =>
+            if not Tags."=" (List.Comments.Query.Parent, null) then
+               Render_Default (Exchange, List.Comments.Query.Parent.all);
+            end if;
 
-      Error_Pages.See_Other (Exchange, List.Parent_Path.Query);
-      Sites.Updates.Reload (Exchange.Site.all);
+         when Save_Comment =>
+            Write_Comment :
+            declare
+               Backend : Backends.Backend'Class
+                 := Exchange.Site.Get_Backend (List.Backend_Name.Query);
+               Stream : aliased Ada.Streams.Root_Stream_Type'Class
+                 := Backend.Create
+                    (List.Backend_Path.Query,
+                     Builder.Core.Id.Query);
+               Printer : S_Expressions.Printers.Pretty.Stream_Printer
+                 (Stream'Access);
+            begin
+               Exchange.Site.Set_Parameters (Printer);
+               Write (Builder.Core, Printer);
+            end Write_Comment;
+
+            Error_Pages.See_Other (Exchange, List.Parent_Path.Query);
+            Sites.Updates.Reload (Exchange.Site.all);
+      end case;
    end Respond;
 
 

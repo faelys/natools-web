@@ -8,6 +8,10 @@
            If_Name, If_No_Name, If_Mail, If_No_Mail, If_Link, If_No_Link);
       end Command;
 
+      package Condition is
+         type Enum is (Unknown, Has_Extra_Fields, Name, Mail, Link, Text);
+      end Condition;
+
       package Element is
          type Enum is (Unknown, Date, Name, Mail, Link, Text);
       end Element;
@@ -15,6 +19,10 @@
       package Form is
          type Enum is (Unknown, Name, Mail, Link, Text);
       end Form;
+
+      package Post_Action is
+         type Enum is (Unknown, Save, Force_Preview);
+      end Post_Action;
    end Item;
 
    package List is
@@ -46,6 +54,17 @@
          (Item.Command.Parent  parent)
          (Item.Command.Text  text)))
 
+   (Item.Condition.Enum
+      (hash-package Natools.Static_Maps.Web.Comments.Item_Conditions)
+      (function To_Item_Condition)
+      (not-found Item.Condition.Unknown)
+      (nodes
+         (Item.Condition.Has_Extra_Fields  has-extra-field has-extra-fields)
+         (Item.Condition.Name  name)
+         (Item.Condition.Mail  mail e-mail)
+         (Item.Condition.Link  link www site website)
+         (Item.Condition.Text  text)))
+
    (Item.Element.Enum
       (hash-package Natools.Static_Maps.Web.Comments.Item_Elements)
       (function To_Item_Element)
@@ -66,6 +85,14 @@
          (Item.Form.Mail  c_mail)
          (Item.Form.Link  c_site)
          (Item.Form.Text  c_text)))
+
+   (Item.Post_Action.Enum
+      (hash-package Natools.Static_Maps.Web.Comments.Item_Actions)
+      (function To_Item_Action)
+      (not-found Item.Post_Action.Unknown)
+      (nodes
+         (Item.Post_Action.Save  accept save)
+         (Item.Post_Action.Force_Preview  preview force-preview)))
 
    (List.Command.Enum
       (hash-package Natools.Static_Maps.Web.Comments.List_Commands)
