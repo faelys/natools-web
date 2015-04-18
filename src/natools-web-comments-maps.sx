@@ -9,7 +9,10 @@
       end Command;
 
       package Condition is
-         type Enum is (Unknown, Has_Extra_Fields, Name, Mail, Link, Text);
+         type Enum is
+           (Unknown,
+            Has_Extra_Fields, Has_Unknown_Field,
+            Name, Mail, Link, Text);
       end Condition;
 
       package Element is
@@ -60,6 +63,8 @@
       (not-found Item.Condition.Unknown)
       (nodes
          (Item.Condition.Has_Extra_Fields  has-extra-field has-extra-fields)
+         (Item.Condition.Has_Unknown_Field
+            has-unknown-field has-unknown-fields)
          (Item.Condition.Name  name)
          (Item.Condition.Mail  mail e-mail)
          (Item.Condition.Link  link www site website)

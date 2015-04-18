@@ -59,6 +59,7 @@ package body Natools.Web.Comments is
    type Comment_Builder is record
       Core : Comment_Data;
       Extra_Fields : String_Maps.Map;
+      Has_Unknown_Field : Boolean := False;
    end record;
 
    type Post_Action is (Save_Comment, Force_Preview);
@@ -503,6 +504,9 @@ package body Natools.Web.Comments is
          when Has_Extra_Fields =>
             return not Builder.Extra_Fields.Is_Empty;
 
+         when Has_Unknown_Field =>
+            return Builder.Has_Unknown_Field;
+
          when Link =>
             return String_Evaluate (Builder.Core.Link, Arguments);
 
@@ -532,6 +536,9 @@ package body Natools.Web.Comments is
 
          when Has_Extra_Fields =>
             return not Builder.Extra_Fields.Is_Empty;
+
+         when Has_Unknown_Field =>
+            return Builder.Has_Unknown_Field;
 
          when Link =>
             return not Builder.Core.Link.Is_Empty;
@@ -703,6 +710,10 @@ package body Natools.Web.Comments is
          case Static_Maps.To_Item_Form (Field) is
             when Unknown =>
                Data.Extra_Fields.Insert (Field, Value);
+
+               if Field /= Submit_Button and then Field /= Preview_Button then
+                  Data.Has_Unknown_Field := True;
+               end if;
 
             when Name =>
                Data.Core.Name := Create (S_Expressions.To_Atom (Value));
