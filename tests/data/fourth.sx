@@ -26,4 +26,4 @@
 (render comment-form))
    (title "Fourth Page"))
 (tags (4 pages/news tags/topic3))
-(comments (backend comments 4) (tags comments))
+(comments (backend comments 4) (tags comments) (filter comment-filter))

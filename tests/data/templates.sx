@@ -83,6 +83,15 @@
 </form>
 ")
 
+(comment-filter
+   accept
+   (if has-unknown-field force-preview)
+   (if
+      (or
+         (not (and name mail link text))
+         (name (contains Spammer)))
+      force-preview))
+
 (error-page "\
 <html>
   <head>
