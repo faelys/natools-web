@@ -32,8 +32,9 @@ check(){
 	STOPPED=
 	shift 2
 	curl -s "$@" "${BASE_URL}${TARGET}" \
-	    | diff -u "${EXPECTED_DIR}/${EXPECTED}" - \
-	    | sed "2s|-|${BASE_URL}${TARGET}|" \
+	    | diff -u --label "${EXPECTED_DIR}/${EXPECTED}" \
+		--label "${BASE_URL}${TARGET}" \
+		"${EXPECTED_DIR}/${EXPECTED}" - \
 	    || STOPPED=yes
 }
 
