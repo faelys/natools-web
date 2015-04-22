@@ -62,7 +62,7 @@ package body Natools.Web.Comments is
       Has_Unknown_Field : Boolean := False;
    end record;
 
-   type Post_Action is (Save_Comment, Force_Preview);
+   type Post_Action is (Save_Comment, Force_Preview, Parent_Redirect);
 
 
    Invalid_Condition : exception;
@@ -616,11 +616,14 @@ package body Natools.Web.Comments is
          when Unknown =>
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
 
-         when Save =>
-            Result := Save_Comment;
-
          when Force_Preview =>
             Result := Force_Preview;
+
+         when Reject =>
+            Result := Parent_Redirect;
+
+         when Save =>
+            Result := Save_Comment;
       end case;
    end Parse_Action;
 
@@ -638,11 +641,14 @@ package body Natools.Web.Comments is
          when Unknown =>
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
 
-         when Save =>
-            Result := Save_Comment;
-
          when Force_Preview =>
             Result := Force_Preview;
+
+         when Reject =>
+            Result := Parent_Redirect;
+
+         when Save =>
+            Result := Save_Comment;
       end case;
    end Parse_Action_Simple;
 
@@ -929,6 +935,9 @@ package body Natools.Web.Comments is
             if not Tags."=" (List.Comments.Query.Parent, null) then
                Render_Default (Exchange, List.Comments.Query.Parent.all);
             end if;
+
+         when Parent_Redirect =>
+            Error_Pages.See_Other (Exchange, List.Parent_Path.Query);
 
          when Save_Comment =>
             Write_Comment :

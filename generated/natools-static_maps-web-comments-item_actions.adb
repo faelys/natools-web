@@ -6,13 +6,13 @@ package body Natools.Static_Maps.Web.Comments.Item_Actions is
      (0 .. 0 => 1);
 
    T1 : constant array (0 .. 0) of Unsigned_8 :=
-     (0 .. 0 => 0);
+     (0 .. 0 => 4);
 
    T2 : constant array (0 .. 0) of Unsigned_8 :=
-     (0 .. 0 => 10);
+     (0 .. 0 => 6);
 
    G : constant array (0 .. 10) of Unsigned_8 :=
-     (0, 0, 0, 0, 0, 0, 1, 0, 3, 2, 0);
+     (0, 0, 0, 0, 0, 2, 0, 1, 0, 4, 3);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -26,7 +26,7 @@ package body Natools.Static_Maps.Web.Comments.Item_Actions is
          F1 := (F1 + Natural (T1 (K)) * J) mod 11;
          F2 := (F2 + Natural (T2 (K)) * J) mod 11;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 4;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 5;
    end Hash;
 
 end Natools.Static_Maps.Web.Comments.Item_Actions;
