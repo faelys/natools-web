@@ -75,11 +75,12 @@ chain /fourth/comments fourth-preview.html -F 'c_mail=' \
     -F 'c_site=http://instinctive.eu/"' -F 'preview=Preview' \
     -F 'c_text=Preview comment that should not be written anywhere.'
 chain /fourth fourth.html
-chain /fourth/comments fourth-spam-1.html -F 'c_mail=' \
+chain /fourth/comments fourth-303.html -F 'c_mail=' \
     -F 'c_name=Random Stranger' \
     -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Attempted spam comment text.' \
     -F 'address=http://instinctive.eu/'
+chain /fourth fourth.html
 chain /fourth/comments fourth-spam-1.html \
     -F 'c_name=Random Stranger' \
     -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
