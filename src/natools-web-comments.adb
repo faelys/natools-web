@@ -20,6 +20,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Indefinite_Ordered_Maps;
+with Ada.Exceptions;
 with Ada.Streams;
 with Natools.S_Expressions.Atom_Buffers;
 with Natools.S_Expressions.Atom_Ref_Constructors;
@@ -151,6 +152,19 @@ package body Natools.Web.Comments is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
       --  Render a command
+
+   function String_Fallback_Parametric
+     (Settings : in S_Expressions.Conditionals.Strings.Settings;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+     return Boolean;
+      --  Raise Invalid_Condition
+
+   function String_Fallback_Simple
+     (Settings : in S_Expressions.Conditionals.Strings.Settings;
+      Name : in S_Expressions.Atom)
+     return Boolean;
+      --  Raise Invalid_Condition
 
    procedure Update_Item
      (Comment : in out Comment_Data;
@@ -476,22 +490,39 @@ package body Natools.Web.Comments is
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
      return Boolean
    is
+      function Dereference
+        (Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
+        return String;
+
       function String_Evaluate
         (Ref : in S_Expressions.Atom_Refs.Immutable_Reference;
          Arg : in out S_Expressions.Lockable.Descriptor'Class)
         return Boolean;
 
+      function Dereference
+        (Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
+        return String is
+      begin
+         if Ref.Is_Empty then
+            return "";
+         else
+            return S_Expressions.To_String (Ref.Query);
+         end if;
+      end Dereference;
+
       function String_Evaluate
         (Ref : in S_Expressions.Atom_Refs.Immutable_Reference;
          Arg : in out S_Expressions.Lockable.Descriptor'Class)
-        return Boolean is
+        return Boolean
+      is
+         Value : aliased constant String := Dereference (Ref);
+         Context : constant S_Expressions.Conditionals.Strings.Context
+           := (Data => Value'Access,
+               Parametric_Fallback => String_Fallback_Parametric'Access,
+               Simple_Fallback => String_Fallback_Simple'Access,
+               Settings => <>);
       begin
-         if Ref.Is_Empty then
-            return S_Expressions.Conditionals.Strings.Evaluate ("", Arg);
-         else
-            return S_Expressions.Conditionals.Strings.Evaluate
-              (S_Expressions.To_String (Ref.Query), Arg);
-         end if;
+         return S_Expressions.Conditionals.Strings.Evaluate (Context, Arg);
       end String_Evaluate;
 
       use Static_Maps.Item.Condition;
@@ -605,10 +636,17 @@ package body Natools.Web.Comments is
         and then Arguments.Current_Event
            in S_Expressions.Events.Add_Atom | S_Expressions.Events.Open_List
       then
-         if Evaluate (Builder, Arguments) then
-            Arguments.Next;
-            Parse (Arguments, Result, Builder);
-         end if;
+         begin
+            if Evaluate (Builder, Arguments) then
+               Arguments.Next;
+               Parse (Arguments, Result, Builder);
+            end if;
+         exception
+            when Ex : Invalid_Condition =>
+               Log (Severities.Error, "Invalid comment condition: "
+                 & Ada.Exceptions.Exception_Message (Ex));
+         end;
+
          return;
       end if;
 
@@ -651,6 +689,33 @@ package body Natools.Web.Comments is
             Result := Save_Comment;
       end case;
    end Parse_Action_Simple;
+
+
+   function String_Fallback_Parametric
+     (Settings : in S_Expressions.Conditionals.Strings.Settings;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+     return Boolean
+   is
+      pragma Unreferenced (Settings, Arguments);
+   begin
+      raise Invalid_Condition with "Unknown string parametric conditional """
+        & S_Expressions.To_String (Name) & '"';
+      return False;
+   end String_Fallback_Parametric;
+
+
+   function String_Fallback_Simple
+     (Settings : in S_Expressions.Conditionals.Strings.Settings;
+      Name : in S_Expressions.Atom)
+     return Boolean
+   is
+      pragma Unreferenced (Settings);
+   begin
+      raise Invalid_Condition with "Unknown string simple conditional """
+        & S_Expressions.To_String (Name) & '"';
+      return False;
+   end String_Fallback_Simple;
 
 
 
