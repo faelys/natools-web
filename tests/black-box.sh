@@ -67,6 +67,12 @@ check /tags tags-redirect.html
 check /comments comments.html
 check /comment-feed comments.atom
 
+check /first/comments first-spam.html -F 'c_mail=' \
+    --form-string 'c_name=<i>Nobody</i>' \
+    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_text=Comment text rejected solely because of bad filter'
+chain /first first.html
+
 check /fourth fourth.html
 chain /fourth/comments 405.html
 chain /fourth fourth.html

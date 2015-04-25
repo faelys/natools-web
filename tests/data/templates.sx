@@ -92,6 +92,13 @@
          (name (contains Spammer)))
       force-preview))
 
+(comment-filter-bad ((used to test exception handling))
+   reject
+   (if unknown-commands-are-accepted accept)
+   (if (unknwon-complex-command with argument) accept)
+   (if (name (unknown-string-command with argument)) accept)
+   (if (name unknown-string-simple-command) accept))
+
 (error-page "\
 <html>
   <head>
