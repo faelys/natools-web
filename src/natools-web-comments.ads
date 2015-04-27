@@ -79,10 +79,16 @@ private
       Mail : S_Expressions.Atom_Refs.Immutable_Reference;
       Link : S_Expressions.Atom_Refs.Immutable_Reference;
       Text : S_Expressions.Atom_Refs.Immutable_Reference;
+      Text_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
       Preprocessed : Boolean := False;
    end record;
 
-   procedure Preprocess (Comment : in out Comment_Data);
+   procedure Preprocess
+     (Comment : in out Comment_Data;
+      Site : in Sites.Site);
+   procedure Preprocess
+     (Comment : in out Comment_Data;
+      Builder : in Sites.Site_Builder);
       --  Preprocess comment field contents
 
    procedure Write

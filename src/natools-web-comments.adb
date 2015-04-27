@@ -40,6 +40,7 @@ with Natools.Web.Error_Pages;
 with Natools.Web.Escapes;
 with Natools.Web.Exchanges;
 with Natools.Web.Fallback_Render;
+with Natools.Web.Filters.Stores;
 with Natools.Web.Filters.Text_Blocks;
 with Natools.Web.Is_Valid_URL;
 with Natools.Web.List_Templates;
@@ -104,6 +105,17 @@ package body Natools.Web.Comments is
      return Boolean;
       --  Evaluate a condition on a comment builder without argument
 
+   function Get_Safe_Filter
+     (Site : in Sites.Site;
+      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
+     return Filters.Filter'Class;
+   function Get_Safe_Filter
+     (Builder : in Sites.Site_Builder;
+      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
+     return Filters.Filter'Class;
+      --  Return the filter designated by Name_Ref, falling back on raw
+      --  text when Name_Ref is empty or named filter is not found.
+
    function Parse_Action
      (Builder : in Comment_Builder;
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
@@ -131,6 +143,11 @@ package body Natools.Web.Comments is
       Builder : in Comment_Builder;
       Name : in S_Expressions.Atom);
       --  Evaluate parameterless action
+
+   procedure Preprocess
+     (Comment : in out Comment_Data;
+      Text_Filter : in Filters.Filter'Class);
+      --  Common preprocessing code, after Text_Filter is determined
 
    function Preview_Id return S_Expressions.Atom_Refs.Immutable_Reference;
       --  Return the comment id of temporary previews
@@ -369,7 +386,7 @@ package body Natools.Web.Comments is
                Builder.Core.Date := Ada.Calendar.Clock;
                Builder.Core.Id := Preview_Id;
                Process_Form (Builder, Exchange);
-               Preprocess (Builder.Core);
+               Preprocess (Builder.Core, Exchange.Site.all);
                Ref.List.Update.Data (1) := Builder.Core;
                Render (Arguments, Exchange, Ref);
             end;
@@ -434,6 +451,9 @@ package body Natools.Web.Comments is
 
          when Text =>
             Comment.Text := Create (Arguments.Current_Atom);
+
+         when Text_Filter =>
+            Comment.Text_Filter := Create (Arguments.Current_Atom);
       end case;
    end Update_Item;
 
@@ -723,7 +743,61 @@ package body Natools.Web.Comments is
    -- Comment Suprograms --
    ------------------------
 
-   procedure Preprocess (Comment : in out Comment_Data) is
+   function Get_Safe_Filter
+     (Site : in Sites.Site;
+      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
+     return Filters.Filter'Class
+   is
+      Fallback : Filters.Text_Blocks.Filter;
+   begin
+      if Name_Ref.Is_Empty then
+         return Fallback;
+      end if;
+
+      return Site.Get_Filter (Name_Ref.Query);
+   exception
+      when Filters.Stores.No_Filter =>
+         return Fallback;
+   end Get_Safe_Filter;
+
+
+   function Get_Safe_Filter
+     (Builder : in Sites.Site_Builder;
+      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
+     return Filters.Filter'Class
+   is
+      Fallback : Filters.Text_Blocks.Filter;
+   begin
+      if Name_Ref.Is_Empty then
+         return Fallback;
+      end if;
+
+      return Sites.Get_Filter (Builder, Name_Ref.Query);
+   exception
+      when Filters.Stores.No_Filter =>
+         return Fallback;
+   end Get_Safe_Filter;
+
+
+   procedure Preprocess
+     (Comment : in out Comment_Data;
+      Site : in Sites.Site) is
+   begin
+      Preprocess (Comment, Get_Safe_Filter (Site, Comment.Text_Filter));
+   end Preprocess;
+
+
+   procedure Preprocess
+     (Comment : in out Comment_Data;
+      Builder : in Sites.Site_Builder) is
+   begin
+      Preprocess (Comment, Get_Safe_Filter (Builder, Comment.Text_Filter));
+   end Preprocess;
+
+
+   procedure Preprocess
+     (Comment : in out Comment_Data;
+      Text_Filter : in Filters.Filter'Class) is
    begin
       if Comment.Preprocessed then
          return;
@@ -748,9 +822,8 @@ package body Natools.Web.Comments is
       if not Comment.Text.Is_Empty then
          declare
             Buffer : S_Expressions.Atom_Buffers.Atom_Buffer;
-            Filter : Filters.Text_Blocks.Filter;
          begin
-            Filter.Apply (Buffer, Comment.Text.Query);
+            Text_Filter.Apply (Buffer, Comment.Text.Query);
             Comment.Text := Create (Buffer.Data);
          end;
       end if;
@@ -914,7 +987,7 @@ package body Natools.Web.Comments is
             Reader.Next;
             Update (Reader, Comment, Meaningless_Value);
             Comment.Id := Create (Name);
-            Preprocess (Comment);
+            Preprocess (Comment, Builder);
 
             Map.Insert (Name, Comment, Position, Inserted);
 

@@ -16,7 +16,7 @@
       end Condition;
 
       package Element is
-         type Enum is (Unknown, Date, Name, Mail, Link, Text);
+         type Enum is (Unknown, Date, Name, Mail, Link, Text, Text_Filter);
       end Element;
 
       package Form is
@@ -79,7 +79,8 @@
          (Item.Element.Name  name)
          (Item.Element.Mail  mail e-mail)
          (Item.Element.Link  link www site website)
-         (Item.Element.Text  text)))
+         (Item.Element.Text  text)
+         (Item.Element.Text_Filter  text-filter filter)))
 
    (Item.Form.Enum
       (hash-package Natools.Static_Maps.Web.Comments.Item_Forms)
