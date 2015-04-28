@@ -351,6 +351,13 @@ package body Natools.Web.Sites is
    end Get_Backend;
 
 
+   function Get_Filter (From : Site_Builder; Name : S_Expressions.Atom)
+     return Filters.Filter'Class is
+   begin
+      return From.Filters.Get_Filter (Name);
+   end Get_Filter;
+
+
    procedure Insert
      (Builder : in out Site_Builder;
       Path : in S_Expressions.Atom;

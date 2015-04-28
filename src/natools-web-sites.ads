@@ -141,6 +141,10 @@ package Natools.Web.Sites is
      return Backends.Backend'Class;
       --  Return a backend from its name, or raise Constraint_Error
 
+   function Get_Filter (From : Site_Builder; Name : S_Expressions.Atom)
+     return Filters.Filter'Class;
+      --  Return a filter from its name, or raise Filters.Stores.No_Filter
+
    procedure Insert
      (Builder : in out Site_Builder;
       Path : in S_Expressions.Atom;
