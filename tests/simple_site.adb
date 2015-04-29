@@ -24,6 +24,7 @@ with Common.Pages;
 with Common.Test_Maps;
 with Natools.Web.Backends.Filesystem;
 with Natools.Web.Escapes.Filters;
+with Natools.Web.Filters.Pass_Through;
 with Natools.Web.Filters.Text_Blocks;
 with Natools.Web.Simple_Pages;
 with Natools.Web.Tag_Pages;
@@ -59,6 +60,8 @@ begin
      ("directory", Natools.Web.Backends.Filesystem.Create'Access);
    Common.Site.Register
      ("html-escape", Natools.Web.Escapes.Filters.Create'Access);
+   Common.Site.Register
+     ("pass-through", Natools.Web.Filters.Pass_Through.Create'Access);
    Common.Site.Register
      ("text-block", Natools.Web.Filters.Text_Blocks.Create'Access);
 
