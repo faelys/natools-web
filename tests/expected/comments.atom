@@ -5,7 +5,7 @@
       <name>Natacha Kerensikova</name>
    </author>
    <id>http://example.com/comment-feed</id>
-   <updated>2015-01-07T17:24:02Z</updated>
+   <updated>2015-02-15T08:09:10Z</updated>
    <entry>
       <id>http://example.com/first#VV118</id>
       <author>
@@ -36,6 +36,16 @@
       <content type="html">
 &lt;p&gt;Two comments on the same page, w00t \o/&lt;/p&gt;
 &lt;p&gt;With even a second paragraph!&lt;/p&gt;
+      </content>
+   </entry>
+   <entry>
+      <id>http://example.com/first#VV2F89A</id>
+      <author>
+         <name>&lt;code&gt;Nat&lt;/code&gt;</name>
+      </author>
+      <updated>2015-02-15T08:09:10Z</updated>
+      <content type="html">
+&lt;p&gt;A third comment, with &lt;strong&gt;legitimate&lt;/strong&gt; embedded HTML&lt;/p&gt;
       </content>
    </entry>
 </feed>

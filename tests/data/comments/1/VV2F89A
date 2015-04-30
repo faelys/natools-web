@@ -1,0 +1,6 @@
+(date 2015-02-15T08:09:10Z)
+(name "<code>Nat</code>")
+(mail "")
+(link "http://instinctive.eu/")
+(text "<p>A third comment, with <strong>legitimate</strong> embedded HTML</p>\n")
+(text-filter pass-through)
