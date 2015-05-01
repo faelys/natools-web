@@ -58,13 +58,14 @@ package body Natools.Web.Comments is
      (String, String);
 
 
+   type Post_Action is (Save_Comment, Force_Preview, Parent_Redirect);
+
    type Comment_Builder is record
       Core : Comment_Data;
       Extra_Fields : String_Maps.Map;
       Has_Unknown_Field : Boolean := False;
+      Action : Post_Action;
    end record;
-
-   type Post_Action is (Save_Comment, Force_Preview, Parent_Redirect);
 
 
    Invalid_Condition : exception;
@@ -116,33 +117,24 @@ package body Natools.Web.Comments is
       --  Return the filter designated by Name_Ref, falling back on raw
       --  text when Name_Ref is empty or named filter is not found.
 
-   function Parse_Action
-     (Builder : in Comment_Builder;
-      Expression : in out S_Expressions.Lockable.Descriptor'Class;
-      Default_Action : in Post_Action := Save_Comment)
-     return Post_Action;
-      --  Evaluate Expression to determine what action to take after POST req
-
-   function Parse_Action
-     (Builder : in Comment_Builder;
-      Site : in Sites.Site;
-      Filter_Name : in S_Expressions.Atom_Refs.Immutable_Reference;
-      Default_Action : in Post_Action := Save_Comment)
-     return Post_Action;
-      --  High-level evaluation, that extracts the expression from Site
-
    procedure Parse_Action
-     (Result : in out Post_Action;
-      Builder : in Comment_Builder;
+     (Builder : in out Comment_Builder;
+      Site : in Sites.Site;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
       --  Evluate action with parameter
 
    procedure Parse_Action_Simple
-     (Result : in out Post_Action;
-      Builder : in Comment_Builder;
+     (Builder : in out Comment_Builder;
+      Site : in Sites.Site;
       Name : in S_Expressions.Atom);
       --  Evaluate parameterless action
+
+   procedure Process_Actions
+     (Builder : in out Comment_Builder;
+      Site : in Sites.Site;
+      Filter_Name : in S_Expressions.Atom_Refs.Immutable_Reference);
+      --  Evaluate the filter whose name is given
 
    procedure Preprocess
      (Comment : in out Comment_Data;
@@ -202,7 +194,7 @@ package body Natools.Web.Comments is
      (Comment_Builder, Evaluate_Parametric, Evaluate_Simple);
 
    procedure Parse is new S_Expressions.Interpreter_Loop
-     (Post_Action, Comment_Builder, Parse_Action, Parse_Action_Simple);
+     (Comment_Builder, Sites.Site, Parse_Action, Parse_Action_Simple);
 
    procedure Render is new S_Expressions.Interpreter_Loop
      (Sites.Exchange, Comment_List, Render_List_Element, Append);
@@ -606,46 +598,9 @@ package body Natools.Web.Comments is
    end Evaluate_Simple;
 
 
-   function Parse_Action
-     (Builder : in Comment_Builder;
-      Expression : in out S_Expressions.Lockable.Descriptor'Class;
-      Default_Action : in Post_Action := Save_Comment)
-     return Post_Action
-   is
-      Result : Post_Action := Default_Action;
-   begin
-      Parse (Expression, Result, Builder);
-      return Result;
-   end Parse_Action;
-
-
-   function Parse_Action
-     (Builder : in Comment_Builder;
-      Site : in Sites.Site;
-      Filter_Name : in S_Expressions.Atom_Refs.Immutable_Reference;
-      Default_Action : in Post_Action := Save_Comment)
-     return Post_Action
-   is
-      Expression : S_Expressions.Caches.Cursor;
-      Found : Boolean;
-   begin
-      if Filter_Name.Is_Empty then
-         return Default_Action;
-      end if;
-
-      Site.Get_Template (Filter_Name.Query, Expression, Found);
-
-      if not Found then
-         return Default_Action;
-      end if;
-
-      return Parse_Action (Builder, Expression, Default_Action);
-   end Parse_Action;
-
-
    procedure Parse_Action
-     (Result : in out Post_Action;
-      Builder : in Comment_Builder;
+     (Builder : in out Comment_Builder;
+      Site : in Sites.Site;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
@@ -659,7 +614,7 @@ package body Natools.Web.Comments is
          begin
             if Evaluate (Builder, Arguments) then
                Arguments.Next;
-               Parse (Arguments, Result, Builder);
+               Parse (Arguments, Builder, Site);
             end if;
          exception
             when Ex : Invalid_Condition =>
@@ -675,23 +630,23 @@ package body Natools.Web.Comments is
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
 
          when Force_Preview =>
-            Result := Force_Preview;
+            Builder.Action := Force_Preview;
 
          when Reject =>
-            Result := Parent_Redirect;
+            Builder.Action := Parent_Redirect;
 
          when Save =>
-            Result := Save_Comment;
+            Builder.Action := Save_Comment;
       end case;
    end Parse_Action;
 
 
    procedure Parse_Action_Simple
-     (Result : in out Post_Action;
-      Builder : in Comment_Builder;
+     (Builder : in out Comment_Builder;
+      Site : in Sites.Site;
       Name : in S_Expressions.Atom)
    is
-      pragma Unreferenced (Builder);
+      pragma Unreferenced (Site);
       use Static_Maps.Item.Post_Action;
       S_Name : constant String := S_Expressions.To_String (Name);
    begin
@@ -700,15 +655,37 @@ package body Natools.Web.Comments is
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
 
          when Force_Preview =>
-            Result := Force_Preview;
+            Builder.Action := Force_Preview;
 
          when Reject =>
-            Result := Parent_Redirect;
+            Builder.Action := Parent_Redirect;
 
          when Save =>
-            Result := Save_Comment;
+            Builder.Action := Save_Comment;
       end case;
    end Parse_Action_Simple;
+
+
+   procedure Process_Actions
+     (Builder : in out Comment_Builder;
+      Site : in Sites.Site;
+      Filter_Name : in S_Expressions.Atom_Refs.Immutable_Reference)
+   is
+      Expression : S_Expressions.Caches.Cursor;
+      Found : Boolean;
+   begin
+      if Filter_Name.Is_Empty then
+         return;
+      end if;
+
+      Site.Get_Template (Filter_Name.Query, Expression, Found);
+
+      if not Found then
+         return;
+      end if;
+
+      Parse (Expression, Builder, Site);
+   end Process_Actions;
 
 
    function String_Fallback_Parametric
@@ -1063,12 +1040,14 @@ package body Natools.Web.Comments is
          return;
       end if;
 
+      Builder.Action := Save_Comment;
       Builder.Core.Date := Ada.Calendar.Clock;
       Builder.Core.Id := Create (S_Expressions.To_Atom
         (Time_Keys.To_Key (Builder.Core.Date)));
       Process_Form (Builder, Exchange);
+      Process_Actions (Builder, Exchange.Site.all, List.Post_Filter);
 
-      case Parse_Action (Builder, Exchange.Site.all, List.Post_Filter) is
+      case Builder.Action is
          when Force_Preview =>
             if not Tags."=" (List.Comments.Query.Parent, null) then
                Render_Default (Exchange, List.Comments.Query.Parent.all);
