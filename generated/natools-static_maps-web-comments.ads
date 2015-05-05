@@ -1,4 +1,4 @@
---  Generated at 2015-04-27 20:45:18 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-05-05 21:35:07 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -26,7 +26,7 @@ package Natools.Static_Maps.Web.Comments is
       end Form;
 
       package Post_Action is
-         type Enum is (Unknown, Save, Force_Preview, Reject);
+         type Enum is (Unknown, Save, Force_Preview, Reject, Dump);
       end Post_Action;
    end Item;
 
@@ -194,19 +194,28 @@ private
          Item.Form.Link,
          Item.Form.Text);
 
-   Map_5_Key_0 : aliased constant String := "preview";
-   Map_5_Key_1 : aliased constant String := "force-preview";
-   Map_5_Key_2 : aliased constant String := "reject";
-   Map_5_Key_3 : aliased constant String := "accept";
-   Map_5_Key_4 : aliased constant String := "save";
-   Map_5_Keys : constant array (0 .. 4) of access constant String
+   Map_5_Key_0 : aliased constant String := "dump";
+   Map_5_Key_1 : aliased constant String := "log";
+   Map_5_Key_2 : aliased constant String := "write";
+   Map_5_Key_3 : aliased constant String := "preview";
+   Map_5_Key_4 : aliased constant String := "force-preview";
+   Map_5_Key_5 : aliased constant String := "reject";
+   Map_5_Key_6 : aliased constant String := "accept";
+   Map_5_Key_7 : aliased constant String := "save";
+   Map_5_Keys : constant array (0 .. 7) of access constant String
      := (Map_5_Key_0'Access,
          Map_5_Key_1'Access,
          Map_5_Key_2'Access,
          Map_5_Key_3'Access,
-         Map_5_Key_4'Access);
-   Map_5_Elements : constant array (0 .. 4) of Item.Post_Action.Enum
-     := (Item.Post_Action.Force_Preview,
+         Map_5_Key_4'Access,
+         Map_5_Key_5'Access,
+         Map_5_Key_6'Access,
+         Map_5_Key_7'Access);
+   Map_5_Elements : constant array (0 .. 7) of Item.Post_Action.Enum
+     := (Item.Post_Action.Dump,
+         Item.Post_Action.Dump,
+         Item.Post_Action.Dump,
+         Item.Post_Action.Force_Preview,
          Item.Post_Action.Force_Preview,
          Item.Post_Action.Reject,
          Item.Post_Action.Save,

@@ -24,7 +24,7 @@
       end Form;
 
       package Post_Action is
-         type Enum is (Unknown, Save, Force_Preview, Reject);
+         type Enum is (Unknown, Save, Force_Preview, Reject, Dump);
       end Post_Action;
    end Item;
 
@@ -97,6 +97,7 @@
       (function To_Item_Action)
       (not-found Item.Post_Action.Unknown)
       (nodes
+         (Item.Post_Action.Dump  dump log write)
          (Item.Post_Action.Force_Preview  preview force-preview)
          (Item.Post_Action.Reject  reject)
          (Item.Post_Action.Save  accept save)))

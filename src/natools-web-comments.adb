@@ -21,7 +21,8 @@
 
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Exceptions;
-with Ada.Streams;
+with Ada.Streams.Stream_IO;
+with Natools.File_Streams;
 with Natools.S_Expressions.Atom_Buffers;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Caches;
@@ -188,6 +189,19 @@ package body Natools.Web.Comments is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
       --  Update comment list with the given expression
+
+   procedure Write
+     (Builder : in Comment_Builder;
+      Output : in out S_Expressions.Printers.Printer'Class);
+      --  Serialize a builder into the given S_Expression stream
+
+   procedure Write
+     (Builder : in Comment_Builder;
+      Site : in Sites.Site;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class);
+      --  Serialize a builder into the file named by Arguments.Current_Atom.
+      --  The Site argument is useless for now, but kept for a future
+      --  backend-based implementation.
 
 
    function Evaluate is new S_Expressions.Conditionals.Generic_Evaluate
@@ -629,6 +643,9 @@ package body Natools.Web.Comments is
          when Unknown =>
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
 
+         when Dump =>
+            Write (Builder, Site, Arguments);
+
          when Force_Preview =>
             Builder.Action := Force_Preview;
 
@@ -651,7 +668,7 @@ package body Natools.Web.Comments is
       S_Name : constant String := S_Expressions.To_String (Name);
    begin
       case Static_Maps.To_Item_Action (S_Name) is
-         when Unknown =>
+         when Unknown | Dump =>
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
 
          when Force_Preview =>
@@ -899,6 +916,73 @@ package body Natools.Web.Comments is
       Print ("link", Comment.Link);
       Print ("text", Comment.Text);
       Print ("text-filter", Comment.Text_Filter);
+   end Write;
+
+
+   procedure Write
+     (Builder : in Comment_Builder;
+      Output : in out S_Expressions.Printers.Printer'Class) is
+   begin
+      Output.Open_List;
+      Output.Append_Atom (Builder.Core.Id.Query);
+
+      Write (Builder.Core, Output);
+
+      Write_Extra_Fields :
+      declare
+         Cursor : String_Maps.Cursor := Builder.Extra_Fields.First;
+      begin
+         Output.Open_List;
+         Output.Append_String ("extra-fields");
+
+         while String_Maps.Has_Element (Cursor) loop
+            Output.Open_List;
+            Output.Append_String (String_Maps.Key (Cursor));
+            Output.Append_String (String_Maps.Element (Cursor));
+            Output.Close_List;
+            String_Maps.Next (Cursor);
+         end loop;
+
+         Output.Close_List;
+      end Write_Extra_Fields;
+
+      Output.Open_List;
+      Output.Append_String ("has-unknown-field");
+      Output.Append_String (Boolean'Image (Builder.Has_Unknown_Field));
+      Output.Close_List;
+
+      Output.Open_List;
+      Output.Append_String ("action");
+      Output.Append_String (Post_Action'Image (Builder.Action));
+      Output.Close_List;
+      Output.Close_List;
+   end Write;
+
+
+   procedure Write
+     (Builder : in Comment_Builder;
+      Site : in Sites.Site;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      use type S_Expressions.Events.Event;
+   begin
+      if Arguments.Current_Event /= S_Expressions.Events.Add_Atom then
+         Log (Severities.Error,
+           "Invalid write target: first name is not an atom");
+         return;
+      end if;
+
+      declare
+         Stream : aliased File_Streams.File_Stream := File_Streams.Open
+           (Ada.Streams.Stream_IO.Append_File,
+            S_Expressions.To_String (Arguments.Current_Atom));
+         Printer : S_Expressions.Printers.Pretty.Stream_Printer
+           (Stream'Access);
+      begin
+         Site.Set_Parameters (Printer);
+         Write (Builder, Printer);
+         Printer.Newline;
+      end;
    end Write;
 
 
