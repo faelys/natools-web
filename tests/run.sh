@@ -27,6 +27,7 @@ fi
 
 rm -rf data/comments/4
 mkdir data/comments/4
+: >|data/comments/spam.sx
 
 touch running
 ${TARGET_BIN} data/site.sx running >server.log &

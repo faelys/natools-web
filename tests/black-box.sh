@@ -23,6 +23,9 @@ fi
 
 BASE_URL=${1%/}
 EXPECTED_DIR=${2:-$(dirname "$0")/expected}
+: ${SPAM_LOG:=${EXPECTED_DIR}/../data/comments/spam.sx}
+
+test -e "${SPAM_LOG}" || touch "${SPAM_LOG}"
 
 # check /relative/path expected/file [curl extra flags]
 #    Request the given URL and compare it with the reference output
@@ -49,6 +52,24 @@ chain(){
 #    didn't fail.
 chain_curl(){
 	test -z "${STOPPED}" && curl -s "$@" >/dev/null
+}
+
+# check_last_spam expected/file
+#    Extract the last spam recorded and compare it to the given file.
+#    Note that this function depends on site S-expression pretty printer cfg.
+check_last_spam(){
+	sed -n '/^(/h; /^   /H; $g; $p' "${SPAM_LOG}" \
+	    | grep -v -e '^(' -e '(date ' \
+	    | diff -u --label "${EXPECTED_DIR}/$1" \
+		--label "last reported spam" \
+		"${EXPECTED_DIR}/$1" - \
+	    || STOPPED=yes
+}
+
+# chain_last_spam expected/file
+#    Same as check function, but only if previous check didn't fail
+chain_last_spam(){
+	test -z "${STOPPED}" && check_last_spam "$@"
 }
 
 
@@ -87,6 +108,7 @@ chain /fourth/comments fourth-303.html -F 'c_mail=' \
     -F 'c_text=Attempted spam comment text.' \
     -F 'address=http://instinctive.eu/'
 chain /fourth fourth.html
+chain_last_spam spam-extra-fields.sx
 chain /fourth/comments fourth-spam-1.html \
     -F 'c_name=Random Stranger' \
     -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
