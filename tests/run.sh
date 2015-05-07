@@ -33,6 +33,7 @@ touch running
 ${TARGET_BIN} data/site.sx running >server.log &
 TARGET_PID=$!
 sleep 1
-sh black-box.sh "${2:-http://localhost:8888/}"
+sh black-box.sh "${2:-http://localhost:8888/}" \
+    || echo "Black box test suite failed."
 rm running
 wait ${TARGET_PID}

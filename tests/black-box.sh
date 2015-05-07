@@ -34,42 +34,50 @@ check(){
 	EXPECTED=$2
 	STOPPED=
 	shift 2
-	curl -s "$@" "${BASE_URL}${TARGET}" \
+	if ! curl -s "$@" "${BASE_URL}${TARGET}" \
 	    | diff -u --label "${EXPECTED_DIR}/${EXPECTED}" \
 		--label "${BASE_URL}${TARGET}" \
-		"${EXPECTED_DIR}/${EXPECTED}" - \
-	    || STOPPED=yes
+		"${EXPECTED_DIR}/${EXPECTED}" -
+	then STOPPED=yes
+	fi
 }
 
 # chain /relative/path expected/file [curl extra flags]
 #    Same as check function, but only if previous check didn't fail
 chain(){
-	test -z "${STOPPED}" && check "$@"
+	if test -z "${STOPPED}"; then
+		check "$@"
+	fi
 }
 
 # chain_curl arguments
 #    Wrapper around raw curl with discarded output, but only if previous check
 #    didn't fail.
 chain_curl(){
-	test -z "${STOPPED}" && curl -s "$@" >/dev/null
+	if test -z "${STOPPED}"; then
+		curl -s "$@" >/dev/null
+	fi
 }
 
 # check_last_spam expected/file
 #    Extract the last spam recorded and compare it to the given file.
 #    Note that this function depends on site S-expression pretty printer cfg.
 check_last_spam(){
-	sed -n '/^(/h; /^   /H; $g; $p' "${SPAM_LOG}" \
+	if ! sed -n '/^(/h; /^   /H; $g; $p' "${SPAM_LOG}" \
 	    | grep -v -e '^(' -e '(date ' \
 	    | diff -u --label "${EXPECTED_DIR}/$1" \
 		--label "last reported spam" \
-		"${EXPECTED_DIR}/$1" - \
-	    || STOPPED=yes
+		"${EXPECTED_DIR}/$1" -
+	then STOPPED=yes
+	fi
 }
 
 # chain_last_spam expected/file
 #    Same as check function, but only if previous check didn't fail
 chain_last_spam(){
-	test -z "${STOPPED}" && check_last_spam "$@"
+	if test -z "${STOPPED}"; then
+		check_last_spam "$@"
+	fi
 }
 
 
