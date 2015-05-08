@@ -24,7 +24,9 @@
       end Form;
 
       package Post_Action is
-         type Enum is (Unknown, Save, Force_Preview, Reject, Dump);
+         type Enum is
+           (Unknown, Save, Force_Preview, Reject, Dump,
+            Reason, Append_Reason, Set_Reason);
       end Post_Action;
    end Item;
 
@@ -97,10 +99,13 @@
       (function To_Item_Action)
       (not-found Item.Post_Action.Unknown)
       (nodes
+         (Item.Post_Action.Append_Reason  append-reason add-reason)
          (Item.Post_Action.Dump  dump log write)
          (Item.Post_Action.Force_Preview  preview force-preview)
+         (Item.Post_Action.Reason  reason)
          (Item.Post_Action.Reject  reject)
-         (Item.Post_Action.Save  accept save)))
+         (Item.Post_Action.Save  accept save)
+         (Item.Post_Action.Set_Reason  set-reason reset-reason)))
 
    (List.Command.Enum
       (hash-package Natools.Static_Maps.Web.Comments.List_Commands)

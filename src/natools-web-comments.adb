@@ -66,6 +66,7 @@ package body Natools.Web.Comments is
       Extra_Fields : String_Maps.Map;
       Has_Unknown_Field : Boolean := False;
       Action : Post_Action;
+      Reason : S_Expressions.Atom_Refs.Immutable_Reference;
    end record;
 
 
@@ -618,6 +619,88 @@ package body Natools.Web.Comments is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
+      use type S_Expressions.Atom;
+      use type S_Expressions.Events.Event;
+
+      procedure Append
+        (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference;
+         Separator : in S_Expressions.Atom;
+         Data : in S_Expressions.Atom);
+      procedure Update_Reason;
+
+      procedure Append
+        (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference;
+         Separator : in S_Expressions.Atom;
+         Data : in S_Expressions.Atom) is
+      begin
+         if Ref.Is_Empty then
+            Ref := Create (Data);
+         else
+            Ref := Create (Ref.Query & Separator & Data);
+         end if;
+      end Append;
+
+      procedure Update_Reason is
+         use type S_Expressions.Octet;
+         use type S_Expressions.Offset;
+      begin
+         if Arguments.Current_Event /= S_Expressions.Events.Add_Atom then
+            return;
+         end if;
+
+         declare
+            Text : constant S_Expressions.Atom := Arguments.Current_Atom;
+            Event : S_Expressions.Events.Event;
+            O : S_Expressions.Offset;
+         begin
+            Arguments.Next (Event);
+
+            if Event = S_Expressions.Events.Add_Atom then
+               Append (Builder.Reason, Text, Arguments.Current_Atom);
+            else
+               if Text'Length > 1
+                 and then Text (Text'First) = Character'Pos ('+')
+               then
+                  case Text (Text'First + 1) is
+                     when Character'Pos ('\') =>
+                        Append
+                          (Builder.Reason,
+                           S_Expressions.Null_Atom,
+                           Text (Text'First + 2 .. Text'Last));
+
+                     when Character'Pos ('(') =>
+                        O := Text'First + 2;
+                        while O in Text'Range
+                          and then Text (O) /= Character'Pos (')')
+                        loop
+                           O := O + 1;
+                        end loop;
+
+                        if O in Text'Range then
+                           Append
+                             (Builder.Reason,
+                              Text (Text'First + 2 .. O - 1),
+                              Text (O + 1 .. Text'Last));
+                        else
+                           Append
+                             (Builder.Reason,
+                              S_Expressions.Null_Atom,
+                              Text (Text'First + 1 .. Text'Last));
+                        end if;
+
+                     when others =>
+                        Append
+                          (Builder.Reason,
+                           S_Expressions.Null_Atom,
+                           Text (Text'First + 1 .. Text'Last));
+                  end case;
+               else
+                  Builder.Reason := Create (Text);
+               end if;
+            end if;
+         end;
+      end Update_Reason;
+
       use Static_Maps.Item.Post_Action;
       S_Name : constant String := S_Expressions.To_String (Name);
    begin
@@ -643,17 +726,47 @@ package body Natools.Web.Comments is
          when Unknown =>
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
 
+         when Append_Reason =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               declare
+                  First_Part : constant S_Expressions.Atom
+                    := Arguments.Current_Atom;
+                  Event : S_Expressions.Events.Event;
+               begin
+                  Arguments.Next (Event);
+
+                  if Event = S_Expressions.Events.Add_Atom then
+                     Append
+                       (Builder.Reason, First_Part, Arguments.Current_Atom);
+                  else
+                     Append
+                       (Builder.Reason, S_Expressions.Null_Atom, First_Part);
+                  end if;
+               end;
+            end if;
+
          when Dump =>
             Write (Builder, Site, Arguments);
 
          when Force_Preview =>
             Builder.Action := Force_Preview;
+            Update_Reason;
+
+         when Reason =>
+            Update_Reason;
 
          when Reject =>
             Builder.Action := Parent_Redirect;
+            Update_Reason;
 
          when Save =>
             Builder.Action := Save_Comment;
+            Update_Reason;
+
+         when Set_Reason =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               Builder.Reason := Create (Arguments.Current_Atom);
+            end if;
       end case;
    end Parse_Action;
 
@@ -671,8 +784,14 @@ package body Natools.Web.Comments is
          when Unknown | Dump =>
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
 
+         when Append_Reason =>
+            null;
+
          when Force_Preview =>
             Builder.Action := Force_Preview;
+
+         when Reason | Set_Reason =>
+            Builder.Reason.Reset;
 
          when Reject =>
             Builder.Action := Parent_Redirect;
@@ -954,6 +1073,9 @@ package body Natools.Web.Comments is
       Output.Open_List;
       Output.Append_String ("action");
       Output.Append_String (Post_Action'Image (Builder.Action));
+      if not Builder.Reason.Is_Empty then
+         Output.Append_Atom (Builder.Reason.Query);
+      end if;
       Output.Close_List;
       Output.Close_List;
    end Write;
@@ -1131,6 +1253,13 @@ package body Natools.Web.Comments is
         (Time_Keys.To_Key (Builder.Core.Date)));
       Process_Form (Builder, Exchange);
       Process_Actions (Builder, Exchange.Site.all, List.Post_Filter);
+
+      if not Builder.Reason.Is_Empty then
+         Log (Severities.Info, "Comment tagged "
+           & Post_Action'Image (Builder.Action)
+           & " because "
+           & S_Expressions.To_String (Builder.Reason.Query));
+      end if;
 
       case Builder.Action is
          when Force_Preview =>

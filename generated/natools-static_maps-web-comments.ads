@@ -1,4 +1,4 @@
---  Generated at 2015-05-05 21:35:07 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-05-08 17:10:48 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -26,7 +26,9 @@ package Natools.Static_Maps.Web.Comments is
       end Form;
 
       package Post_Action is
-         type Enum is (Unknown, Save, Force_Preview, Reject, Dump);
+         type Enum is
+           (Unknown, Save, Force_Preview, Reject, Dump,
+            Reason, Append_Reason, Set_Reason);
       end Post_Action;
    end Item;
 
@@ -194,15 +196,20 @@ private
          Item.Form.Link,
          Item.Form.Text);
 
-   Map_5_Key_0 : aliased constant String := "dump";
-   Map_5_Key_1 : aliased constant String := "log";
-   Map_5_Key_2 : aliased constant String := "write";
-   Map_5_Key_3 : aliased constant String := "preview";
-   Map_5_Key_4 : aliased constant String := "force-preview";
-   Map_5_Key_5 : aliased constant String := "reject";
-   Map_5_Key_6 : aliased constant String := "accept";
-   Map_5_Key_7 : aliased constant String := "save";
-   Map_5_Keys : constant array (0 .. 7) of access constant String
+   Map_5_Key_0 : aliased constant String := "append-reason";
+   Map_5_Key_1 : aliased constant String := "add-reason";
+   Map_5_Key_2 : aliased constant String := "dump";
+   Map_5_Key_3 : aliased constant String := "log";
+   Map_5_Key_4 : aliased constant String := "write";
+   Map_5_Key_5 : aliased constant String := "preview";
+   Map_5_Key_6 : aliased constant String := "force-preview";
+   Map_5_Key_7 : aliased constant String := "reason";
+   Map_5_Key_8 : aliased constant String := "reject";
+   Map_5_Key_9 : aliased constant String := "accept";
+   Map_5_Key_10 : aliased constant String := "save";
+   Map_5_Key_11 : aliased constant String := "set-reason";
+   Map_5_Key_12 : aliased constant String := "reset-reason";
+   Map_5_Keys : constant array (0 .. 12) of access constant String
      := (Map_5_Key_0'Access,
          Map_5_Key_1'Access,
          Map_5_Key_2'Access,
@@ -210,16 +217,26 @@ private
          Map_5_Key_4'Access,
          Map_5_Key_5'Access,
          Map_5_Key_6'Access,
-         Map_5_Key_7'Access);
-   Map_5_Elements : constant array (0 .. 7) of Item.Post_Action.Enum
-     := (Item.Post_Action.Dump,
+         Map_5_Key_7'Access,
+         Map_5_Key_8'Access,
+         Map_5_Key_9'Access,
+         Map_5_Key_10'Access,
+         Map_5_Key_11'Access,
+         Map_5_Key_12'Access);
+   Map_5_Elements : constant array (0 .. 12) of Item.Post_Action.Enum
+     := (Item.Post_Action.Append_Reason,
+         Item.Post_Action.Append_Reason,
+         Item.Post_Action.Dump,
          Item.Post_Action.Dump,
          Item.Post_Action.Dump,
          Item.Post_Action.Force_Preview,
          Item.Post_Action.Force_Preview,
+         Item.Post_Action.Reason,
          Item.Post_Action.Reject,
          Item.Post_Action.Save,
-         Item.Post_Action.Save);
+         Item.Post_Action.Save,
+         Item.Post_Action.Set_Reason,
+         Item.Post_Action.Set_Reason);
 
    Map_6_Key_0 : aliased constant String := "list";
    Map_6_Key_1 : aliased constant String := "preview";
