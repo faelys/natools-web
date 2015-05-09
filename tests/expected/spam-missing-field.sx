@@ -1,9 +1,7 @@
    (name "Random Stranger")
-   (mail "")
    (link http://instinctive.eu/)
    (text "Attempted spam comment text.")
    (extra-fields
-      (address http://instinctive.eu/)
       (submit Submit))
-   (has-unknown-field TRUE)
-   (action PARENT_REDIRECT "unknown field encountered"))
+   (has-unknown-field FALSE)
+   (action FORCE_PREVIEW "missing mandatory field"))

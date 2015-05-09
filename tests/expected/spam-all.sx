@@ -1,0 +1,9 @@
+   (name "Random Spammer")
+   (link http://instinctive.eu/)
+   (text "Attempted spam comment text.")
+   (extra-fields
+      (address here)
+      (submit Submit))
+   (has-unknown-field TRUE)
+   (action PARENT_REDIRECT "missing mandatory field, spammer name found, unkno\
+wn field encountered"))

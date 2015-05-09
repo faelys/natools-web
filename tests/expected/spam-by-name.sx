@@ -1,0 +1,8 @@
+   (name "Random Spammer")
+   (mail "")
+   (link http://instinctive.eu/)
+   (text "Attempted spam comment text.")
+   (extra-fields
+      (submit Submit))
+   (has-unknown-field FALSE)
+   (action FORCE_PREVIEW "spammer name found"))
