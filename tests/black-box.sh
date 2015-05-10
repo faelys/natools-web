@@ -63,7 +63,7 @@ chain_curl(){
 #    Extract the last spam recorded and compare it to the given file.
 #    Note that this function depends on site S-expression pretty printer cfg.
 check_last_spam(){
-	if ! sed -n '/^(/h; /^   /H; $g; $p' "${SPAM_LOG}" \
+	if ! sed -n '/^(/h; /^[^(]/H; $g; $p' "${SPAM_LOG}" \
 	    | grep -v -e '^(' -e '(date ' \
 	    | diff -u --label "${EXPECTED_DIR}/$1" \
 		--label "last reported spam" \
