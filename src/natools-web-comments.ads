@@ -72,6 +72,11 @@ package Natools.Web.Comments is
 
 private
 
+   package Comment_Flags is
+      type Enum is (Preprocessed);
+      type Set is array (Enum) of Boolean with Pack;
+   end Comment_Flags;
+
    type Comment_Data is record
       Date : Ada.Calendar.Time;
       Id : S_Expressions.Atom_Refs.Immutable_Reference;
@@ -80,7 +85,7 @@ private
       Link : S_Expressions.Atom_Refs.Immutable_Reference;
       Text : S_Expressions.Atom_Refs.Immutable_Reference;
       Text_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
-      Preprocessed : Boolean := False;
+      Flags : Comment_Flags.Set := (others => False);
    end record;
 
    procedure Preprocess

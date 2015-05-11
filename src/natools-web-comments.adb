@@ -291,7 +291,7 @@ package body Natools.Web.Comments is
       Accessor : constant Comment_Array_Refs.Accessor := Context.List.Query;
       Comment : Comment_Data renames Accessor.Data.Data (Context.Position);
    begin
-      pragma Assert (Comment.Preprocessed);
+      pragma Assert (Comment.Flags (Comment_Flags.Preprocessed));
 
       case Static_Maps.To_Item_Command (S_Expressions.To_String (Name)) is
          when Unknown =>
@@ -422,7 +422,7 @@ package body Natools.Web.Comments is
       use Static_Maps.Item.Element;
       use type S_Expressions.Events.Event;
    begin
-      pragma Assert (not Comment.Preprocessed);
+      pragma Assert (not Comment.Flags (Comment_Flags.Preprocessed));
 
       if Arguments.Current_Event /= S_Expressions.Events.Add_Atom then
          return;
@@ -912,7 +912,7 @@ package body Natools.Web.Comments is
      (Comment : in out Comment_Data;
       Text_Filter : in Filters.Filter'Class) is
    begin
-      if Comment.Preprocessed then
+      if Comment.Flags (Comment_Flags.Preprocessed) then
          return;
       end if;
 
@@ -941,7 +941,7 @@ package body Natools.Web.Comments is
          end;
       end if;
 
-      Comment.Preprocessed := True;
+      Comment.Flags (Comment_Flags.Preprocessed) := True;
    end Preprocess;
 
 
@@ -1025,7 +1025,7 @@ package body Natools.Web.Comments is
          end if;
       end Print;
    begin
-      pragma Assert (not Comment.Preprocessed);
+      pragma Assert (not Comment.Flags (Comment_Flags.Preprocessed));
 
       Print ("date", S_Expressions.To_Atom
         (Time_IO.RFC_3339.Image (Comment.Date)));
