@@ -28,6 +28,7 @@ with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Conditionals.Generic_Evaluate;
 with Natools.S_Expressions.Conditionals.Strings;
+with Natools.S_Expressions.Enumeration_IO;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Parsers;
 with Natools.S_Expressions.Printers.Pretty;
@@ -51,6 +52,9 @@ with Natools.Web.Sites.Updates;
 package body Natools.Web.Comments is
 
    package Static_Maps renames Natools.Static_Maps.Web.Comments;
+
+   package Comment_Flag_IO is new S_Expressions.Enumeration_IO.Typed_IO
+     (Comment_Flags.Enum);
 
    package Comment_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (S_Expressions.Atom, Comment_Data, S_Expressions."<");
@@ -446,6 +450,22 @@ package body Natools.Web.Comments is
                     & Image & """ for comment "
                     & S_Expressions.To_String (Comment.Id.Query));
             end;
+
+         when Flags =>
+            while Arguments.Current_Event in S_Expressions.Events.Add_Atom loop
+               begin
+                  Comment.Flags
+                    (Comment_Flag_IO.Value (Arguments.Current_Atom))
+                    := True;
+               exception
+                  when Constraint_Error =>
+                     Log (Severities.Error, "Invalid comment flag value """
+                       & S_Expressions.To_String (Arguments.Current_Atom)
+                       & '"');
+               end;
+
+               Arguments.Next;
+            end loop;
 
          when Static_Maps.Item.Element.Name =>
             Comment.Name := Create (Arguments.Current_Atom);
@@ -1035,6 +1055,27 @@ package body Natools.Web.Comments is
       Print ("link", Comment.Link);
       Print ("text", Comment.Text);
       Print ("text-filter", Comment.Text_Filter);
+
+      Print_Flags :
+      declare
+         Flag_Printed : Boolean := False;
+      begin
+         for Flag in Comment_Flags.Enum loop
+            if Comment.Flags (Flag) then
+               if not Flag_Printed then
+                  Output.Open_List;
+                  Output.Append_String ("flags");
+                  Flag_Printed := True;
+               end if;
+
+               Output.Append_Atom (Comment_Flag_IO.Image (Flag));
+            end if;
+         end loop;
+
+         if Flag_Printed then
+            Output.Close_List;
+         end if;
+      end Print_Flags;
    end Write;
 
 

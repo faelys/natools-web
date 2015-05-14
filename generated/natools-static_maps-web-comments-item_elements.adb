@@ -6,14 +6,14 @@ package body Natools.Static_Maps.Web.Comments.Item_Elements is
      (1, 5);
 
    T1 : constant array (0 .. 1) of Unsigned_8 :=
-     (13, 6);
+     (0, 9);
 
    T2 : constant array (0 .. 1) of Unsigned_8 :=
-     (16, 3);
+     (5, 7);
 
-   G : constant array (0 .. 23) of Unsigned_8 :=
-     (0, 2, 0, 0, 0, 0, 0, 6, 0, 0, 0, 5, 4, 0, 1, 6, 0, 2, 0, 0, 8, 0, 0,
-      9);
+   G : constant array (0 .. 25) of Unsigned_8 :=
+     (0, 0, 0, 7, 2, 0, 0, 0, 9, 6, 0, 5, 0, 0, 0, 5, 0, 0, 10, 0, 5, 8, 0,
+      6, 0, 3);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -24,10 +24,10 @@ package body Natools.Static_Maps.Web.Comments.Item_Elements is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 24;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 24;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 26;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 26;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 11;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 12;
    end Hash;
 
 end Natools.Static_Maps.Web.Comments.Item_Elements;

@@ -16,7 +16,8 @@
       end Condition;
 
       package Element is
-         type Enum is (Unknown, Date, Name, Mail, Link, Text, Text_Filter);
+         type Enum is
+           (Unknown, Date, Name, Mail, Link, Text, Text_Filter, Flags);
       end Element;
 
       package Form is
@@ -78,6 +79,7 @@
       (not-found Item.Element.Unknown)
       (nodes
          (Item.Element.Date  date)
+         (Item.Element.Flags  flags)
          (Item.Element.Name  name)
          (Item.Element.Mail  mail e-mail)
          (Item.Element.Link  link www site website)
