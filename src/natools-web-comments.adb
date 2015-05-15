@@ -1211,14 +1211,20 @@ package body Natools.Web.Comments is
          begin
             Reader.Next;
             Update (Reader, Comment, Meaningless_Value);
-            Comment.Id := Create (Name);
-            Preprocess (Comment, Builder);
 
-            Map.Insert (Name, Comment, Position, Inserted);
+            if not Comment.Flags (Comment_Flags.Ignored) then
+               Comment.Id := Create (Name);
+               Preprocess (Comment, Builder);
 
-            if not Inserted then
-               Log (Severities.Error, "Duplicate comment id """
-                 & S_Expressions.To_String (Name) & '"');
+               Map.Insert (Name, Comment, Position, Inserted);
+
+               if not Inserted then
+                  Log (Severities.Error, "Duplicate comment id """
+                    & S_Expressions.To_String (Name) & '"');
+               end if;
+            else
+               Log (Severities.Info, "Ignoring comment "
+                 & S_Expressions.To_String (Name));
             end if;
          end Process;
       begin

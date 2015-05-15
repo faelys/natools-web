@@ -73,7 +73,7 @@ package Natools.Web.Comments is
 private
 
    package Comment_Flags is
-      type Enum is (Preprocessed);
+      type Enum is (Preprocessed, Ignored);
       type Set is array (Enum) of Boolean with Pack;
    end Comment_Flags;
 
