@@ -1222,9 +1222,6 @@ package body Natools.Web.Comments is
                   Log (Severities.Error, "Duplicate comment id """
                     & S_Expressions.To_String (Name) & '"');
                end if;
-            else
-               Log (Severities.Info, "Ignoring comment "
-                 & S_Expressions.To_String (Name));
             end if;
          end Process;
       begin
