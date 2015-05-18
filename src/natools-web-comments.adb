@@ -772,6 +772,10 @@ package body Natools.Web.Comments is
             Builder.Action := Force_Preview;
             Update_Reason;
 
+         when Ignore =>
+            Builder.Core.Flags (Comment_Flags.Ignored) := True;
+            Update_Reason;
+
          when Reason =>
             Update_Reason;
 
@@ -809,6 +813,9 @@ package body Natools.Web.Comments is
 
          when Force_Preview =>
             Builder.Action := Force_Preview;
+
+         when Ignore =>
+            Builder.Core.Flags (Comment_Flags.Ignored) := True;
 
          when Reason | Set_Reason =>
             Builder.Reason.Reset;
@@ -1331,7 +1338,10 @@ package body Natools.Web.Comments is
             end Write_Comment;
 
             Error_Pages.See_Other (Exchange, List.Parent_Path.Query);
-            Sites.Updates.Reload (Exchange.Site.all);
+
+            if not Builder.Core.Flags (Comment_Flags.Ignored) then
+               Sites.Updates.Reload (Exchange.Site.all);
+            end if;
       end case;
    end Respond;
 
