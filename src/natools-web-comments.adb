@@ -71,6 +71,7 @@ package body Natools.Web.Comments is
       Has_Unknown_Field : Boolean := False;
       Action : Post_Action;
       Reason : S_Expressions.Atom_Refs.Immutable_Reference;
+      Anchor : S_Expressions.Atom_Refs.Immutable_Reference;
    end record;
 
 
@@ -746,6 +747,13 @@ package body Natools.Web.Comments is
          when Unknown =>
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
 
+         when Anchor =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               Builder.Anchor := Create (Arguments.Current_Atom);
+            else
+               Builder.Anchor.Reset;
+            end if;
+
          when Append_Reason =>
             if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
                declare
@@ -807,6 +815,9 @@ package body Natools.Web.Comments is
       case Static_Maps.To_Item_Action (S_Name) is
          when Unknown | Dump =>
             Log (Severities.Error, "Unknown comment action """ & S_Name & '"');
+
+         when Anchor =>
+            Builder.Anchor.Reset;
 
          when Append_Reason =>
             null;
@@ -1125,6 +1136,14 @@ package body Natools.Web.Comments is
          Output.Append_Atom (Builder.Reason.Query);
       end if;
       Output.Close_List;
+
+      if not Builder.Anchor.Is_Empty then
+         Output.Open_List;
+         Output.Append_String ("anchor");
+         Output.Append_Atom (Builder.Anchor.Query);
+         Output.Close_List;
+      end if;
+
       Output.Close_List;
    end Write;
 
@@ -1268,7 +1287,44 @@ package body Natools.Web.Comments is
       Exchange : in out Sites.Exchange;
       Extra_Path : in S_Expressions.Atom)
    is
+      function Get_Anchor
+        (Builder : Comment_Builder;
+         Default : S_Expressions.Atom)
+        return S_Expressions.Atom;
+      function Redirect_Location
+        (Default_Anchor : S_Expressions.Atom := S_Expressions.Null_Atom)
+        return S_Expressions.Atom;
+
+      function Get_Anchor
+        (Builder : Comment_Builder;
+         Default : S_Expressions.Atom)
+        return S_Expressions.Atom is
+      begin
+         if Builder.Anchor.Is_Empty then
+            return Default;
+         else
+            return Builder.Anchor.Query;
+         end if;
+      end Get_Anchor;
+
       Builder : Comment_Builder;
+
+      function Redirect_Location
+        (Default_Anchor : S_Expressions.Atom := S_Expressions.Null_Atom)
+        return S_Expressions.Atom
+      is
+         use type Ada.Streams.Stream_Element_Array;
+
+         Parent : constant S_Expressions.Atom := List.Parent_Path.Query;
+         Anchor : constant S_Expressions.Atom
+           := Get_Anchor (Builder, Default_Anchor);
+      begin
+         if Anchor'Length > 0 then
+            return Parent & Character'Pos ('#') & Anchor;
+         else
+            return Parent;
+         end if;
+      end Redirect_Location;
    begin
       if Extra_Path'Length > 0
         or else List.Backend_Name.Is_Empty
@@ -1319,7 +1375,7 @@ package body Natools.Web.Comments is
             end if;
 
          when Parent_Redirect =>
-            Error_Pages.See_Other (Exchange, List.Parent_Path.Query);
+            Error_Pages.See_Other (Exchange, Redirect_Location);
 
          when Save_Comment =>
             Write_Comment :
@@ -1337,7 +1393,9 @@ package body Natools.Web.Comments is
                Write (Builder.Core, Printer);
             end Write_Comment;
 
-            Error_Pages.See_Other (Exchange, List.Parent_Path.Query);
+            Error_Pages.See_Other
+              (Exchange,
+               Redirect_Location (Builder.Core.Id.Query));
 
             if not Builder.Core.Flags (Comment_Flags.Ignored) then
                Sites.Updates.Reload (Exchange.Site.all);
