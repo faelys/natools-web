@@ -6,4 +6,5 @@
       (submit Submit))
    (has-unknown-field TRUE)
    (action PARENT_REDIRECT "missing mandatory field, spammer name found, unkno\
-wn field encountered"))
+wn field encountered")
+   (anchor ""))

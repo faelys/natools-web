@@ -6,4 +6,5 @@
       (address http://instinctive.eu/)
       (submit Submit))
    (has-unknown-field TRUE)
-   (action PARENT_REDIRECT "unknown field encountered"))
+   (action PARENT_REDIRECT "unknown field encountered")
+   (anchor ""))

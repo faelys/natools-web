@@ -13,7 +13,7 @@
       "</blockquote></li>\n"))
    "</ol>\n"
    (preview
-      "<h1>Preview</h1>\n<ol>\n"
+      "<h1 id=\"preview\">Preview</h1>\n<ol>\n"
       "<li><p>"
       (if-link "<a href=\"" (link) "\">") (if-no-link "<strong>")
       (name)
@@ -22,7 +22,7 @@
       (text)
       "</blockquote></li>\n"
       "</ol>\n"))
-"<h1>Post a Comment</h1>\n"
+"<h1 id=\"newcomment\">Post a Comment</h1>\n"
 (render comment-form))
    (title "Fourth Page"))
 (tags (4 pages/news tags/topic3))

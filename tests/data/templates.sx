@@ -85,7 +85,10 @@
 
 (comment-filter
    accept
-   (if (text (contains suspicious)) ignore)
+   (anchor "")
+   (if (text (contains suspicious))
+      (anchor newcomment)
+      ignore)
    (if (not (and name mail link text))
       (force-preview "missing mandatory field")
       (log data/comments/spam.sx))
