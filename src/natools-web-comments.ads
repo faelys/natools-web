@@ -77,6 +77,11 @@ private
       type Set is array (Enum) of Boolean with Pack;
    end Comment_Flags;
 
+   package List_Flags is
+      type Enum is (Ignore_By_Default);
+      type Set is array (Enum) of Boolean with Pack;
+   end List_Flags;
+
    type Comment_Data is record
       Date : Ada.Calendar.Time;
       Id : S_Expressions.Atom_Refs.Immutable_Reference;
@@ -128,6 +133,7 @@ private
       Comments : Comment_Array_Refs.Reference;
       Post_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
       Tags : Containers.Atom_Array_Refs.Immutable_Reference;
+      Flags : List_Flags.Set := (others => False);
    end record;
 
    overriding procedure Finalize (Object : in out Comment_List);
@@ -173,6 +179,7 @@ private
          Parent_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Comments => Comment_Array_Refs.Null_Reference,
          Post_Filter => S_Expressions.Atom_Refs.Null_Immutable_Reference,
-         Tags => Containers.Atom_Array_Refs.Null_Immutable_Reference);
+         Tags => Containers.Atom_Array_Refs.Null_Immutable_Reference,
+         Flags => (others => False));
 
 end Natools.Web.Comments;

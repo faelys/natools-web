@@ -59,6 +59,9 @@ package body Natools.Web.Comments is
    package Comment_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (S_Expressions.Atom, Comment_Data, S_Expressions."<");
 
+   package List_Flag_IO is new S_Expressions.Enumeration_IO.Typed_IO
+     (List_Flags.Enum);
+
    package String_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (String, String);
 
@@ -512,6 +515,22 @@ package body Natools.Web.Comments is
             if Event = S_Expressions.Events.Add_Atom then
                List.Backend_Path := Create (Arguments.Current_Atom);
             end if;
+
+         when Flags =>
+            while Arguments.Current_Event in S_Expressions.Events.Add_Atom loop
+               begin
+                  List.Flags
+                    (List_Flag_IO.Value (Arguments.Current_Atom))
+                    := True;
+               exception
+                  when Constraint_Error =>
+                     Log (Severities.Error, "Invalid comment list flag """
+                       & S_Expressions.To_String (Arguments.Current_Atom)
+                       & '"');
+               end;
+
+               Arguments.Next;
+            end loop;
 
          when Post_Filter =>
             List.Post_Filter := Create (Arguments.Current_Atom);
@@ -1358,6 +1377,8 @@ package body Natools.Web.Comments is
       Builder.Core.Date := Ada.Calendar.Clock;
       Builder.Core.Id := Create (S_Expressions.To_Atom
         (Time_Keys.To_Key (Builder.Core.Date)));
+      Builder.Core.Flags (Comment_Flags.Ignored)
+        := List.Flags (List_Flags.Ignore_By_Default);
       Process_Form (Builder, Exchange);
       Process_Actions (Builder, Exchange.Site.all, List.Post_Filter);
 
