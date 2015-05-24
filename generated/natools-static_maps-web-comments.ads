@@ -1,4 +1,4 @@
---  Generated at 2015-05-22 16:28:08 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-05-24 15:43:16 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -29,7 +29,7 @@ package Natools.Static_Maps.Web.Comments is
       package Post_Action is
          type Enum is
            (Unknown, Save, Force_Preview, Reject, Dump,
-            Reason, Append_Reason, Set_Reason, Ignore, Anchor);
+            Reason, Append_Reason, Set_Reason, Ignore, Unignore, Anchor);
       end Post_Action;
    end Item;
 
@@ -216,7 +216,8 @@ private
    Map_5_Key_13 : aliased constant String := "save";
    Map_5_Key_14 : aliased constant String := "set-reason";
    Map_5_Key_15 : aliased constant String := "reset-reason";
-   Map_5_Keys : constant array (0 .. 15) of access constant String
+   Map_5_Key_16 : aliased constant String := "unignore";
+   Map_5_Keys : constant array (0 .. 16) of access constant String
      := (Map_5_Key_0'Access,
          Map_5_Key_1'Access,
          Map_5_Key_2'Access,
@@ -232,8 +233,9 @@ private
          Map_5_Key_12'Access,
          Map_5_Key_13'Access,
          Map_5_Key_14'Access,
-         Map_5_Key_15'Access);
-   Map_5_Elements : constant array (0 .. 15) of Item.Post_Action.Enum
+         Map_5_Key_15'Access,
+         Map_5_Key_16'Access);
+   Map_5_Elements : constant array (0 .. 16) of Item.Post_Action.Enum
      := (Item.Post_Action.Anchor,
          Item.Post_Action.Anchor,
          Item.Post_Action.Append_Reason,
@@ -249,7 +251,8 @@ private
          Item.Post_Action.Save,
          Item.Post_Action.Save,
          Item.Post_Action.Set_Reason,
-         Item.Post_Action.Set_Reason);
+         Item.Post_Action.Set_Reason,
+         Item.Post_Action.Unignore);
 
    Map_6_Key_0 : aliased constant String := "list";
    Map_6_Key_1 : aliased constant String := "preview";

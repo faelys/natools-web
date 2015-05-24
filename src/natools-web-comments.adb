@@ -818,6 +818,10 @@ package body Natools.Web.Comments is
             if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
                Builder.Reason := Create (Arguments.Current_Atom);
             end if;
+
+         when Unignore =>
+            Builder.Core.Flags (Comment_Flags.Ignored) := False;
+            Update_Reason;
       end case;
    end Parse_Action;
 
@@ -855,6 +859,9 @@ package body Natools.Web.Comments is
 
          when Save =>
             Builder.Action := Save_Comment;
+
+         when Unignore =>
+            Builder.Core.Flags (Comment_Flags.Ignored) := False;
       end case;
    end Parse_Action_Simple;
 
