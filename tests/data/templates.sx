@@ -89,6 +89,8 @@
    (if (text (contains suspicious))
       (anchor newcomment)
       ignore)
+   (if (name (starts-with Administrator))
+      unignore)
    (if (not (and name mail link text))
       (force-preview "missing mandatory field")
       (log data/comments/spam.sx))

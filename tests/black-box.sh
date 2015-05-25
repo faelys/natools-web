@@ -151,3 +151,7 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Nobody' \
     -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Perfectly valid comment set to be ignored in the page.'
 chain /fifth fifth.html
+chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
+    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_text=Administrator comments that bypasses default ignore'
+chain /fifth fifth-commented.html
