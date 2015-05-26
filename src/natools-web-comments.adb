@@ -156,7 +156,8 @@ package body Natools.Web.Comments is
 
    procedure Process_Form
      (Data : in out Comment_Builder;
-      Exchange : in Sites.Exchange);
+      Exchange : in Sites.Exchange;
+      List : in Comment_List);
       --  Read form data in Exchange to fill Data
 
    procedure Render_Comment_Position
@@ -400,7 +401,7 @@ package body Natools.Web.Comments is
             begin
                Builder.Core.Date := Ada.Calendar.Clock;
                Builder.Core.Id := Preview_Id;
-               Process_Form (Builder, Exchange);
+               Process_Form (Builder, Exchange, List);
                Preprocess (Builder.Core, Exchange.Site.all);
                Ref.List.Update.Data (1) := Builder.Core;
                Render (Arguments, Exchange, Ref);
@@ -1021,7 +1022,8 @@ package body Natools.Web.Comments is
 
    procedure Process_Form
      (Data : in out Comment_Builder;
-      Exchange : in Sites.Exchange)
+      Exchange : in Sites.Exchange;
+      List : in Comment_List)
    is
       procedure Process (Field, Value : String);
 
@@ -1034,6 +1036,17 @@ package body Natools.Web.Comments is
 
                if Field /= Submit_Button and then Field /= Preview_Button then
                   Data.Has_Unknown_Field := True;
+               end if;
+
+            when Date =>
+               if List.Flags (List_Flags.Allow_Date_Override) then
+                  begin
+                     Data.Core.Date := Time_IO.RFC_3339.Value (Value);
+                  exception
+                     when others => null;
+                  end;
+               else
+                  Data.Extra_Fields.Insert (Field, Value);
                end if;
 
             when Name =>
@@ -1386,7 +1399,7 @@ package body Natools.Web.Comments is
         (Time_Keys.To_Key (Builder.Core.Date)));
       Builder.Core.Flags (Comment_Flags.Ignored)
         := List.Flags (List_Flags.Ignore_By_Default);
-      Process_Form (Builder, Exchange);
+      Process_Form (Builder, Exchange, List);
       Process_Actions (Builder, Exchange.Site.all, List.Post_Filter);
 
       if not Builder.Reason.Is_Empty then

@@ -21,7 +21,7 @@
       end Element;
 
       package Form is
-         type Enum is (Unknown, Name, Mail, Link, Text);
+         type Enum is (Unknown, Date, Name, Mail, Link, Text);
       end Form;
 
       package Post_Action is
@@ -91,6 +91,7 @@
       (function To_Item_Form)
       (not-found Item.Form.Unknown)
       (nodes
+         (Item.Form.Date  c_date)
          (Item.Form.Name  c_name)
          (Item.Form.Mail  c_mail)
          (Item.Form.Link  c_site)

@@ -1,4 +1,4 @@
---  Generated at 2015-05-24 15:43:16 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-05-26 21:09:21 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -23,7 +23,7 @@ package Natools.Static_Maps.Web.Comments is
       end Element;
 
       package Form is
-         type Enum is (Unknown, Name, Mail, Link, Text);
+         type Enum is (Unknown, Date, Name, Mail, Link, Text);
       end Form;
 
       package Post_Action is
@@ -185,17 +185,20 @@ private
          Item.Element.Text_Filter,
          Item.Element.Text_Filter);
 
-   Map_4_Key_0 : aliased constant String := "c_name";
-   Map_4_Key_1 : aliased constant String := "c_mail";
-   Map_4_Key_2 : aliased constant String := "c_site";
-   Map_4_Key_3 : aliased constant String := "c_text";
-   Map_4_Keys : constant array (0 .. 3) of access constant String
+   Map_4_Key_0 : aliased constant String := "c_date";
+   Map_4_Key_1 : aliased constant String := "c_name";
+   Map_4_Key_2 : aliased constant String := "c_mail";
+   Map_4_Key_3 : aliased constant String := "c_site";
+   Map_4_Key_4 : aliased constant String := "c_text";
+   Map_4_Keys : constant array (0 .. 4) of access constant String
      := (Map_4_Key_0'Access,
          Map_4_Key_1'Access,
          Map_4_Key_2'Access,
-         Map_4_Key_3'Access);
-   Map_4_Elements : constant array (0 .. 3) of Item.Form.Enum
-     := (Item.Form.Name,
+         Map_4_Key_3'Access,
+         Map_4_Key_4'Access);
+   Map_4_Elements : constant array (0 .. 4) of Item.Form.Enum
+     := (Item.Form.Date,
+         Item.Form.Name,
          Item.Form.Mail,
          Item.Form.Link,
          Item.Form.Text);
