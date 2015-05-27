@@ -1,33 +1,13 @@
 (elements
    (main-text "\
 <p>Data in the fifth page.</p>\n"
-(comments
-   "<h1>Timeless Comments</h1>\n<ol>\n"
-   (list (render
-      "<li><p>"
-      (if-link "<a href=\"" (link) "\">") (if-no-link "<strong>")
-      (name)
-      (if-link "</a>") (if-no-link "</strong>")
-      " wrote:</p>\n<blockquote>\n"
-      (text)
-      "</blockquote></li>\n"))
-   "</ol>\n"
-   (preview
-      "<h1 id=\"preview\">Preview</h1>\n<ol>\n"
-      "<li><p>"
-      (if-link "<a href=\"" (link) "\">") (if-no-link "<strong>")
-      (name)
-      (if-link "</a>") (if-no-link "</strong>")
-      " wrote:</p>\n<blockquote>\n"
-      (text)
-      "</blockquote></li>\n"
-      "</ol>\n"))
+(render page-comments)
 "<h1 id=\"newcomment\">Post a Comment</h1>\n"
 (render comment-form))
    (title "Fifth Page"))
 (tags (5 pages/news))
 (comments
-   (flags ignore-by-default)
+   (flags ignore-by-default allow-date-override)
    (filter comment-filter)
    (backend comments 5)
    (tags comments))

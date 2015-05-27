@@ -114,7 +114,7 @@ chain /fourth/comments fourth-303.html -F 'c_mail=' \
     -F 'c_name=Random Stranger' \
     -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Attempted spam comment text.' \
-    -F 'address=http://instinctive.eu/'
+    -F 'c_date=2015-03-03T15:10:00Z'
 chain /fourth fourth.html
 chain_last_spam spam-extra-fields.sx
 chain /fourth/comments fourth-spam-1.html \
@@ -152,6 +152,7 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Nobody' \
     -F 'c_text=Perfectly valid comment set to be ignored in the page.'
 chain /fifth fifth.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
+    -F 'c_date=2015-03-03T15:10:00Z' \
     -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Administrator comments that bypasses default ignore'
 chain /fifth fifth-commented.html

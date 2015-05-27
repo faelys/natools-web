@@ -3,7 +3,7 @@
    (link http://instinctive.eu/)
    (text "Attempted spam comment text.")
    (extra-fields
-      (address http://instinctive.eu/)
+      (c_date "2015-03-03T15:10:00Z")
       (submit Submit))
    (has-unknown-field TRUE)
    (action PARENT_REDIRECT "unknown field encountered")
