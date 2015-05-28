@@ -1047,6 +1047,7 @@ package body Natools.Web.Comments is
                   end;
                else
                   Data.Extra_Fields.Insert (Field, Value);
+                  Data.Has_Unknown_Field := True;
                end if;
 
             when Name =>
