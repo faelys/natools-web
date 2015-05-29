@@ -543,6 +543,14 @@ package body Natools.Web.Comments is
                Containers.Append_Atoms (List_Builder, Arguments);
                List.Tags := Containers.Create (List_Builder);
             end;
+
+         when Text_Filters =>
+            declare
+               List_Builder : Containers.Unsafe_Atom_Lists.List;
+            begin
+               Containers.Append_Atoms (List_Builder, Arguments);
+               List.Text_Filters := Containers.Create (List_Builder);
+            end;
       end case;
    end Update_List;
 
@@ -1048,6 +1056,19 @@ package body Natools.Web.Comments is
                else
                   Data.Extra_Fields.Insert (Field, Value);
                   Data.Has_Unknown_Field := True;
+               end if;
+
+            when Filter =>
+               if List.Text_Filters.Is_Empty then
+                  Data.Extra_Fields.Insert (Field, Value);
+                  Data.Has_Unknown_Field := True;
+               else
+                  for Name_Ref of List.Text_Filters.Query.Data.all loop
+                     if S_Expressions.To_String (Name_Ref.Query) = Value then
+                        Data.Core.Text_Filter := Name_Ref;
+                        exit;
+                     end if;
+                  end loop;
                end if;
 
             when Name =>

@@ -133,6 +133,7 @@ private
       Comments : Comment_Array_Refs.Reference;
       Post_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
       Tags : Containers.Atom_Array_Refs.Immutable_Reference;
+      Text_Filters : Containers.Atom_Array_Refs.Immutable_Reference;
       Flags : List_Flags.Set := (others => False);
    end record;
 
@@ -180,6 +181,7 @@ private
          Comments => Comment_Array_Refs.Null_Reference,
          Post_Filter => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Tags => Containers.Atom_Array_Refs.Null_Immutable_Reference,
+         Text_Filters => Containers.Atom_Array_Refs.Null_Immutable_Reference,
          Flags => (others => False));
 
 end Natools.Web.Comments;
