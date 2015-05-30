@@ -98,6 +98,9 @@
       force-preview
       (append-reason ", " "spammer name found")
       (log data/comments/spam.sx))
+   (if (site (contains /dev/null))
+      (reject ", " "/dev/null requested")
+      (log data/comments/spam.sx))
    (if has-unknown-field
       (reject "+(, )unknown field encountered")
       (log data/comments/spam.sx)))

@@ -1,0 +1,10 @@
+   (name "Random Stranger")
+   (mail "")
+   (link http://instinctive.eu/)
+   (text "Attempted use of disabled filter")
+   (extra-fields
+      (c_filter pass-through)
+      (submit Submit))
+   (has-unknown-field TRUE)
+   (action PARENT_REDIRECT "unknown field encountered")
+   (anchor ""))

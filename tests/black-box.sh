@@ -117,6 +117,12 @@ chain /fourth/comments fourth-303.html -F 'c_mail=' \
     -F 'c_date=2015-03-03T15:10:00Z'
 chain /fourth fourth.html
 chain_last_spam spam-extra-fields.sx
+chain /fourth/comments fourth-303.html -F 'c_mail=' \
+    -F 'c_name=Random Stranger' \
+    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_text=Attempted use of disabled filter' \
+    -F 'c_filter=pass-through'
+chain_last_spam spam-filter-extra-field.sx
 chain /fourth/comments fourth-spam-1.html \
     -F 'c_name=Random Stranger' \
     -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
@@ -156,3 +162,15 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Administrator comments that bypasses default ignore'
 chain /fifth fifth-commented.html
+chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
+    -F 'c_date=2015-03-03T15:12:00Z' \
+    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_filter=pass-through' --form-string \
+    'c_text=<p>Administrator comment in <strong>raw</strong> HTML mode.</p>'
+chain /fifth fifth-commented-2.html
+chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
+    -F 'c_date=2015-03-03T15:10:00Z' -F 'c_site=/dev/null' -F 'submit=Submit' \
+    -F 'c_filter=html-escape' \
+    -F 'c_text=Spam comment with wrong filter'
+chain_last_spam spam-wrong-filter.sx
+chain /fifth fifth-commented-2.html

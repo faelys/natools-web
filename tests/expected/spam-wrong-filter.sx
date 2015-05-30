@@ -1,0 +1,9 @@
+   (name Administrator)
+   (mail "")
+   (link /dev/null)
+   (text "Spam comment with wrong filter")
+   (extra-fields
+      (submit Submit))
+   (has-unknown-field FALSE)
+   (action PARENT_REDIRECT "/dev/null requested")
+   (anchor ""))

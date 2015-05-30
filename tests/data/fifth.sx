@@ -10,4 +10,5 @@
    (flags ignore-by-default allow-date-override)
    (filter comment-filter)
    (backend comments 5)
-   (tags comments))
+   (tags comments)
+   (text-filters pass-through))
