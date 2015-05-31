@@ -95,9 +95,11 @@ private
 
    procedure Preprocess
      (Comment : in out Comment_Data;
+      List : in Comment_List;
       Site : in Sites.Site);
    procedure Preprocess
      (Comment : in out Comment_Data;
+      List : in Comment_List;
       Builder : in Sites.Site_Builder);
       --  Preprocess comment field contents
 
@@ -134,6 +136,7 @@ private
       Post_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
       Tags : Containers.Atom_Array_Refs.Immutable_Reference;
       Text_Filters : Containers.Atom_Array_Refs.Immutable_Reference;
+      Default_Text_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
       Flags : List_Flags.Set := (others => False);
    end record;
 
@@ -182,6 +185,8 @@ private
          Post_Filter => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Tags => Containers.Atom_Array_Refs.Null_Immutable_Reference,
          Text_Filters => Containers.Atom_Array_Refs.Null_Immutable_Reference,
+         Default_Text_Filter
+           => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Flags => (others => False));
 
 end Natools.Web.Comments;

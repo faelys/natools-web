@@ -118,11 +118,13 @@ package body Natools.Web.Comments is
 
    function Get_Safe_Filter
      (Site : in Sites.Site;
-      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
+      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference;
+      Default : in S_Expressions.Atom_Refs.Immutable_Reference)
      return Filters.Filter'Class;
    function Get_Safe_Filter
      (Builder : in Sites.Site_Builder;
-      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
+      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference;
+      Default : in S_Expressions.Atom_Refs.Immutable_Reference)
      return Filters.Filter'Class;
       --  Return the filter designated by Name_Ref, falling back on raw
       --  text when Name_Ref is empty or named filter is not found.
@@ -402,7 +404,7 @@ package body Natools.Web.Comments is
                Builder.Core.Date := Ada.Calendar.Clock;
                Builder.Core.Id := Preview_Id;
                Process_Form (Builder, Exchange, List);
-               Preprocess (Builder.Core, Exchange.Site.all);
+               Preprocess (Builder.Core, List, Exchange.Site.all);
                Ref.List.Update.Data (1) := Builder.Core;
                Render (Arguments, Exchange, Ref);
             end;
@@ -516,6 +518,9 @@ package body Natools.Web.Comments is
             if Event = S_Expressions.Events.Add_Atom then
                List.Backend_Path := Create (Arguments.Current_Atom);
             end if;
+
+         when Default_Text_Filter =>
+            List.Default_Text_Filter := Create (Arguments.Current_Atom);
 
          when Flags =>
             while Arguments.Current_Event in S_Expressions.Events.Add_Atom loop
@@ -931,53 +936,85 @@ package body Natools.Web.Comments is
 
    function Get_Safe_Filter
      (Site : in Sites.Site;
-      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
-     return Filters.Filter'Class
-   is
-      Fallback : Filters.Text_Blocks.Filter;
+      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference;
+      Default : in S_Expressions.Atom_Refs.Immutable_Reference)
+     return Filters.Filter'Class is
    begin
-      if Name_Ref.Is_Empty then
-         return Fallback;
+      if not Name_Ref.Is_Empty then
+         begin
+            return Site.Get_Filter (Name_Ref.Query);
+         exception
+            when Filters.Stores.No_Filter => null;
+         end;
       end if;
 
-      return Site.Get_Filter (Name_Ref.Query);
-   exception
-      when Filters.Stores.No_Filter =>
+      if not Default.Is_Empty then
+         begin
+            return Site.Get_Filter (Default.Query);
+         exception
+            when Filters.Stores.No_Filter => null;
+         end;
+      end if;
+
+      declare
+         Fallback : Filters.Text_Blocks.Filter;
+      begin
          return Fallback;
+      end;
    end Get_Safe_Filter;
 
 
    function Get_Safe_Filter
      (Builder : in Sites.Site_Builder;
-      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference)
-     return Filters.Filter'Class
-   is
-      Fallback : Filters.Text_Blocks.Filter;
+      Name_Ref : in S_Expressions.Atom_Refs.Immutable_Reference;
+      Default : in S_Expressions.Atom_Refs.Immutable_Reference)
+     return Filters.Filter'Class is
    begin
-      if Name_Ref.Is_Empty then
-         return Fallback;
+      if not Name_Ref.Is_Empty then
+         begin
+            return Sites.Get_Filter (Builder, Name_Ref.Query);
+         exception
+            when Filters.Stores.No_Filter => null;
+         end;
       end if;
 
-      return Sites.Get_Filter (Builder, Name_Ref.Query);
-   exception
-      when Filters.Stores.No_Filter =>
+      if not Default.Is_Empty then
+         begin
+            return Sites.Get_Filter (Builder, Default.Query);
+         exception
+            when Filters.Stores.No_Filter => null;
+         end;
+      end if;
+
+      declare
+         Fallback : Filters.Text_Blocks.Filter;
+      begin
          return Fallback;
+      end;
    end Get_Safe_Filter;
 
 
    procedure Preprocess
      (Comment : in out Comment_Data;
+      List : in Comment_List;
       Site : in Sites.Site) is
    begin
-      Preprocess (Comment, Get_Safe_Filter (Site, Comment.Text_Filter));
+      Preprocess
+        (Comment,
+         Get_Safe_Filter
+           (Site, Comment.Text_Filter, List.Default_Text_Filter));
    end Preprocess;
 
 
    procedure Preprocess
      (Comment : in out Comment_Data;
+      List : in Comment_List;
       Builder : in Sites.Site_Builder) is
    begin
-      Preprocess (Comment, Get_Safe_Filter (Builder, Comment.Text_Filter));
+      Preprocess
+        (Comment,
+         Get_Safe_Filter
+           (Builder, Comment.Text_Filter, List.Default_Text_Filter));
    end Preprocess;
 
 
@@ -1301,7 +1338,7 @@ package body Natools.Web.Comments is
 
             if not Comment.Flags (Comment_Flags.Ignored) then
                Comment.Id := Create (Name);
-               Preprocess (Comment, Builder);
+               Preprocess (Comment, Object, Builder);
 
                Map.Insert (Name, Comment, Position, Inserted);
 

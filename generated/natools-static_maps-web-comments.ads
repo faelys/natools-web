@@ -1,4 +1,4 @@
---  Generated at 2015-05-29 21:05:45 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-05-31 16:20:19 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -40,7 +40,8 @@ package Natools.Static_Maps.Web.Comments is
 
       package Element is
          type Enum is
-           (Unknown, Backend, Post_Filter, Tags, Text_Filters, Flags);
+           (Unknown, Backend, Post_Filter, Tags,
+            Default_Text_Filter, Text_Filters, Flags);
       end Element;
    end List;
 
@@ -277,22 +278,25 @@ private
          List.Command.Size);
 
    Map_7_Key_0 : aliased constant String := "backend";
-   Map_7_Key_1 : aliased constant String := "flags";
-   Map_7_Key_2 : aliased constant String := "post-filter";
-   Map_7_Key_3 : aliased constant String := "filter";
-   Map_7_Key_4 : aliased constant String := "tags";
-   Map_7_Key_5 : aliased constant String := "allowed-filters";
-   Map_7_Key_6 : aliased constant String := "text-filters";
-   Map_7_Keys : constant array (0 .. 6) of access constant String
+   Map_7_Key_1 : aliased constant String := "default-text-filter";
+   Map_7_Key_2 : aliased constant String := "flags";
+   Map_7_Key_3 : aliased constant String := "post-filter";
+   Map_7_Key_4 : aliased constant String := "filter";
+   Map_7_Key_5 : aliased constant String := "tags";
+   Map_7_Key_6 : aliased constant String := "allowed-filters";
+   Map_7_Key_7 : aliased constant String := "text-filters";
+   Map_7_Keys : constant array (0 .. 7) of access constant String
      := (Map_7_Key_0'Access,
          Map_7_Key_1'Access,
          Map_7_Key_2'Access,
          Map_7_Key_3'Access,
          Map_7_Key_4'Access,
          Map_7_Key_5'Access,
-         Map_7_Key_6'Access);
-   Map_7_Elements : constant array (0 .. 6) of List.Element.Enum
+         Map_7_Key_6'Access,
+         Map_7_Key_7'Access);
+   Map_7_Elements : constant array (0 .. 7) of List.Element.Enum
      := (List.Element.Backend,
+         List.Element.Default_Text_Filter,
          List.Element.Flags,
          List.Element.Post_Filter,
          List.Element.Post_Filter,
