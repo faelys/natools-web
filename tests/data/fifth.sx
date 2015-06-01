@@ -7,6 +7,7 @@
    (title "Fifth Page"))
 (tags (5 pages/news))
 (comments
+   (default-text-filter html-escape)
    (flags ignore-by-default allow-date-override)
    (filter comment-filter)
    (backend comments 5)

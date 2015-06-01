@@ -159,8 +159,8 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Nobody' \
 chain /fifth fifth.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:10:00Z' \
-    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
-    -F 'c_text=Administrator comments that bypasses default ignore'
+    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' --form-string \
+    'c_text=<p>Administrator comments that bypasses default ignore</p>'
 chain /fifth fifth-commented.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:12:00Z' \
