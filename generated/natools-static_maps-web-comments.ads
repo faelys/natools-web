@@ -1,4 +1,4 @@
---  Generated at 2015-05-31 16:20:19 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-06-02 17:23:03 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -13,7 +13,7 @@ package Natools.Static_Maps.Web.Comments is
       package Condition is
          type Enum is
            (Unknown,
-            Has_Extra_Fields, Has_Unknown_Field,
+            Has_Extra_Fields, Has_Unknown_Field, Action_Is,
             Name, Mail, Link, Text);
       end Condition;
 
@@ -109,19 +109,21 @@ private
          Item.Command.Parent,
          Item.Command.Text);
 
-   Map_2_Key_0 : aliased constant String := "has-extra-field";
-   Map_2_Key_1 : aliased constant String := "has-extra-fields";
-   Map_2_Key_2 : aliased constant String := "has-unknown-field";
-   Map_2_Key_3 : aliased constant String := "has-unknown-fields";
-   Map_2_Key_4 : aliased constant String := "name";
-   Map_2_Key_5 : aliased constant String := "mail";
-   Map_2_Key_6 : aliased constant String := "e-mail";
-   Map_2_Key_7 : aliased constant String := "link";
-   Map_2_Key_8 : aliased constant String := "www";
-   Map_2_Key_9 : aliased constant String := "site";
-   Map_2_Key_10 : aliased constant String := "website";
-   Map_2_Key_11 : aliased constant String := "text";
-   Map_2_Keys : constant array (0 .. 11) of access constant String
+   Map_2_Key_0 : aliased constant String := "action-is";
+   Map_2_Key_1 : aliased constant String := "action-is-any-of";
+   Map_2_Key_2 : aliased constant String := "has-extra-field";
+   Map_2_Key_3 : aliased constant String := "has-extra-fields";
+   Map_2_Key_4 : aliased constant String := "has-unknown-field";
+   Map_2_Key_5 : aliased constant String := "has-unknown-fields";
+   Map_2_Key_6 : aliased constant String := "name";
+   Map_2_Key_7 : aliased constant String := "mail";
+   Map_2_Key_8 : aliased constant String := "e-mail";
+   Map_2_Key_9 : aliased constant String := "link";
+   Map_2_Key_10 : aliased constant String := "www";
+   Map_2_Key_11 : aliased constant String := "site";
+   Map_2_Key_12 : aliased constant String := "website";
+   Map_2_Key_13 : aliased constant String := "text";
+   Map_2_Keys : constant array (0 .. 13) of access constant String
      := (Map_2_Key_0'Access,
          Map_2_Key_1'Access,
          Map_2_Key_2'Access,
@@ -133,9 +135,13 @@ private
          Map_2_Key_8'Access,
          Map_2_Key_9'Access,
          Map_2_Key_10'Access,
-         Map_2_Key_11'Access);
-   Map_2_Elements : constant array (0 .. 11) of Item.Condition.Enum
-     := (Item.Condition.Has_Extra_Fields,
+         Map_2_Key_11'Access,
+         Map_2_Key_12'Access,
+         Map_2_Key_13'Access);
+   Map_2_Elements : constant array (0 .. 13) of Item.Condition.Enum
+     := (Item.Condition.Action_Is,
+         Item.Condition.Action_Is,
+         Item.Condition.Has_Extra_Fields,
          Item.Condition.Has_Extra_Fields,
          Item.Condition.Has_Unknown_Field,
          Item.Condition.Has_Unknown_Field,

@@ -613,6 +613,33 @@ package body Natools.Web.Comments is
             raise Invalid_Condition with "Unknown parametric conditional """
               & S_Expressions.To_String (Name) & '"';
 
+         when Action_Is =>
+            declare
+               use type S_Expressions.Events.Event;
+               Action : Post_Action;
+               Event : S_Expressions.Events.Event := Arguments.Current_Event;
+            begin
+               while Event = S_Expressions.Events.Add_Atom loop
+                  begin
+                     Action := Post_Action'Value
+                       (S_Expressions.To_String (Arguments.Current_Atom));
+
+                     if Action = Builder.Action then
+                        return True;
+                     end if;
+                  exception
+                     when Constraint_Error =>
+                        Log (Severities.Error, "Invalid post action string """
+                          & S_Expressions.To_String (Arguments.Current_Atom)
+                          & '"');
+                  end;
+
+                  Arguments.Next (Event);
+               end loop;
+
+               return False;
+            end;
+
          when Has_Extra_Fields =>
             return not Builder.Extra_Fields.Is_Empty;
 
@@ -642,7 +669,7 @@ package body Natools.Web.Comments is
       use Static_Maps.Item.Condition;
    begin
       case Static_Maps.To_Item_Condition (S_Expressions.To_String (Name)) is
-         when Unknown =>
+         when Unknown | Action_Is =>
             raise Invalid_Condition with "Unknown simple conditional """
               & S_Expressions.To_String (Name) & '"';
 
