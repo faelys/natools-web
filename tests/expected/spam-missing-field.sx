@@ -4,5 +4,5 @@
    (extra-fields
       (submit Submit))
    (has-unknown-field FALSE)
-   (action FORCE_PREVIEW "missing mandatory field")
+   (action force-preview "missing mandatory field")
    (anchor ""))

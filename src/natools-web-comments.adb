@@ -68,6 +68,9 @@ package body Natools.Web.Comments is
 
    type Post_Action is (Save_Comment, Force_Preview, Parent_Redirect);
 
+   package Post_Action_IO is new S_Expressions.Enumeration_IO.Typed_IO
+     (Post_Action);
+
    type Comment_Builder is record
       Core : Comment_Data;
       Extra_Fields : String_Maps.Map;
@@ -621,8 +624,7 @@ package body Natools.Web.Comments is
             begin
                while Event = S_Expressions.Events.Add_Atom loop
                   begin
-                     Action := Post_Action'Value
-                       (S_Expressions.To_String (Arguments.Current_Atom));
+                     Action := Post_Action_IO.Value (Arguments.Current_Atom);
 
                      if Action = Builder.Action then
                         return True;
@@ -1256,7 +1258,7 @@ package body Natools.Web.Comments is
 
       Output.Open_List;
       Output.Append_String ("action");
-      Output.Append_String (Post_Action'Image (Builder.Action));
+      Output.Append_Atom (Post_Action_IO.Image (Builder.Action));
       if not Builder.Reason.Is_Empty then
          Output.Append_Atom (Builder.Reason.Query);
       end if;

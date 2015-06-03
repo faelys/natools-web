@@ -5,5 +5,5 @@
    (extra-fields
       (submit Submit))
    (has-unknown-field FALSE)
-   (action PARENT_REDIRECT "/dev/null requested")
+   (action parent-redirect "/dev/null requested")
    (anchor ""))

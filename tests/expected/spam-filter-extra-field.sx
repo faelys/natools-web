@@ -6,5 +6,5 @@
       (c_filter pass-through)
       (submit Submit))
    (has-unknown-field TRUE)
-   (action PARENT_REDIRECT "unknown field encountered")
+   (action parent-redirect "unknown field encountered")
    (anchor ""))

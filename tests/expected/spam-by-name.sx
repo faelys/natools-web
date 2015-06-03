@@ -5,5 +5,5 @@
    (extra-fields
       (submit Submit))
    (has-unknown-field FALSE)
-   (action FORCE_PREVIEW "spammer name found")
+   (action force-preview "spammer name found")
    (anchor ""))
