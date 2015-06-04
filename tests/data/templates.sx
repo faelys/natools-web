@@ -92,17 +92,15 @@
    (if (name (starts-with Administrator))
       unignore)
    (if (not (and name mail link text))
-      (force-preview "missing mandatory field")
-      (log data/comments/spam.sx))
+      (force-preview "missing mandatory field"))
    (if (name (contains Spammer))
       force-preview
-      (append-reason ", " "spammer name found")
-      (log data/comments/spam.sx))
+      (append-reason ", " "spammer name found"))
    (if (site (contains /dev/null))
-      (reject ", " "/dev/null requested")
-      (log data/comments/spam.sx))
+      (reject ", " "/dev/null requested"))
    (if has-unknown-field
-      (reject "+(, )unknown field encountered")
+      (reject "+(, )unknown field encountered"))
+   (if (not (action-is save-comment))
       (log data/comments/spam.sx)))
 
 (comment-filter-bad ((used to test exception handling))
