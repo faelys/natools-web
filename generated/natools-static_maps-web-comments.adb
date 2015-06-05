@@ -1,4 +1,4 @@
---  Generated at 2015-06-02 17:23:03 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-06-05 20:15:44 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 with Natools.Static_Maps.Web.Comments.Item_Commands;

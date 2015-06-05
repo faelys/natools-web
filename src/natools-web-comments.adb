@@ -73,7 +73,7 @@ package body Natools.Web.Comments is
 
    type Comment_Builder is record
       Core : Comment_Data;
-      Extra_Fields : String_Maps.Map;
+      Extra_Fields, Raw_Fields : String_Maps.Map;
       Has_Unknown_Field : Boolean := False;
       Action : Post_Action;
       Reason : S_Expressions.Atom_Refs.Immutable_Reference;
@@ -642,6 +642,72 @@ package body Natools.Web.Comments is
                return False;
             end;
 
+         when Field_List_Is =>
+            declare
+               use type S_Expressions.Events.Event;
+               Cursor : String_Maps.Cursor := Builder.Raw_Fields.First;
+               Event : S_Expressions.Events.Event := Arguments.Current_Event;
+            begin
+               loop
+                  if not String_Maps.Has_Element (Cursor)
+                    or else Event /= S_Expressions.Events.Add_Atom
+                  then
+                     return String_Maps.Has_Element (Cursor)
+                       = (Event = S_Expressions.Events.Add_Atom);
+                  end if;
+
+                  if String_Maps.Key (Cursor)
+                    /= S_Expressions.To_String (Arguments.Current_Atom)
+                  then
+                     return False;
+                  end if;
+
+                  Arguments.Next (Event);
+                  String_Maps.Next (Cursor);
+               end loop;
+            end;
+
+         when Field_List_Contains =>
+            declare
+               use type S_Expressions.Events.Event;
+               Event : S_Expressions.Events.Event := Arguments.Current_Event;
+            begin
+               while Event = S_Expressions.Events.Add_Atom loop
+                  if not Builder.Raw_Fields.Contains
+                    (S_Expressions.To_String (Arguments.Current_Atom))
+                  then
+                     return False;
+                  end if;
+
+                  Arguments.Next (Event);
+               end loop;
+
+               return True;
+            end;
+
+         when Field_List_Among =>
+            declare
+               use type S_Expressions.Events.Event;
+               Cursor : String_Maps.Cursor := Builder.Raw_Fields.First;
+               Event : S_Expressions.Events.Event := Arguments.Current_Event;
+            begin
+               while String_Maps.Has_Element (Cursor) loop
+                  if Event /= S_Expressions.Events.Add_Atom then
+                     return False;
+                  end if;
+
+                  if String_Maps.Key (Cursor)
+                    = S_Expressions.To_String (Arguments.Current_Atom)
+                  then
+                     String_Maps.Next (Cursor);
+                  end if;
+
+                  Arguments.Next (Event);
+               end loop;
+
+               return True;
+            end;
+
          when Has_Extra_Fields =>
             return not Builder.Extra_Fields.Is_Empty;
 
@@ -671,7 +737,9 @@ package body Natools.Web.Comments is
       use Static_Maps.Item.Condition;
    begin
       case Static_Maps.To_Item_Condition (S_Expressions.To_String (Name)) is
-         when Unknown | Action_Is =>
+         when Unknown
+           | Action_Is | Field_List_Is | Field_List_Contains | Field_List_Among
+         =>
             raise Invalid_Condition with "Unknown simple conditional """
               & S_Expressions.To_String (Name) & '"';
 
@@ -1104,6 +1172,8 @@ package body Natools.Web.Comments is
       procedure Process (Field, Value : String) is
          use Static_Maps.Item.Form;
       begin
+         Data.Raw_Fields.Insert (Field, Value);
+
          case Static_Maps.To_Item_Form (Field) is
             when Unknown =>
                Data.Extra_Fields.Insert (Field, Value);
