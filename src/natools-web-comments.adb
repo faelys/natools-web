@@ -610,6 +610,7 @@ package body Natools.Web.Comments is
       end String_Evaluate;
 
       use Static_Maps.Item.Condition;
+      use type S_Expressions.Events.Event;
    begin
       case Static_Maps.To_Item_Condition (S_Expressions.To_String (Name)) is
          when Unknown =>
@@ -618,7 +619,6 @@ package body Natools.Web.Comments is
 
          when Action_Is =>
             declare
-               use type S_Expressions.Events.Event;
                Action : Post_Action;
                Event : S_Expressions.Events.Event := Arguments.Current_Event;
             begin
@@ -644,7 +644,6 @@ package body Natools.Web.Comments is
 
          when Field_List_Is =>
             declare
-               use type S_Expressions.Events.Event;
                Cursor : String_Maps.Cursor := Builder.Raw_Fields.First;
                Event : S_Expressions.Events.Event := Arguments.Current_Event;
             begin
@@ -669,7 +668,6 @@ package body Natools.Web.Comments is
 
          when Field_List_Contains =>
             declare
-               use type S_Expressions.Events.Event;
                Event : S_Expressions.Events.Event := Arguments.Current_Event;
             begin
                while Event = S_Expressions.Events.Add_Atom loop
@@ -687,7 +685,6 @@ package body Natools.Web.Comments is
 
          when Field_List_Among =>
             declare
-               use type S_Expressions.Events.Event;
                Cursor : String_Maps.Cursor := Builder.Raw_Fields.First;
                Event : S_Expressions.Events.Event := Arguments.Current_Event;
             begin
@@ -703,6 +700,41 @@ package body Natools.Web.Comments is
                   end if;
 
                   Arguments.Next (Event);
+               end loop;
+
+               return True;
+            end;
+
+         when Fields_Equal =>
+            if Arguments.Current_Event /= S_Expressions.Events.Add_Atom then
+               return True;
+            end if;
+
+            declare
+               function Current_Field return String;
+
+               function Current_Field return String is
+                  Cursor : constant String_Maps.Cursor
+                    := Builder.Raw_Fields.Find
+                       (S_Expressions.To_String (Arguments.Current_Atom));
+               begin
+                  if String_Maps.Has_Element (Cursor) then
+                     return String_Maps.Element (Cursor);
+                  else
+                     return "";
+                  end if;
+               end Current_Field;
+
+               Reference : constant String := Current_Field;
+               Event : S_Expressions.Events.Event;
+            begin
+               loop
+                  Arguments.Next (Event);
+                  exit when Event /= S_Expressions.Events.Add_Atom;
+
+                  if Current_Field /= Reference then
+                     return False;
+                  end if;
                end loop;
 
                return True;
@@ -739,6 +771,7 @@ package body Natools.Web.Comments is
       case Static_Maps.To_Item_Condition (S_Expressions.To_String (Name)) is
          when Unknown
            | Action_Is | Field_List_Is | Field_List_Contains | Field_List_Among
+           | Fields_Equal
          =>
             raise Invalid_Condition with "Unknown simple conditional """
               & S_Expressions.To_String (Name) & '"';
