@@ -138,6 +138,11 @@ chain /fourth/comments fourth-303.html -F 'address=here' \
     -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Attempted spam comment text.'
 chain_last_spam spam-all.sx
+chain /fourth/comments fourth-303.html -F 'c_mail=quxx' \
+    -F 'c_name=quxx' \
+    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_text=Innocent-looking spam comment'
+chain_last_spam spam-fields-equal.sx
 chain /fourth/comments fourth-303-newcomment.html -F 'c_mail=' \
     -F 'c_name=Random Troll' -F 'c_site=' -F 'submit=Submit' \
     -F 'c_text=Moderated comment text because of suspicious content.'

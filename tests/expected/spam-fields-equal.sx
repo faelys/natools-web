@@ -1,0 +1,9 @@
+   (name quxx)
+   (mail quxx)
+   (link http://instinctive.eu/)
+   (text "Innocent-looking spam comment")
+   (extra-fields
+      (submit Submit))
+   (has-unknown-field FALSE)
+   (action parent-redirect "name and mail are equal")
+   (anchor ""))

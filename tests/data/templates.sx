@@ -105,6 +105,8 @@
          (field-list-among c_date c_filter c_mail c_name c_site c_text
             preview submit))
       (reject "+(, )forbidden field encountered"))
+   (if (fields-equal c_name c_mail)
+      (reject ", " "name and mail are equal"))
    (if (not (action-is save-comment))
       (log data/comments/spam.sx)))
 
