@@ -17,6 +17,7 @@
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Printers;
+with Natools.Time_IO.RFC_3339;
 
 package body Natools.Web.Containers is
 
@@ -25,6 +26,13 @@ package body Natools.Web.Containers is
       Context : in Meaningless_Type;
       Atom : in S_Expressions.Atom);
       --  Append a new atom to List
+
+   procedure Add_Date
+     (Map : in out Date_Maps.Unsafe_Maps.Map;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Value : in out S_Expressions.Lockable.Descriptor'Class);
+      --  Append a new named date to Map
 
    procedure Add_Expression
      (Map : in out Expression_Maps.Unsafe_Maps.Map;
@@ -40,6 +48,9 @@ package body Natools.Web.Containers is
       Value : in out S_Expressions.Lockable.Descriptor'Class);
       --  Insert a new node (Name -> Expression_Map (Value)) in Map
 
+
+   procedure Date_Reader is new S_Expressions.Interpreter_Loop
+     (Date_Maps.Unsafe_Maps.Map, Meaningless_Type, Add_Date);
 
    procedure List_Reader is new S_Expressions.Interpreter_Loop
      (Unsafe_Atom_Lists.List, Meaningless_Type,
@@ -66,6 +77,33 @@ package body Natools.Web.Containers is
    begin
       List.Append (Atom);
    end Add_Atom;
+
+
+   procedure Add_Date
+     (Map : in out Date_Maps.Unsafe_Maps.Map;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Value : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      pragma Unreferenced (Context);
+      use type S_Expressions.Events.Event;
+   begin
+      if Value.Current_Event = S_Expressions.Events.Add_Atom then
+         declare
+            Image : constant String
+              := S_Expressions.To_String (Value.Current_Atom);
+         begin
+            if Time_IO.RFC_3339.Is_Valid (Image) then
+               Map.Include (Name, Time_IO.RFC_3339.Value (Image));
+            else
+               Log (Severities.Warning, "Ignoring invalid date named """
+                 & S_Expressions.To_String (Name) & '"');
+            end if;
+         end;
+      else
+         Map.Exclude (Name);
+      end if;
+   end Add_Date;
 
 
    procedure Add_Expression
@@ -104,9 +142,20 @@ package body Natools.Web.Containers is
 
 
 
-   --------------------------
-   -- Expression Interface --
-   --------------------------
+   --------------------
+   -- Map Interfaces --
+   --------------------
+
+   procedure Set_Dates
+     (Map : in out Date_Maps.Constant_Map;
+      Date_List : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      New_Map : Date_Maps.Unsafe_Maps.Map;
+   begin
+      Date_Reader (Date_List, New_Map, Meaningless_Value);
+      Map.Replace (New_Map);
+   end Set_Dates;
+
 
    procedure Set_Expressions
      (Map : in out Expression_Maps.Constant_Map;
