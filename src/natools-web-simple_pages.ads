@@ -72,6 +72,7 @@ private
       Web_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Elements : Containers.Expression_Maps.Constant_Map;
       Tags : Web.Tags.Tag_List;
+      Dates : Containers.Date_Maps.Constant_Map;
       Comment_List : Comments.Comment_List;
    end record;
 

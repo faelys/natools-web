@@ -14,9 +14,10 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
-with Natools.S_Expressions.Atom_Ref_Constructors;
+with Natools.S_Expressions.Templates.Dates;
 with Natools.Static_Maps.Web.Simple_Pages;
 with Natools.Web.Error_Pages;
 with Natools.Web.Exchanges;
@@ -70,6 +71,9 @@ package body Natools.Web.Simple_Pages is
          when Components.Comment_List =>
             Data.Comment_List.Set (Arguments);
 
+         when Components.Dates =>
+            Containers.Set_Dates (Data.Dates, Arguments);
+
          when Components.Elements =>
             Containers.Set_Expressions (Data.Elements, Arguments);
 
@@ -107,12 +111,38 @@ package body Natools.Web.Simple_Pages is
         (Exchange : in out Sites.Exchange;
          Expression : in out S_Expressions.Lockable.Descriptor'Class);
 
+      procedure Render_Date (Log_Error : in Boolean);
+
       procedure Re_Enter
         (Exchange : in out Sites.Exchange;
          Expression : in out S_Expressions.Lockable.Descriptor'Class) is
       begin
          Render_Page (Expression, Exchange, Page);
       end Re_Enter;
+
+      procedure Render_Date (Log_Error : in Boolean) is
+      begin
+         if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+            declare
+               Cursor : constant Containers.Date_Maps.Cursor
+                 := Page.Dates.Find (Arguments.Current_Atom);
+            begin
+               if not Containers.Date_Maps.Has_Element (Cursor) then
+                  if Log_Error then
+                     Log (Severities.Error, "Unable to find date """
+                       & S_Expressions.To_String (Arguments.Current_Atom)
+                       & """ in page date map");
+                  end if;
+
+                  return;
+               end if;
+
+               Arguments.Next;
+               S_Expressions.Templates.Dates.Render
+                 (Exchange, Arguments, Containers.Date_Maps.Element (Cursor));
+            end;
+         end if;
+      end Render_Date;
 
       package Commands renames Natools.Static_Maps.Web.Simple_Pages;
    begin
@@ -125,6 +155,9 @@ package body Natools.Web.Simple_Pages is
 
          when Commands.Comment_List =>
             Comments.Render (Exchange, Page.Comment_List, Arguments);
+
+         when Commands.Date =>
+            Render_Date (True);
 
          when Commands.My_Tags =>
             if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
@@ -141,6 +174,17 @@ package body Natools.Web.Simple_Pages is
                      Arguments);
                end;
             end if;
+
+         when Commands.If_No_Date =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom
+              and then not Page.Dates.Contains (Arguments.Current_Atom)
+            then
+               Arguments.Next;
+               Render_Page (Arguments, Exchange, Page);
+            end if;
+
+         when Commands.Optional_Date =>
+            Render_Date (False);
 
          when Commands.Path =>
             Exchange.Append (Page.Web_Path.Query);
@@ -191,7 +235,7 @@ package body Natools.Web.Simple_Pages is
          Web_Path => Web_Path,
          Tags => <>,
          Self => null,
-         Comment_List | Elements => <>);
+         Comment_List | Elements | Dates => <>);
       Result : constant Page_Ref := (Ref => Data_Refs.Create (Page));
    begin
       Page.Self := Tags.Visible_Access (Page);

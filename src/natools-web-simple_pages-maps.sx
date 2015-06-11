@@ -5,6 +5,7 @@
    type Command is
      (Unknown_Command,
       Comment_List,
+      Date, Optional_Date, If_No_Date,
       My_Tags,
       Path,
       Tags);
@@ -12,6 +13,7 @@
    type Component is
      (Error,
       Comment_List,
+      Dates,
       Elements,
       Tags);")
    (Command
@@ -20,7 +22,10 @@
       (not-found Unknown_Command)
       (nodes
          (Comment_List comments comment-list)
+         (Date  date)
+         (If_No_Date  if-no-date)
          (My_Tags  my-tags my-tag-list tag-list)
+         (Optional_Date  optional-date)
          (Path  path)
          (Tags  pagelist page-list tag tags)))
    (Component
@@ -28,6 +33,7 @@
       (function To_Component)
       (not-found Error)
       (nodes
+         (Dates dates)
          (Tags tags)
          (Comment_List comments comment-list)
          (Elements  elements layout))))
