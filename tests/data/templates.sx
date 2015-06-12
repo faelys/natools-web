@@ -9,6 +9,7 @@
 "    <div class=\"sidebar\">\n"
 (render sidebar
    "<h1>Side bar</h1>\n"
+   (optional-date published "<p>Published on " (rfc-3339) "</p>\n")
    "<p>Tags:" (tag-list tags/ (render
          " <a href=\"/tags/" (name (2)) "\">"
          (element description (name (2)))

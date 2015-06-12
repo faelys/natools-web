@@ -1,6 +1,8 @@
 (elements
-   (main-text "\
-<p>Data in the third page.</p>\n"
+   (main-text
+(if-no-date published "<p>Data in the third page.</p>\n")
+(date validated "<p>Validated on " (rfc-3339) "</p>\n")
 (render page-comments))
    (title "Third Page"))
 (tags (3 pages/news tags/topic1/other-subtopic tags/topic3))
+(dates (validated "2015-02-01T01:02:03Z"))
