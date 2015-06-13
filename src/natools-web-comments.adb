@@ -382,6 +382,16 @@ package body Natools.Web.Comments is
             Log (Severities.Error, "Unknown comment list command """
               & S_Expressions.To_String (Name) & '"');
 
+         when If_Closed =>
+            if List.Flags (List_Flags.Closed) then
+               Render (Arguments, Exchange, List);
+            end if;
+
+         when If_Not_Closed =>
+            if not List.Flags (List_Flags.Closed) then
+               Render (Arguments, Exchange, List);
+            end if;
+
          when Static_Maps.List.Command.List =>
             Render_List
               (Exchange,
@@ -1557,6 +1567,7 @@ package body Natools.Web.Comments is
       end Redirect_Location;
    begin
       if Extra_Path'Length > 0
+        or else List.Flags (List_Flags.Closed)
         or else List.Backend_Name.Is_Empty
         or else List.Backend_Path.Is_Empty
         or else List.Parent_Path.Is_Empty

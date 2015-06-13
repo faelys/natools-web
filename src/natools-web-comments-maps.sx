@@ -34,7 +34,7 @@
 
    package List is
       package Command is
-         type Enum is (Unknown, List, Preview, Size);
+         type Enum is (Unknown, List, Preview, Size, If_Closed, If_Not_Closed);
       end Command;
 
       package Element is
@@ -127,6 +127,8 @@
       (function To_List_Command)
       (not-found List.Command.Unknown)
       (nodes
+         (List.Command.If_Closed  if-closed)
+         (List.Command.If_Not_Closed  if-not-closed)
          (List.Command.List  list)
          (List.Command.Preview  preview)
          (List.Command.Size  size length)))

@@ -1,4 +1,4 @@
---  Generated at 2015-06-07 17:12:52 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-06-13 11:04:48 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -36,7 +36,7 @@ package Natools.Static_Maps.Web.Comments is
 
    package List is
       package Command is
-         type Enum is (Unknown, List, Preview, Size);
+         type Enum is (Unknown, List, Preview, Size, If_Closed, If_Not_Closed);
       end Command;
 
       package Element is
@@ -281,17 +281,23 @@ private
          Item.Post_Action.Set_Reason,
          Item.Post_Action.Unignore);
 
-   Map_6_Key_0 : aliased constant String := "list";
-   Map_6_Key_1 : aliased constant String := "preview";
-   Map_6_Key_2 : aliased constant String := "size";
-   Map_6_Key_3 : aliased constant String := "length";
-   Map_6_Keys : constant array (0 .. 3) of access constant String
+   Map_6_Key_0 : aliased constant String := "if-closed";
+   Map_6_Key_1 : aliased constant String := "if-not-closed";
+   Map_6_Key_2 : aliased constant String := "list";
+   Map_6_Key_3 : aliased constant String := "preview";
+   Map_6_Key_4 : aliased constant String := "size";
+   Map_6_Key_5 : aliased constant String := "length";
+   Map_6_Keys : constant array (0 .. 5) of access constant String
      := (Map_6_Key_0'Access,
          Map_6_Key_1'Access,
          Map_6_Key_2'Access,
-         Map_6_Key_3'Access);
-   Map_6_Elements : constant array (0 .. 3) of List.Command.Enum
-     := (List.Command.List,
+         Map_6_Key_3'Access,
+         Map_6_Key_4'Access,
+         Map_6_Key_5'Access);
+   Map_6_Elements : constant array (0 .. 5) of List.Command.Enum
+     := (List.Command.If_Closed,
+         List.Command.If_Not_Closed,
+         List.Command.List,
          List.Command.Preview,
          List.Command.Size,
          List.Command.Size);
