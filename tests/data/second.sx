@@ -5,5 +5,5 @@
    (footer "<p>Special footer</p>\n")
    (title "Second Page"))
 (tags (2 pages/news tags/topic2 tags/topic3))
-(comments (backend comments 2) (tags comments))
+(comments (backend comments 2) (tags comments) (flags closed))
 (dates (published "2015-01-01T09:50:00Z"))

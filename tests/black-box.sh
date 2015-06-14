@@ -102,6 +102,12 @@ check /first/comments first-spam.html -F 'c_mail=' \
     -F 'c_text=Comment text rejected solely because of bad filter'
 chain /first first.html
 
+check /second/comments second-404.html -F 'c_mail=' \
+    --form-string 'c_name=<i>Nobody</i>' \
+    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_text=Valid comment sent to a closed comment list'
+chain /second second.html
+
 check /fourth fourth.html
 chain /fourth/comments 405.html
 chain /fourth fourth.html
