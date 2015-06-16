@@ -398,6 +398,18 @@ package body Natools.Web.Comments is
                Comment_Range'(List => List.Comments),
                List_Templates.Read_Parameters (Arguments));
 
+         when Parent =>
+            declare
+               use type Tags.Visible_Access;
+
+               Accessor : constant Comment_Array_Refs.Accessor
+                 := List.Comments.Query;
+            begin
+               if Accessor.Parent /= null then
+                  Tags.Render (Exchange, Accessor.Parent.all, Arguments);
+               end if;
+            end;
+
          when Preview =>
             if Exchange.Parameter (Preview_Button) = ""
               and then Exchange.Parameter (Submit_Button) = ""
