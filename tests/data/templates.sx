@@ -53,10 +53,13 @@
    "<h1>Comments</h1>\n<ol>\n"
    (list (render (render comment-li)))
    "</ol>\n"
-   (preview
-      "<h1>Preview</h1>\n<ol>\n"
-      (render comment-li)
-      "</ol>\n")))
+   (if-not-closed
+      (preview
+         "<h1>Preview</h1>\n<ol>\n"
+         (render comment-li)
+         "</ol>\n")
+      "<h1 id=\"newcomment\">Post a Comment</h1>\n"
+      (parent (render comment-form)))))
 
 (site-root "http://example.com")
 

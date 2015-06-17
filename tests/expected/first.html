@@ -23,6 +23,28 @@
 <p>A third comment, with <strong>legitimate</strong> embedded HTML</p>
 </blockquote></li>
 </ol>
+<h1 id="newcomment">Post a Comment</h1>
+<form class="mainform" method="post" action="/first/comments">
+  <p><label>Name or nick:
+    <input name="c_name" value="" type="text">
+  </label></p>
+  <p><label>E-mail address:
+    <input name="c_mail" value="" type="text">
+  </label></p>
+  <p><label>Web site:
+    <input name="c_site" value="" type="text">
+  </label></p><!--
+  <p><label>Very special field:
+    <input name="address" value="http://" type="text">
+  </label></p>-->
+  <p><label>Comment text:
+    <textarea name="c_text" cols="80" rows="10"></textarea>
+  </label></p>
+  <p class="buttons">
+    <input value="Preview" name="preview" type="submit">
+    <input value="Submit" name="submit" type="submit">
+  </p>
+</form>
     <div class="sidebar">
 <h1>Side bar</h1>
 <p>Tags: <a href="/tags/topic1">Subtopic of topic I</a></p>

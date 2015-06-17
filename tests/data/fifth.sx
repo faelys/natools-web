@@ -1,9 +1,7 @@
 (elements
    (main-text "\
 <p>Data in the fifth page.</p>\n"
-(render page-comments)
-"<h1 id=\"newcomment\">Post a Comment</h1>\n"
-(render comment-form))
+(render page-comments))
    (title "Fifth Page"))
 (tags (5 pages/news))
 (comments
