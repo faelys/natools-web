@@ -1,4 +1,4 @@
---  Generated at 2015-06-16 17:10:17 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-06-19 20:53:52 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -6,7 +6,7 @@ package Natools.Static_Maps.Web.Comments is
 
    package Item is
       package Command is
-         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent,
+         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent, Rank,
            If_Name, If_No_Name, If_Mail, If_No_Mail, If_Link, If_No_Link);
       end Command;
 
@@ -73,8 +73,9 @@ private
    Map_1_Key_13 : aliased constant String := "site";
    Map_1_Key_14 : aliased constant String := "website";
    Map_1_Key_15 : aliased constant String := "parent";
-   Map_1_Key_16 : aliased constant String := "text";
-   Map_1_Keys : constant array (0 .. 16) of access constant String
+   Map_1_Key_16 : aliased constant String := "rank";
+   Map_1_Key_17 : aliased constant String := "text";
+   Map_1_Keys : constant array (0 .. 17) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -91,8 +92,9 @@ private
          Map_1_Key_13'Access,
          Map_1_Key_14'Access,
          Map_1_Key_15'Access,
-         Map_1_Key_16'Access);
-   Map_1_Elements : constant array (0 .. 16) of Item.Command.Enum
+         Map_1_Key_16'Access,
+         Map_1_Key_17'Access);
+   Map_1_Elements : constant array (0 .. 17) of Item.Command.Enum
      := (Item.Command.Date,
          Item.Command.Id,
          Item.Command.If_Link,
@@ -109,6 +111,7 @@ private
          Item.Command.Link,
          Item.Command.Link,
          Item.Command.Parent,
+         Item.Command.Rank,
          Item.Command.Text);
 
    Map_2_Key_0 : aliased constant String := "action-is";

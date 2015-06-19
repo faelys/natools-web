@@ -4,7 +4,7 @@
    (extra-decl "\
    package Item is
       package Command is
-         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent,
+         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent, Rank,
            If_Name, If_No_Name, If_Mail, If_No_Mail, If_Link, If_No_Link);
       end Command;
 
@@ -62,6 +62,7 @@
          (Item.Command.Mail  mail e-mail)
          (Item.Command.Link  link www site website)
          (Item.Command.Parent  parent)
+         (Item.Command.Rank  rank)
          (Item.Command.Text  text)))
 
    (Item.Condition.Enum

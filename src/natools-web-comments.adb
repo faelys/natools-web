@@ -363,6 +363,12 @@ package body Natools.Web.Comments is
                Tags.Render (Exchange, Accessor.Parent.all, Arguments);
             end if;
 
+         when Rank =>
+            S_Expressions.Templates.Integers.Render
+              (Exchange,
+               Arguments,
+               Integer (Context.Position));
+
          when Text =>
             Render_Ref (Comment.Text);
       end case;
