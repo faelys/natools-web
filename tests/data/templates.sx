@@ -31,7 +31,7 @@
 (href "<a href=\"" (path) "\">" (element title) "</a>")
 
 (comment-li
-   "<li><p>On "
+   "<li><p>" (rank) ". On "
    (date
       (month January February March April May June July
          August September October November December)
