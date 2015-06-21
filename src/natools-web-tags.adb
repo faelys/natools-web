@@ -16,6 +16,7 @@
 
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
+with Natools.S_Expressions.Templates.Integers;
 with Natools.Static_Maps.Web.Tags;
 with Natools.Web.Fallback_Render;
 with Natools.Web.List_Templates;
@@ -573,6 +574,12 @@ package body Natools.Web.Tags is
                     "Current_Element called when it's empty");
                end if;
             end;
+
+         when Commands.Element_Count =>
+            S_Expressions.Templates.Integers.Render
+              (Exchange,
+               Arguments,
+               Integer (Tag_Maps.Element (Tag.Position).Length));
 
          when Commands.Greater_Children =>
             Render_Tags
