@@ -9,10 +9,12 @@
       "<ul>\n"
       (current
          (lesser-children (render
-            "<li><a href=\"/tags/" (name (2)) "\">" (name (2)) "</a></li>\n"))
-         "<li style=\"current\">" (name (2)) "</li>\n"
+            "<li><a href=\"/tags/" (name (2)) "\">" (name (2))
+            "</a> (" (element-count) ")</li>\n"))
+         "<li style=\"current\">" (name (2)) " (" (element-count) ")</li>\n"
          (greater-children (render
-            "<li><a href=\"/tags/" (name (2)) "\">" (name (2)) "</a></li>\n")))
+            "<li><a href=\"/tags/" (name (2)) "\">" (name (2))
+            "</a> (" (element-count) ")</li>\n")))
       "<ul>\n"))
 (index-elements
    (title "All tags")
