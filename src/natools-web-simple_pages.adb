@@ -227,6 +227,19 @@ package body Natools.Web.Simple_Pages is
    ----------------------
 
    function Create
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     return Page_Ref
+   is
+      Page : constant Data_Refs.Data_Access := new Page_Data;
+      Result : constant Page_Ref := (Ref => Data_Refs.Create (Page));
+   begin
+      Page.Self := Tags.Visible_Access (Page);
+      Read_Page (Expression, Page.all, Meaningless_Value);
+      return Result;
+   end Create;
+
+
+   function Create
      (File_Path, Web_Path : in S_Expressions.Atom_Refs.Immutable_Reference)
      return Page_Ref
    is

@@ -39,6 +39,10 @@ package Natools.Web.Simple_Pages is
      (File_Path, Web_Path : in S_Expressions.Atom_Refs.Immutable_Reference)
      return Page_Ref;
 
+   function Create
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     return Page_Ref;
+
    function Get_Tags (Page : Page_Ref) return Tags.Tag_List;
 
    overriding procedure Render
