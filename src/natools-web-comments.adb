@@ -314,7 +314,7 @@ package body Natools.Web.Comments is
 
          when Date =>
             S_Expressions.Templates.Dates.Render
-              (Exchange, Arguments, Comment.Date);
+              (Exchange, Arguments, Comment.Date, Comment.Offset);
 
          when Id =>
             Exchange.Append (Comment.Id.Query);
@@ -433,6 +433,8 @@ package body Natools.Web.Comments is
                Builder : Comment_Builder;
             begin
                Builder.Core.Date := Ada.Calendar.Clock;
+               Builder.Core.Offset := Ada.Calendar.Time_Zones.UTC_Time_Offset
+                 (Builder.Core.Date);
                Builder.Core.Id := Preview_Id;
                Process_Form (Builder, Exchange, List);
                Preprocess (Builder.Core, List, Exchange.Site.all);
@@ -481,7 +483,7 @@ package body Natools.Web.Comments is
                Image : constant String
                  := S_Expressions.To_String (Arguments.Current_Atom);
             begin
-               Comment.Date := Time_IO.RFC_3339.Value (Image);
+               Time_IO.RFC_3339.Value (Image, Comment.Date, Comment.Offset);
             exception
                when others =>
                   Log (Severities.Error, "Invalid date """
@@ -1246,7 +1248,8 @@ package body Natools.Web.Comments is
             when Date =>
                if List.Flags (List_Flags.Allow_Date_Override) then
                   begin
-                     Data.Core.Date := Time_IO.RFC_3339.Value (Value);
+                     Time_IO.RFC_3339.Value
+                       (Value, Data.Core.Date, Data.Core.Offset);
                   exception
                      when others => null;
                   end;
@@ -1324,7 +1327,7 @@ package body Natools.Web.Comments is
       pragma Assert (not Comment.Flags (Comment_Flags.Preprocessed));
 
       Print ("date", S_Expressions.To_Atom
-        (Time_IO.RFC_3339.Image (Comment.Date)));
+        (Time_IO.RFC_3339.Image (Comment.Date, Comment.Offset)));
 
       Print ("name", Comment.Name);
       Print ("mail", Comment.Mail);
@@ -1615,6 +1618,8 @@ package body Natools.Web.Comments is
 
       Builder.Action := Save_Comment;
       Builder.Core.Date := Ada.Calendar.Clock;
+      Builder.Core.Offset := Ada.Calendar.Time_Zones.UTC_Time_Offset
+        (Builder.Core.Date);
       Builder.Core.Id := Create (S_Expressions.To_Atom
         (Time_Keys.To_Key (Builder.Core.Date)));
       Builder.Core.Flags (Comment_Flags.Ignored)

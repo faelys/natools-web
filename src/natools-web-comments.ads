@@ -25,7 +25,7 @@ with Natools.S_Expressions.Printers;
 with Natools.Web.Sites;
 with Natools.Web.Tags;
 
-private with Ada.Calendar;
+private with Ada.Calendar.Time_Zones;
 private with Ada.Finalization;
 private with Ada.Iterator_Interfaces;
 private with Natools.References;
@@ -84,6 +84,7 @@ private
 
    type Comment_Data is record
       Date : Ada.Calendar.Time;
+      Offset : Ada.Calendar.Time_Zones.Time_Offset;
       Id : S_Expressions.Atom_Refs.Immutable_Reference;
       Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Mail : S_Expressions.Atom_Refs.Immutable_Reference;
