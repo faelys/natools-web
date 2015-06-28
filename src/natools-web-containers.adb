@@ -87,6 +87,7 @@ package body Natools.Web.Containers is
    is
       pragma Unreferenced (Context);
       use type S_Expressions.Events.Event;
+      Item : Date;
    begin
       if Value.Current_Event = S_Expressions.Events.Add_Atom then
          declare
@@ -94,7 +95,8 @@ package body Natools.Web.Containers is
               := S_Expressions.To_String (Value.Current_Atom);
          begin
             if Time_IO.RFC_3339.Is_Valid (Image) then
-               Map.Include (Name, Time_IO.RFC_3339.Value (Image));
+               Time_IO.RFC_3339.Value (Image, Item.Time, Item.Offset);
+               Map.Include (Name, Item);
             else
                Log (Severities.Warning, "Ignoring invalid date named """
                  & S_Expressions.To_String (Name) & '"');

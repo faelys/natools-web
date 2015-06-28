@@ -19,7 +19,7 @@
 -- persistent data.                                                         --
 ------------------------------------------------------------------------------
 
-with Ada.Calendar;
+with Ada.Calendar.Time_Zones;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Streams;
 with Natools.Constant_Indefinite_Ordered_Maps;
@@ -31,11 +31,13 @@ with Natools.Storage_Pools;
 
 package Natools.Web.Containers is
 
+   type Date is record
+      Time : Ada.Calendar.Time;
+      Offset : Ada.Calendar.Time_Zones.Time_Offset;
+   end record;
+
    package Date_Maps is new Constant_Indefinite_Ordered_Maps
-     (S_Expressions.Atom,
-      Ada.Calendar.Time,
-      S_Expressions.Less_Than,
-      Ada.Calendar."=");
+     (S_Expressions.Atom, Date, S_Expressions.Less_Than);
 
    procedure Set_Dates
      (Map : in out Date_Maps.Constant_Map;

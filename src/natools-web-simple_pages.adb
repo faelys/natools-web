@@ -138,8 +138,14 @@ package body Natools.Web.Simple_Pages is
                end if;
 
                Arguments.Next;
-               S_Expressions.Templates.Dates.Render
-                 (Exchange, Arguments, Containers.Date_Maps.Element (Cursor));
+
+               declare
+                  Item : constant Containers.Date
+                    := Containers.Date_Maps.Element (Cursor);
+               begin
+                  S_Expressions.Templates.Dates.Render
+                    (Exchange, Arguments, Item.Time, Item.Offset);
+               end;
             end;
          end if;
       end Render_Date;
