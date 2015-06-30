@@ -1,4 +1,4 @@
---  Generated at 2015-06-21 21:40:52 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-06-30 20:35:41 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-tags-maps.sx
 
 package Natools.Static_Maps.Web.Tags is
@@ -22,7 +22,8 @@ package Natools.Static_Maps.Web.Tags is
       Lesser_Descendants,
       Lesser_Elements,
       Lesser_Leaves,
-      Name);
+      Name,
+      Tags);
 
    function To_List_Command (Key : String) return List_Command;
 
@@ -45,7 +46,8 @@ private
    Map_1_Key_14 : aliased constant String := "lesser-elements";
    Map_1_Key_15 : aliased constant String := "lesser-leaves";
    Map_1_Key_16 : aliased constant String := "name";
-   Map_1_Keys : constant array (0 .. 16) of access constant String
+   Map_1_Key_17 : aliased constant String := "tags";
+   Map_1_Keys : constant array (0 .. 17) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -62,8 +64,9 @@ private
          Map_1_Key_13'Access,
          Map_1_Key_14'Access,
          Map_1_Key_15'Access,
-         Map_1_Key_16'Access);
-   Map_1_Elements : constant array (0 .. 16) of List_Command
+         Map_1_Key_16'Access,
+         Map_1_Key_17'Access);
+   Map_1_Elements : constant array (0 .. 17) of List_Command
      := (All_Children,
          All_Descendants,
          All_Elements,
@@ -80,6 +83,7 @@ private
          Lesser_Descendants,
          Lesser_Elements,
          Lesser_Leaves,
-         Name);
+         Name,
+         Tags);
 
 end Natools.Static_Maps.Web.Tags;

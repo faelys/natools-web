@@ -20,7 +20,8 @@
       Lesser_Descendants,
       Lesser_Elements,
       Lesser_Leaves,
-      Name);")
+      Name,
+      Tags);")
    (List_Command
       (hash-package Natools.Static_Maps.Web.Tags.Commands)
       (function To_List_Command)
@@ -42,4 +43,5 @@
          (Lesser_Descendants   lesser-descendants)
          (Lesser_Elements   lesser-elements)
          (Lesser_Leaves   lesser-leaves)
-         (Name   name))))
+         (Name   name)
+         (Tags   tags))))
