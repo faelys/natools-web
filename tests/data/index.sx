@@ -6,5 +6,8 @@
             "<ul>\n"
             (all-elements
                (render "<li>" (render href) "</li>\n"))
-            "</ul>\n")))
+            "</ul>\n<p>Tags:"
+            (tags tags (all-children (template
+               "\n<a href=\"/tags/" (name (2)) "\">" (name (2)) "</a>")))
+            "</p>\n")))
    (sidebar ""))
