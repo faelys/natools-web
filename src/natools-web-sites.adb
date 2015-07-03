@@ -512,13 +512,17 @@ package body Natools.Web.Sites is
       end Call_Page;
 
       procedure Send_File_If_Exists (In_Directory : in S_Expressions.Atom) is
+         use type Ada.Directories.File_Kind;
          use type S_Expressions.Atom;
-         Candidate_Name : constant S_Expressions.Atom := In_Directory & Path;
+         File_Name : constant S_Expressions.Atom := In_Directory & Path;
+         Candidate_Name : constant String
+           := S_Expressions.To_String (File_Name);
       begin
-         if Ada.Directories.Exists
-              (S_Expressions.To_String (Candidate_Name))
+         if Ada.Directories.Exists (Candidate_Name)
+           and then Ada.Directories.Kind (Candidate_Name)
+              /= Ada.Directories.Directory
          then
-            Exchanges.Send_File (Exchange, Candidate_Name);
+            Exchanges.Send_File (Exchange, File_Name);
          end if;
       end Send_File_If_Exists;
 
