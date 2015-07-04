@@ -21,6 +21,7 @@
       Lesser_Elements,
       Lesser_Leaves,
       Name,
+      Parent,
       Tags);")
    (List_Command
       (hash-package Natools.Static_Maps.Web.Tags.Commands)
@@ -44,4 +45,5 @@
          (Lesser_Elements   lesser-elements)
          (Lesser_Leaves   lesser-leaves)
          (Name   name)
+         (Parent   parent)
          (Tags   tags))))

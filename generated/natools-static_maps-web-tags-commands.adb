@@ -6,14 +6,14 @@ package body Natools.Static_Maps.Web.Tags.Commands is
      (1, 11);
 
    T1 : constant array (0 .. 1) of Unsigned_8 :=
-     (18, 14);
+     (35, 8);
 
    T2 : constant array (0 .. 1) of Unsigned_8 :=
-     (7, 27);
+     (0, 7);
 
-   G : constant array (0 .. 36) of Unsigned_8 :=
-     (0, 0, 0, 2, 0, 0, 0, 7, 0, 12, 0, 3, 1, 14, 1, 0, 3, 0, 5, 7, 8, 0, 0,
-      7, 0, 13, 0, 0, 0, 0, 9, 6, 0, 0, 0, 14, 14);
+   G : constant array (0 .. 38) of Unsigned_8 :=
+     (0, 2, 3, 0, 18, 0, 8, 15, 0, 13, 0, 10, 0, 0, 0, 12, 9, 0, 0, 0, 17,
+      10, 4, 0, 0, 5, 0, 0, 16, 0, 0, 0, 0, 2, 0, 0, 11, 16, 4);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -24,10 +24,10 @@ package body Natools.Static_Maps.Web.Tags.Commands is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 37;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 37;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 39;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 39;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 18;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 19;
    end Hash;
 
 end Natools.Static_Maps.Web.Tags.Commands;

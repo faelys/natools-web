@@ -718,6 +718,9 @@ package body Natools.Web.Tags is
          when Commands.Name =>
             Render (Arguments, Exchange, Create (Tag_Maps.Key (Tag.Position)));
 
+         when Commands.Parent =>
+            Render (Arguments, Exchange, Parent (Tag));
+
          when Commands.Tags =>
             Render (Exchange, Tag.DB, Arguments, Tag.Caller_Tags);
       end case;
