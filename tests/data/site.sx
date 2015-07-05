@@ -10,10 +10,12 @@
 (tag-page tags)
 (test-page test)
 (named-elements
+   (tags/topic1
+      (description "topic I"))
    (tags/topic1/subtopic
-      (description "Subtopic of topic I"))
+      (description "Subtopic of " (parent (element description))))
    (tags/topic1/other-subtopic
-      (description "Secondary subtopic of topic I"))
+      (description "Secondary subtopic of " (parent (element description))))
    (tags/topic2
       (description "Topic II"))
    (tags/topic3
