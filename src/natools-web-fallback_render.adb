@@ -20,6 +20,7 @@ with Natools.S_Expressions.Templates.Dates;
 with Natools.Static_Maps.Web.Fallback_Render;
 with Natools.Web.Escapes;
 with Natools.Web.Filters.Stores;
+with Natools.Web.Tags;
 
 procedure Natools.Web.Fallback_Render
   (Exchange : in out Natools.Web.Sites.Exchange;
@@ -116,6 +117,9 @@ begin
          if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
             Exchange.Set_MIME_Type (Arguments.Current_Atom);
          end if;
+
+      when Commands.Tags =>
+         Tags.Render (Exchange, Exchange.Site.Get_Tags, Arguments);
 
       when Commands.Template =>
          if Re_Enter = null then
