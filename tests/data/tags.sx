@@ -26,9 +26,15 @@
                (all-elements (render "<li>" (render href) "</li>\n"))
                "</ul>\n"))))
    (sidebar
+      "<h1>Side bar</h1>\n"
       (current
-         "<ul>\n"
+         "<h2>Tags</h2>\n<ul>\n"
          (all-leaves
             (render "<li>" (element description (name (2 last))) "</li>\n"))
+         "</ul>\n")
+      (tags pages
+         "<h2>Latest pages</h2>\n<ul>\n"
+         (all-elements reverse (limit 2) (ellipsis "<li>…</li>\n")
+            (template "<li>" (render href) "</li>\n"))
          "</ul>\n")))
 (slashless-redirect)
