@@ -176,7 +176,7 @@ chain_curl -F 'wait_version=3' "${BASE_URL}/test"
 chain /fifth fifth-commented.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:12:00Z' \
-    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_site=http://users.example.com/admin/' -F 'submit=Submit' \
     -F 'c_filter=pass-through' --form-string \
     'c_text=<p>Administrator comment in <strong>raw</strong> HTML mode.</p>'
 chain_curl -F 'wait_version=4' "${BASE_URL}/test"
