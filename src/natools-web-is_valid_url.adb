@@ -117,7 +117,7 @@ begin
          then
             return False;
          end if;
-      elsif Data (Index) not in Unreserved then
+      elsif Data (Index) not in Unreserved and then Data (Index) /= '/' then
          exit Check_Path;
       end if;
    end loop Check_Path;
