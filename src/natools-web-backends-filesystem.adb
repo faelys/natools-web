@@ -88,6 +88,10 @@ package body Natools.Web.Backends.Filesystem is
       Directory, Name : in S_Expressions.Atom)
      return Ada.Streams.Root_Stream_Type'Class is
    begin
+      Ada.Directories.Create_Path
+        (S_Expressions.To_String (Self.Root.Query)
+           & S_Expressions.To_String (Directory));
+
       return File_Streams.Create
         (Stream_IO.Append_File,
          Compose (Self, Directory, Name));
