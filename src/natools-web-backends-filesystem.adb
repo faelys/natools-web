@@ -113,11 +113,17 @@ package body Natools.Web.Backends.Filesystem is
    is
       Search : Ada.Directories.Search_Type;
       Directory_Entry : Ada.Directories.Directory_Entry_Type;
+      Dir_Name : constant String
+        := S_Expressions.To_String (Self.Root.Query)
+           & S_Expressions.To_String (Directory);
    begin
+      if not Ada.Directories.Exists (Dir_Name) then
+         return;
+      end if;
+
       Ada.Directories.Start_Search
         (Search => Search,
-         Directory => S_Expressions.To_String (Self.Root.Query)
-                        & S_Expressions.To_String (Directory),
+         Directory => Dir_Name,
          Pattern => "",
          Filter => (Ada.Directories.Ordinary_File => True, others => False));
 
