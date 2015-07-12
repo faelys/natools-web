@@ -26,7 +26,6 @@ if ! test -x "${TARGET_BIN}"; then
 fi
 
 rm -rf data/comments/4 data/comments/5
-mkdir data/comments/4 data/comments/5
 : >|data/comments/spam.sx
 
 touch running
