@@ -382,11 +382,22 @@ package body Natools.Web.Comments is
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
       use Static_Maps.List.Command;
+
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+      procedure Re_Enter
+        (Exchange : in out Sites.Exchange;
+         Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+      begin
+         Render (Expression, Exchange, List);
+      end Re_Enter;
    begin
       case Static_Maps.To_List_Command (S_Expressions.To_String (Name)) is
          when Unknown =>
-            Log (Severities.Error, "Unknown comment list command """
-              & S_Expressions.To_String (Name) & '"');
+            Fallback_Render
+              (Exchange, Name, Arguments, "comment list", Re_Enter'Access);
 
          when If_Closed =>
             if List.Flags (List_Flags.Closed) then
