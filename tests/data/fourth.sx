@@ -21,9 +21,9 @@
       " wrote:</p>\n<blockquote>\n"
       (text)
       "</blockquote></li>\n"
-      "</ol>\n"))
-"<h1 id=\"newcomment\">Post a Comment</h1>\n"
-(render comment-form))
+      "</ol>\n")
+   "<h1 id=\"newcomment\">Post a Comment</h1>\n"
+   (render comment-form)))
    (title "Fourth Page"))
 (tags (4 pages/news tags/topic3))
 (comments (backend comments 4) (tags comments) (filter comment-filter))

@@ -59,12 +59,12 @@
          (render comment-li)
          "</ol>\n")
       "<h1 id=\"newcomment\">Post a Comment</h1>\n"
-      (parent (render comment-form)))))
+      (render comment-form))))
 
 (site-root "http://example.com")
 
 (comment-form "\
-<form class=\"mainform\" method=\"post\" action=\"" (path) "/comments\">
+<form class=\"mainform\" method=\"post\" action=\"" (parent (path)) "/comments\">
   <p><label>Name or nick:
     <input name=\"c_name\" value=\"" (parameter c_name) "\" type=\"text\">
   </label></p>
