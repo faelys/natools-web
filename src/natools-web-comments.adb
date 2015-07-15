@@ -178,6 +178,10 @@ package body Natools.Web.Comments is
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
       --  Render a command
 
+   procedure Reset_If_Blank
+     (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference);
+      --  Reset Ref if it only contains blank characters
+
    function String_Fallback_Parametric
      (Settings : in S_Expressions.Conditionals.Strings.Settings;
       Name : in S_Expressions.Atom;
@@ -1073,6 +1077,28 @@ package body Natools.Web.Comments is
    end Process_Actions;
 
 
+   procedure Reset_If_Blank
+     (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference) is
+   begin
+      if Ref.Is_Empty then
+         return;
+      end if;
+
+      Abort_If_Not_Blank :
+      declare
+         Accessor : constant S_Expressions.Atom_Refs.Accessor := Ref.Query;
+      begin
+         for I in Accessor.Data.all'Range loop
+            if Accessor.Data (I) not in 9 | 10 | 13 | 32 then
+               return;
+            end if;
+         end loop;
+      end Abort_If_Not_Blank;
+
+      Ref.Reset;
+   end Reset_If_Blank;
+
+
    function String_Fallback_Parametric
      (Settings : in S_Expressions.Conditionals.Strings.Settings;
       Name : in S_Expressions.Atom;
@@ -1197,9 +1223,13 @@ package body Natools.Web.Comments is
          return;
       end if;
 
+      Reset_If_Blank (Comment.Name);
+
       if not Comment.Name.Is_Empty then
          Comment.Name := Escapes.Escape (Comment.Name, Escapes.HTML_Attribute);
       end if;
+
+      Reset_If_Blank (Comment.Mail);
 
       if not Comment.Mail.Is_Empty then
          Comment.Mail := Escapes.Escape (Comment.Mail, Escapes.HTML_Attribute);
@@ -1212,6 +1242,8 @@ package body Natools.Web.Comments is
       else
          Comment.Link.Reset;
       end if;
+
+      Reset_If_Blank (Comment.Text);
 
       if not Comment.Text.Is_Empty then
          declare
