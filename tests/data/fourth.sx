@@ -6,7 +6,7 @@
    (list (render
       "<li><p>"
       (if-link "<a href=\"" (link) "\">") (if-no-link "<strong>")
-      (name)
+      (name Anonymous)
       (if-link "</a>") (if-no-link "</strong>")
       " wrote:</p>\n<blockquote>\n"
       (text)
@@ -16,7 +16,7 @@
       "<h1 id=\"preview\">Preview</h1>\n<ol>\n"
       "<li><p>"
       (if-link "<a href=\"" (link) "\">") (if-no-link "<strong>")
-      (name)
+      (name Anonymous)
       (if-link "</a>") (if-no-link "</strong>")
       " wrote:</p>\n<blockquote>\n"
       (text)

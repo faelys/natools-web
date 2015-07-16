@@ -112,7 +112,7 @@ check /fourth fourth.html
 chain /fourth/comments 405.html
 chain /fourth fourth.html
 chain /fourth/comments fourth-preview.html -F 'c_mail=' \
-    --form-string 'c_name=<code>nat</code>' \
+    -F 'c_name=  ' \
     -F 'c_site=http://instinctive.eu/"' -F 'preview=Preview' \
     -F 'c_text=Preview comment that should not be written anywhere.'
 chain /fourth fourth.html
