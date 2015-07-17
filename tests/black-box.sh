@@ -164,6 +164,7 @@ chain_curl -F 'wait_version=2' "${BASE_URL}/test"
 chain /fourth fourth-commented.html
 
 check /fifth fifth.html
+chain /test version-2.txt
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Nobody' \
     -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Perfectly valid comment set to be ignored in the page.'
