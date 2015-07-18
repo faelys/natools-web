@@ -98,13 +98,13 @@ check /comment-feed comments.atom
 
 check /first/comments first-spam.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \
-    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Comment text rejected solely because of bad filter'
 chain /first first.html
 
 check /second/comments second-404.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \
-    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Valid comment sent to a closed comment list'
 chain /second second.html
 
@@ -113,51 +113,51 @@ chain /fourth/comments 405.html
 chain /fourth fourth.html
 chain /fourth/comments fourth-preview.html -F 'c_mail=' \
     -F 'c_name=  ' \
-    -F 'c_site=http://instinctive.eu/"' -F 'preview=Preview' \
+    -F 'c_link=http://instinctive.eu/"' -F 'preview=Preview' \
     -F 'c_text=Preview comment that should not be written anywhere.'
 chain /fourth fourth.html
 chain /fourth/comments fourth-303.html -F 'c_mail=' \
     -F 'c_name=Random Stranger' \
-    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Attempted spam comment text.' \
     -F 'c_date=2015-03-03T15:10:00Z'
 chain /fourth fourth.html
 chain_last_spam spam-extra-fields.sx
 chain /fourth/comments fourth-303.html -F 'c_mail=' \
     -F 'c_name=Random Stranger' \
-    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Attempted use of disabled filter' \
     -F 'c_filter=pass-through'
 chain_last_spam spam-filter-extra-field.sx
 chain /fourth/comments fourth-spam-1.html \
     -F 'c_name=Random Stranger' \
-    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Attempted spam comment text.'
 chain_last_spam spam-missing-field.sx
 chain /fourth/comments fourth-spam-2.html -F 'c_mail=' \
     -F 'c_name=Random Spammer' \
-    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Attempted spam comment text.'
 chain_last_spam spam-by-name.sx
 chain /fourth/comments fourth-303.html -F 'address=here' \
     -F 'c_name=Random Spammer' \
-    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Attempted spam comment text.'
 chain_last_spam spam-all.sx
 chain /fourth/comments fourth-303.html -F 'c_mail=quxx' \
     -F 'c_name=quxx' \
-    -F 'c_site=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Innocent-looking spam comment'
 chain_last_spam spam-fields-equal.sx
 chain /fourth/comments fourth-303-newcomment.html -F 'c_mail=' \
-    -F 'c_name=Random Troll' -F 'c_site=' -F 'submit=Submit' \
+    -F 'c_name=Random Troll' -F 'c_link=' -F 'submit=Submit' \
     -F 'c_text=Moderated comment text because of suspicious content.'
 chain /fourth fourth.html
 chain /test base_version.txt
 chain_curl -F 'sleep_update=2' "${BASE_URL}/test"
 chain /fourth/comments fourth-303.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \
-    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Brand new comment posted during the test suite'
 chain /fourth fourth.html
 chain_curl -F 'wait_version=2' "${BASE_URL}/test"
@@ -166,24 +166,24 @@ chain /fourth fourth-commented.html
 check /fifth fifth.html
 chain /test version-2.txt
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Nobody' \
-    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Perfectly valid comment set to be ignored in the page.'
 chain /fifth fifth.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:10:00Z' \
-    -F 'c_site=http://instinctive.eu/"' -F 'submit=Submit' --form-string \
+    -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' --form-string \
     'c_text=<p>Administrator comments that bypasses default ignore</p>'
 chain_curl -F 'wait_version=3' "${BASE_URL}/test"
 chain /fifth fifth-commented.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:12:00Z' \
-    -F 'c_site=http://users.example.com/admin/' -F 'submit=Submit' \
+    -F 'c_link=http://users.example.com/admin/' -F 'submit=Submit' \
     -F 'c_filter=pass-through' --form-string \
     'c_text=<p>Administrator comment in <strong>raw</strong> HTML mode.</p>'
 chain_curl -F 'wait_version=4' "${BASE_URL}/test"
 chain /fifth fifth-commented-2.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
-    -F 'c_date=2015-03-03T15:10:00Z' -F 'c_site=/dev/null' -F 'submit=Submit' \
+    -F 'c_date=2015-03-03T15:10:00Z' -F 'c_link=/dev/null' -F 'submit=Submit' \
     -F 'c_filter=html-escape' \
     -F 'c_text=Spam comment with wrong filter'
 chain_last_spam spam-wrong-filter.sx

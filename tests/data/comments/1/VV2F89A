@@ -3,4 +3,4 @@
 (mail "")
 (link "http://instinctive.eu/")
 (text "<p>A third comment, with <strong>legitimate</strong> embedded HTML</p>\n")
-(text-filter pass-through)
+(filter pass-through)

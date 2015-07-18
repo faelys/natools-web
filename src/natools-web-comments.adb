@@ -1376,7 +1376,7 @@ package body Natools.Web.Comments is
       Print ("mail", Comment.Mail);
       Print ("link", Comment.Link);
       Print ("text", Comment.Text);
-      Print ("text-filter", Comment.Text_Filter);
+      Print ("filter", Comment.Text_Filter);
 
       Print_Flags :
       declare

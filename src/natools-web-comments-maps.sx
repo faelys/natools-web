@@ -59,8 +59,8 @@
          (Item.Command.If_Mail  if-mail)
          (Item.Command.If_Name  if-name)
          (Item.Command.Name  name)
-         (Item.Command.Mail  mail e-mail)
-         (Item.Command.Link  link www site website)
+         (Item.Command.Mail  mail)
+         (Item.Command.Link  link)
          (Item.Command.Parent  parent)
          (Item.Command.Rank  rank)
          (Item.Command.Text  text)))
@@ -79,8 +79,8 @@
          (Item.Condition.Has_Unknown_Field
             has-unknown-field has-unknown-fields)
          (Item.Condition.Name  name)
-         (Item.Condition.Mail  mail e-mail)
-         (Item.Condition.Link  link www site website)
+         (Item.Condition.Mail  mail)
+         (Item.Condition.Link  link)
          (Item.Condition.Text  text)))
 
    (Item.Element.Enum
@@ -91,10 +91,10 @@
          (Item.Element.Date  date)
          (Item.Element.Flags  flags)
          (Item.Element.Name  name)
-         (Item.Element.Mail  mail e-mail)
-         (Item.Element.Link  link www site website)
+         (Item.Element.Mail  mail)
+         (Item.Element.Link  link)
          (Item.Element.Text  text)
-         (Item.Element.Text_Filter  text-filter filter)))
+         (Item.Element.Text_Filter   filter)))
 
    (Item.Form.Enum
       (hash-package Natools.Static_Maps.Web.Comments.Item_Forms)
@@ -105,7 +105,7 @@
          (Item.Form.Filter  c_filter)
          (Item.Form.Name  c_name)
          (Item.Form.Mail  c_mail)
-         (Item.Form.Link  c_site)
+         (Item.Form.Link  c_link)
          (Item.Form.Text  c_text)))
 
    (Item.Post_Action.Enum
