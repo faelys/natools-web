@@ -72,6 +72,11 @@ package Natools.Web.Comments is
 
 private
 
+   package Comment_Atoms is
+      type Enum is (Name, Mail, Link, Text, Filter);
+      type Set is array (Enum) of S_Expressions.Atom_Refs.Immutable_Reference;
+   end Comment_Atoms;
+
    package Comment_Flags is
       type Enum is (Preprocessed, Ignored);
       type Set is array (Enum) of Boolean with Pack;
@@ -86,11 +91,7 @@ private
       Date : Ada.Calendar.Time;
       Offset : Ada.Calendar.Time_Zones.Time_Offset;
       Id : S_Expressions.Atom_Refs.Immutable_Reference;
-      Name : S_Expressions.Atom_Refs.Immutable_Reference;
-      Mail : S_Expressions.Atom_Refs.Immutable_Reference;
-      Link : S_Expressions.Atom_Refs.Immutable_Reference;
-      Text : S_Expressions.Atom_Refs.Immutable_Reference;
-      Text_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
+      Atoms : Comment_Atoms.Set;
       Flags : Comment_Flags.Set := (others => False);
    end record;
 

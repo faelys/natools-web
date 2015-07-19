@@ -1,4 +1,4 @@
---  Generated at 2015-07-18 14:38:45 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-07-19 17:50:07 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -6,25 +6,22 @@ package Natools.Static_Maps.Web.Comments is
 
    package Item is
       package Command is
-         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent, Rank,
-           If_Name, If_No_Name, If_Mail, If_No_Mail, If_Link, If_No_Link);
+         type Enum is (Unknown, Date, Id, Parent, Rank);
       end Command;
 
       package Condition is
          type Enum is
            (Unknown,
-            Has_Extra_Fields, Has_Unknown_Field, Action_Is,
             Field_List_Is, Field_List_Contains, Field_List_Among, Fields_Equal,
-            Name, Mail, Link, Text);
+            Has_Extra_Fields, Has_Unknown_Field, Action_Is);
       end Condition;
 
       package Element is
-         type Enum is
-           (Unknown, Date, Name, Mail, Link, Text, Text_Filter, Flags);
+         type Enum is (Unknown, Date, Flags);
       end Element;
 
       package Form is
-         type Enum is (Unknown, Date, Filter, Name, Mail, Link, Text);
+         type Enum is (Unknown, Date, Filter, Atom);
       end Form;
 
       package Post_Action is
@@ -59,48 +56,18 @@ private
 
    Map_1_Key_0 : aliased constant String := "date";
    Map_1_Key_1 : aliased constant String := "id";
-   Map_1_Key_2 : aliased constant String := "if-link";
-   Map_1_Key_3 : aliased constant String := "if-no-link";
-   Map_1_Key_4 : aliased constant String := "if-no-mail";
-   Map_1_Key_5 : aliased constant String := "if-no-name";
-   Map_1_Key_6 : aliased constant String := "if-mail";
-   Map_1_Key_7 : aliased constant String := "if-name";
-   Map_1_Key_8 : aliased constant String := "name";
-   Map_1_Key_9 : aliased constant String := "mail";
-   Map_1_Key_10 : aliased constant String := "link";
-   Map_1_Key_11 : aliased constant String := "parent";
-   Map_1_Key_12 : aliased constant String := "rank";
-   Map_1_Key_13 : aliased constant String := "text";
-   Map_1_Keys : constant array (0 .. 13) of access constant String
+   Map_1_Key_2 : aliased constant String := "parent";
+   Map_1_Key_3 : aliased constant String := "rank";
+   Map_1_Keys : constant array (0 .. 3) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
-         Map_1_Key_3'Access,
-         Map_1_Key_4'Access,
-         Map_1_Key_5'Access,
-         Map_1_Key_6'Access,
-         Map_1_Key_7'Access,
-         Map_1_Key_8'Access,
-         Map_1_Key_9'Access,
-         Map_1_Key_10'Access,
-         Map_1_Key_11'Access,
-         Map_1_Key_12'Access,
-         Map_1_Key_13'Access);
-   Map_1_Elements : constant array (0 .. 13) of Item.Command.Enum
+         Map_1_Key_3'Access);
+   Map_1_Elements : constant array (0 .. 3) of Item.Command.Enum
      := (Item.Command.Date,
          Item.Command.Id,
-         Item.Command.If_Link,
-         Item.Command.If_No_Link,
-         Item.Command.If_No_Mail,
-         Item.Command.If_No_Name,
-         Item.Command.If_Mail,
-         Item.Command.If_Name,
-         Item.Command.Name,
-         Item.Command.Mail,
-         Item.Command.Link,
          Item.Command.Parent,
-         Item.Command.Rank,
-         Item.Command.Text);
+         Item.Command.Rank);
 
    Map_2_Key_0 : aliased constant String := "action-is";
    Map_2_Key_1 : aliased constant String := "action-is-any-of";
@@ -112,11 +79,7 @@ private
    Map_2_Key_7 : aliased constant String := "has-extra-fields";
    Map_2_Key_8 : aliased constant String := "has-unknown-field";
    Map_2_Key_9 : aliased constant String := "has-unknown-fields";
-   Map_2_Key_10 : aliased constant String := "name";
-   Map_2_Key_11 : aliased constant String := "mail";
-   Map_2_Key_12 : aliased constant String := "link";
-   Map_2_Key_13 : aliased constant String := "text";
-   Map_2_Keys : constant array (0 .. 13) of access constant String
+   Map_2_Keys : constant array (0 .. 9) of access constant String
      := (Map_2_Key_0'Access,
          Map_2_Key_1'Access,
          Map_2_Key_2'Access,
@@ -126,12 +89,8 @@ private
          Map_2_Key_6'Access,
          Map_2_Key_7'Access,
          Map_2_Key_8'Access,
-         Map_2_Key_9'Access,
-         Map_2_Key_10'Access,
-         Map_2_Key_11'Access,
-         Map_2_Key_12'Access,
-         Map_2_Key_13'Access);
-   Map_2_Elements : constant array (0 .. 13) of Item.Condition.Enum
+         Map_2_Key_9'Access);
+   Map_2_Elements : constant array (0 .. 9) of Item.Condition.Enum
      := (Item.Condition.Action_Is,
          Item.Condition.Action_Is,
          Item.Condition.Field_List_Is,
@@ -141,35 +100,16 @@ private
          Item.Condition.Has_Extra_Fields,
          Item.Condition.Has_Extra_Fields,
          Item.Condition.Has_Unknown_Field,
-         Item.Condition.Has_Unknown_Field,
-         Item.Condition.Name,
-         Item.Condition.Mail,
-         Item.Condition.Link,
-         Item.Condition.Text);
+         Item.Condition.Has_Unknown_Field);
 
    Map_3_Key_0 : aliased constant String := "date";
    Map_3_Key_1 : aliased constant String := "flags";
-   Map_3_Key_2 : aliased constant String := "name";
-   Map_3_Key_3 : aliased constant String := "mail";
-   Map_3_Key_4 : aliased constant String := "link";
-   Map_3_Key_5 : aliased constant String := "text";
-   Map_3_Key_6 : aliased constant String := "filter";
-   Map_3_Keys : constant array (0 .. 6) of access constant String
+   Map_3_Keys : constant array (0 .. 1) of access constant String
      := (Map_3_Key_0'Access,
-         Map_3_Key_1'Access,
-         Map_3_Key_2'Access,
-         Map_3_Key_3'Access,
-         Map_3_Key_4'Access,
-         Map_3_Key_5'Access,
-         Map_3_Key_6'Access);
-   Map_3_Elements : constant array (0 .. 6) of Item.Element.Enum
+         Map_3_Key_1'Access);
+   Map_3_Elements : constant array (0 .. 1) of Item.Element.Enum
      := (Item.Element.Date,
-         Item.Element.Flags,
-         Item.Element.Name,
-         Item.Element.Mail,
-         Item.Element.Link,
-         Item.Element.Text,
-         Item.Element.Text_Filter);
+         Item.Element.Flags);
 
    Map_4_Key_0 : aliased constant String := "c_date";
    Map_4_Key_1 : aliased constant String := "c_filter";
@@ -187,10 +127,10 @@ private
    Map_4_Elements : constant array (0 .. 5) of Item.Form.Enum
      := (Item.Form.Date,
          Item.Form.Filter,
-         Item.Form.Name,
-         Item.Form.Mail,
-         Item.Form.Link,
-         Item.Form.Text);
+         Item.Form.Atom,
+         Item.Form.Atom,
+         Item.Form.Atom,
+         Item.Form.Atom);
 
    Map_5_Key_0 : aliased constant String := "anchor";
    Map_5_Key_1 : aliased constant String := "no-anchor";

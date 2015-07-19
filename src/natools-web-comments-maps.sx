@@ -4,25 +4,22 @@
    (extra-decl "\
    package Item is
       package Command is
-         type Enum is (Unknown, Date, Id, Name, Mail, Link, Text, Parent, Rank,
-           If_Name, If_No_Name, If_Mail, If_No_Mail, If_Link, If_No_Link);
+         type Enum is (Unknown, Date, Id, Parent, Rank);
       end Command;
 
       package Condition is
          type Enum is
            (Unknown,
-            Has_Extra_Fields, Has_Unknown_Field, Action_Is,
             Field_List_Is, Field_List_Contains, Field_List_Among, Fields_Equal,
-            Name, Mail, Link, Text);
+            Has_Extra_Fields, Has_Unknown_Field, Action_Is);
       end Condition;
 
       package Element is
-         type Enum is
-           (Unknown, Date, Name, Mail, Link, Text, Text_Filter, Flags);
+         type Enum is (Unknown, Date, Flags);
       end Element;
 
       package Form is
-         type Enum is (Unknown, Date, Filter, Name, Mail, Link, Text);
+         type Enum is (Unknown, Date, Filter, Atom);
       end Form;
 
       package Post_Action is
@@ -52,18 +49,8 @@
       (nodes
          (Item.Command.Date  date)
          (Item.Command.Id  id)
-         (Item.Command.If_Link  if-link)
-         (Item.Command.If_No_Link  if-no-link)
-         (Item.Command.If_No_Mail  if-no-mail)
-         (Item.Command.If_No_Name  if-no-name)
-         (Item.Command.If_Mail  if-mail)
-         (Item.Command.If_Name  if-name)
-         (Item.Command.Name  name)
-         (Item.Command.Mail  mail)
-         (Item.Command.Link  link)
          (Item.Command.Parent  parent)
-         (Item.Command.Rank  rank)
-         (Item.Command.Text  text)))
+         (Item.Command.Rank  rank)))
 
    (Item.Condition.Enum
       (hash-package Natools.Static_Maps.Web.Comments.Item_Conditions)
@@ -77,11 +64,7 @@
          (Item.Condition.Fields_Equal  fields-equal)
          (Item.Condition.Has_Extra_Fields  has-extra-field has-extra-fields)
          (Item.Condition.Has_Unknown_Field
-            has-unknown-field has-unknown-fields)
-         (Item.Condition.Name  name)
-         (Item.Condition.Mail  mail)
-         (Item.Condition.Link  link)
-         (Item.Condition.Text  text)))
+            has-unknown-field has-unknown-fields)))
 
    (Item.Element.Enum
       (hash-package Natools.Static_Maps.Web.Comments.Item_Elements)
@@ -89,12 +72,7 @@
       (not-found Item.Element.Unknown)
       (nodes
          (Item.Element.Date  date)
-         (Item.Element.Flags  flags)
-         (Item.Element.Name  name)
-         (Item.Element.Mail  mail)
-         (Item.Element.Link  link)
-         (Item.Element.Text  text)
-         (Item.Element.Text_Filter   filter)))
+         (Item.Element.Flags  flags)))
 
    (Item.Form.Enum
       (hash-package Natools.Static_Maps.Web.Comments.Item_Forms)
@@ -103,10 +81,7 @@
       (nodes
          (Item.Form.Date  c_date)
          (Item.Form.Filter  c_filter)
-         (Item.Form.Name  c_name)
-         (Item.Form.Mail  c_mail)
-         (Item.Form.Link  c_link)
-         (Item.Form.Text  c_text)))
+         (Item.Form.Atom  c_name c_mail c_link c_text)))
 
    (Item.Post_Action.Enum
       (hash-package Natools.Static_Maps.Web.Comments.Item_Actions)

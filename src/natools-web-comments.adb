@@ -19,6 +19,7 @@
 -- like is commonly found on blogs.                                         --
 ------------------------------------------------------------------------------
 
+with Ada.Characters.Handling;
 with Ada.Containers.Indefinite_Ordered_Maps;
 with Ada.Exceptions;
 with Ada.Streams.Stream_IO;
@@ -132,6 +133,9 @@ package body Natools.Web.Comments is
       --  Return the filter designated by Name_Ref, falling back on raw
       --  text when Name_Ref is empty or named filter is not found.
 
+   function Image (Name : Comment_Atoms.Enum) return String;
+      --  Return a string representation of Name
+
    procedure Parse_Action
      (Builder : in out Comment_Builder;
       Site : in Sites.Site;
@@ -209,6 +213,10 @@ package body Natools.Web.Comments is
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
       --  Update comment list with the given expression
 
+   function Value (Name : S_Expressions.Atom) return Comment_Atoms.Enum;
+      --  Convert Name into a comment atom reference, raising Constraint_Error
+      --  when Name is not valid.
+
    procedure Write
      (Builder : in Comment_Builder;
       Output : in out S_Expressions.Printers.Printer'Class);
@@ -242,6 +250,24 @@ package body Natools.Web.Comments is
 
    procedure Update is new S_Expressions.Interpreter_Loop
      (Comment_List, Meaningless_Type, Update_List);
+
+
+
+   ------------------------------
+   -- Local Helper Subprograms --
+   ------------------------------
+
+   function Image (Name : Comment_Atoms.Enum) return String is
+   begin
+      return Ada.Characters.Handling.To_Lower
+        (Comment_Atoms.Enum'Image (Name));
+   end Image;
+
+
+   function Value (Name : S_Expressions.Atom) return Comment_Atoms.Enum is
+   begin
+      return Comment_Atoms.Enum'Value (S_Expressions.To_String (Name));
+   end Value;
 
 
 
@@ -287,6 +313,11 @@ package body Natools.Web.Comments is
       procedure Render_Ref
         (Ref : in S_Expressions.Atom_Refs.Immutable_Reference);
 
+      procedure Value
+        (Image : in String;
+         Found : out Boolean;
+         Id : out Comment_Atoms.Enum);
+
       procedure Re_Enter
         (Exchange : in out Sites.Exchange;
          Expression : in out S_Expressions.Lockable.Descriptor'Class) is
@@ -306,15 +337,65 @@ package body Natools.Web.Comments is
          end if;
       end Render_Ref;
 
+      procedure Value
+        (Image : in String;
+         Found : out Boolean;
+         Id : out Comment_Atoms.Enum) is
+      begin
+         Id := Comment_Atoms.Enum'Value (Image);
+         Found := True;
+      exception
+         when Constraint_Error =>
+            Found := False;
+      end Value;
+
       Accessor : constant Comment_Array_Refs.Accessor := Context.List.Query;
       Comment : Comment_Data renames Accessor.Data.Data (Context.Position);
+      S_Name : constant String := S_Expressions.To_String (Name);
    begin
       pragma Assert (Comment.Flags (Comment_Flags.Preprocessed));
 
-      case Static_Maps.To_Item_Command (S_Expressions.To_String (Name)) is
+      case Static_Maps.To_Item_Command (S_Name) is
          when Unknown =>
-            Fallback_Render
-              (Exchange, Name, Arguments, "comment", Re_Enter'Access);
+            declare
+               Has_Id : Boolean;
+               Atom_Id : Comment_Atoms.Enum;
+            begin
+               if S_Name'Length > 6
+                 and then S_Name (S_Name'First .. S_Name'First + 5) = "if-no-"
+               then
+                  Value
+                    (S_Name (S_Name'First + 6 .. S_Name'Last),
+                     Has_Id, Atom_Id);
+
+                  if Has_Id and then Comment.Atoms (Atom_Id).Is_Empty then
+                     Render (Arguments, Exchange, Context);
+                  end if;
+
+               elsif S_Name'Length > 3
+                 and then S_Name (S_Name'First .. S_Name'First + 2) = "if-"
+               then
+                  Value
+                    (S_Name (S_Name'First + 3 .. S_Name'Last),
+                     Has_Id, Atom_Id);
+
+                  if Has_Id and then not Comment.Atoms (Atom_Id).Is_Empty then
+                     Render (Arguments, Exchange, Context);
+                  end if;
+
+               elsif S_Name /= "filter" then
+                  Value (S_Name, Has_Id, Atom_Id);
+
+                  if Has_Id then
+                     Render_Ref (Comment.Atoms (Atom_Id));
+                  end if;
+               end if;
+
+               if not Has_Id then
+                  Fallback_Render
+                    (Exchange, Name, Arguments, "comment", Re_Enter'Access);
+               end if;
+            end;
 
          when Date =>
             S_Expressions.Templates.Dates.Render
@@ -322,45 +403,6 @@ package body Natools.Web.Comments is
 
          when Id =>
             Exchange.Append (Comment.Id.Query);
-
-         when If_Link =>
-            if not Comment.Link.Is_Empty then
-               Render (Arguments, Exchange, Context);
-            end if;
-
-         when If_No_Link =>
-            if Comment.Link.Is_Empty then
-               Render (Arguments, Exchange, Context);
-            end if;
-
-         when If_No_Mail =>
-            if Comment.Mail.Is_Empty then
-               Render (Arguments, Exchange, Context);
-            end if;
-
-         when If_No_Name =>
-            if Comment.Name.Is_Empty then
-               Render (Arguments, Exchange, Context);
-            end if;
-
-         when If_Mail =>
-            if not Comment.Mail.Is_Empty then
-               Render (Arguments, Exchange, Context);
-            end if;
-
-         when If_Name =>
-            if not Comment.Name.Is_Empty then
-               Render (Arguments, Exchange, Context);
-            end if;
-
-         when Static_Maps.Item.Command.Name =>
-            Render_Ref (Comment.Name);
-
-         when Mail =>
-            Render_Ref (Comment.Mail);
-
-         when Link =>
-            Render_Ref (Comment.Link);
 
          when Parent =>
             if Accessor.Parent /= null then
@@ -372,9 +414,6 @@ package body Natools.Web.Comments is
               (Exchange,
                Arguments,
                Integer (Context.Position));
-
-         when Text =>
-            Render_Ref (Comment.Text);
       end case;
    end Render_Comment_Position;
 
@@ -489,9 +528,15 @@ package body Natools.Web.Comments is
 
       case Static_Maps.To_Item_Element (S_Expressions.To_String (Name)) is
          when Unknown =>
-            Log (Severities.Error,
-              "Unknown comment element """
-               & S_Expressions.To_String (Name) & '"');
+            Set_Atom :
+            begin
+               Comment.Atoms (Value (Name)) := Create (Arguments.Current_Atom);
+            exception
+               when Constraint_Error =>
+                  Log (Severities.Error,
+                    "Unknown comment element """
+                     & S_Expressions.To_String (Name) & '"');
+            end Set_Atom;
 
          when Date =>
             declare
@@ -521,21 +566,6 @@ package body Natools.Web.Comments is
 
                Arguments.Next;
             end loop;
-
-         when Static_Maps.Item.Element.Name =>
-            Comment.Name := Create (Arguments.Current_Atom);
-
-         when Mail =>
-            Comment.Mail := Create (Arguments.Current_Atom);
-
-         when Link =>
-            Comment.Link := Create (Arguments.Current_Atom);
-
-         when Text =>
-            Comment.Text := Create (Arguments.Current_Atom);
-
-         when Text_Filter =>
-            Comment.Text_Filter := Create (Arguments.Current_Atom);
       end case;
    end Update_Item;
 
@@ -659,6 +689,14 @@ package body Natools.Web.Comments is
    begin
       case Static_Maps.To_Item_Condition (S_Expressions.To_String (Name)) is
          when Unknown =>
+            Evaluate_Atom :
+            begin
+               return String_Evaluate
+                 (Builder.Core.Atoms (Value (Name)), Arguments);
+            exception
+               when Constraint_Error => null;
+            end Evaluate_Atom;
+
             raise Invalid_Condition with "Unknown parametric conditional """
               & S_Expressions.To_String (Name) & '"';
 
@@ -790,18 +828,6 @@ package body Natools.Web.Comments is
 
          when Has_Unknown_Field =>
             return Builder.Has_Unknown_Field;
-
-         when Link =>
-            return String_Evaluate (Builder.Core.Link, Arguments);
-
-         when Mail =>
-            return String_Evaluate (Builder.Core.Mail, Arguments);
-
-         when Static_Maps.Item.Condition.Name =>
-            return String_Evaluate (Builder.Core.Name, Arguments);
-
-         when Text =>
-            return String_Evaluate (Builder.Core.Text, Arguments);
       end case;
    end Evaluate_Parametric;
 
@@ -818,6 +844,13 @@ package body Natools.Web.Comments is
            | Action_Is | Field_List_Is | Field_List_Contains | Field_List_Among
            | Fields_Equal
          =>
+            Evaluate_Atom :
+            begin
+               return not Builder.Core.Atoms (Value (Name)).Is_Empty;
+            exception
+               when Constraint_Error => null;
+            end Evaluate_Atom;
+
             raise Invalid_Condition with "Unknown simple conditional """
               & S_Expressions.To_String (Name) & '"';
 
@@ -826,18 +859,6 @@ package body Natools.Web.Comments is
 
          when Has_Unknown_Field =>
             return Builder.Has_Unknown_Field;
-
-         when Link =>
-            return not Builder.Core.Link.Is_Empty;
-
-         when Mail =>
-            return not Builder.Core.Mail.Is_Empty;
-
-         when Static_Maps.Item.Condition.Name =>
-            return not Builder.Core.Name.Is_Empty;
-
-         when Text =>
-            return not Builder.Core.Text.Is_Empty;
       end case;
    end Evaluate_Simple;
 
@@ -1194,65 +1215,92 @@ package body Natools.Web.Comments is
    procedure Preprocess
      (Comment : in out Comment_Data;
       List : in Comment_List;
-      Site : in Sites.Site) is
+      Site : in Sites.Site)
+   is
+      use Comment_Atoms;
    begin
       Preprocess
         (Comment,
          Get_Safe_Filter
-           (Site, Comment.Text_Filter, List.Default_Text_Filter));
+           (Site, Comment.Atoms (Filter), List.Default_Text_Filter));
    end Preprocess;
 
 
    procedure Preprocess
      (Comment : in out Comment_Data;
       List : in Comment_List;
-      Builder : in Sites.Site_Builder) is
+      Builder : in Sites.Site_Builder)
+   is
+      use Comment_Atoms;
    begin
       Preprocess
         (Comment,
          Get_Safe_Filter
-           (Builder, Comment.Text_Filter, List.Default_Text_Filter));
+           (Builder, Comment.Atoms (Filter), List.Default_Text_Filter));
    end Preprocess;
 
 
    procedure Preprocess
      (Comment : in out Comment_Data;
-      Text_Filter : in Filters.Filter'Class) is
+      Text_Filter : in Filters.Filter'Class)
+   is
+      procedure Preprocess_Atom
+        (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference);
+      procedure Preprocess_Link
+        (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference;
+         Value : in S_Expressions.Atom);
+
+      procedure Preprocess_Atom
+        (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference) is
+      begin
+         Reset_If_Blank (Ref);
+
+         if not Ref.Is_Empty then
+            Ref := Escapes.Escape (Ref, Escapes.HTML_Attribute);
+         end if;
+      end Preprocess_Atom;
+
+      procedure Preprocess_Link
+        (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference;
+         Value : in S_Expressions.Atom) is
+      begin
+         if Is_Valid_URL (S_Expressions.To_String (Value)) then
+            Ref := Escapes.Escape (Ref, Escapes.HTML_Attribute);
+         else
+            Ref.Reset;
+         end if;
+      end Preprocess_Link;
+
+      use Comment_Atoms;
    begin
       if Comment.Flags (Comment_Flags.Preprocessed) then
          return;
       end if;
 
-      Reset_If_Blank (Comment.Name);
+      for I in Comment_Atoms.Enum loop
+         case I is
+            when Filter =>
+               null;
 
-      if not Comment.Name.Is_Empty then
-         Comment.Name := Escapes.Escape (Comment.Name, Escapes.HTML_Attribute);
-      end if;
+            when Link =>
+               if not Comment.Atoms (I).Is_Empty then
+                  Preprocess_Link (Comment.Atoms (I), Comment.Atoms (I).Query);
+               end if;
 
-      Reset_If_Blank (Comment.Mail);
+            when Text =>
+               if not Comment.Atoms (I).Is_Empty then
+                  declare
+                     Buffer : S_Expressions.Atom_Buffers.Atom_Buffer;
+                  begin
+                     Text_Filter.Apply (Buffer, Comment.Atoms (I).Query);
+                     Comment.Atoms (I) := Create (Buffer.Data);
+                  end;
+               end if;
 
-      if not Comment.Mail.Is_Empty then
-         Comment.Mail := Escapes.Escape (Comment.Mail, Escapes.HTML_Attribute);
-      end if;
-
-      if not Comment.Link.Is_Empty
-        and then Is_Valid_URL (S_Expressions.To_String (Comment.Link.Query))
-      then
-         Comment.Link := Escapes.Escape (Comment.Link, Escapes.HTML_Attribute);
-      else
-         Comment.Link.Reset;
-      end if;
-
-      Reset_If_Blank (Comment.Text);
-
-      if not Comment.Text.Is_Empty then
-         declare
-            Buffer : S_Expressions.Atom_Buffers.Atom_Buffer;
-         begin
-            Text_Filter.Apply (Buffer, Comment.Text.Query);
-            Comment.Text := Create (Buffer.Data);
-         end;
-      end if;
+            when Name | Mail =>
+               Preprocess_Atom (Comment.Atoms (I));
+         end case;
+      end loop;
 
       Comment.Flags (Comment_Flags.Preprocessed) := True;
    end Preprocess;
@@ -1308,23 +1356,19 @@ package body Natools.Web.Comments is
                else
                   for Name_Ref of List.Text_Filters.Query.Data.all loop
                      if S_Expressions.To_String (Name_Ref.Query) = Value then
-                        Data.Core.Text_Filter := Name_Ref;
+                        Data.Core.Atoms (Comment_Atoms.Filter) := Name_Ref;
                         exit;
                      end if;
                   end loop;
                end if;
 
-            when Name =>
-               Data.Core.Name := Create (S_Expressions.To_Atom (Value));
-
-            when Mail =>
-               Data.Core.Mail := Create (S_Expressions.To_Atom (Value));
-
-            when Link =>
-               Data.Core.Link := Create (S_Expressions.To_Atom (Value));
-
-            when Text =>
-               Data.Core.Text := Create (S_Expressions.To_Atom (Value));
+            when Atom =>
+               pragma Assert (Field'Length > 2
+                 and then Field (Field'First .. Field'First + 1) = "c_");
+               Data.Core.Atoms
+                 (Comment_Atoms.Enum'Value
+                    (Field (Field'First + 2 .. Field'Last)))
+                 := Create (S_Expressions.To_Atom (Value));
          end case;
       end Process;
    begin
@@ -1366,17 +1410,17 @@ package body Natools.Web.Comments is
             Print (Key, Value.Query);
          end if;
       end Print;
+
+      use type Comment_Atoms.Enum;
    begin
       pragma Assert (not Comment.Flags (Comment_Flags.Preprocessed));
 
       Print ("date", S_Expressions.To_Atom
         (Time_IO.RFC_3339.Image (Comment.Date, Comment.Offset)));
 
-      Print ("name", Comment.Name);
-      Print ("mail", Comment.Mail);
-      Print ("link", Comment.Link);
-      Print ("text", Comment.Text);
-      Print ("filter", Comment.Text_Filter);
+      for I in Comment_Atoms.Enum loop
+         Print (Image (I), Comment.Atoms (I));
+      end loop;
 
       Print_Flags :
       declare
