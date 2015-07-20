@@ -1,0 +1,23 @@
+(elements
+   (title "List Test")
+   (main-text
+      (comments
+         "<p>Empty list:"
+         (list (limit 2) (ellipsis " …") (template " |"))
+         "</p>\n")
+      (tags tags
+         "<p>Template list:"
+         (all-descendants (template " " (name (-1))))
+         "</p>\n<p>Reverse:"
+         (all-descendants reverse (template " " (name (-1))))
+         "</p>\n<p>Beginning:"
+         (all-descendants (limit 2) (ellipsis " …") (template " " (name (-1))))
+         "</p>\n<p>Reverse beginning:"
+         (all-descendants (reverse) (limit 2)
+            (ellipsis-prefix "[") (ellipsis-suffix "]")
+            (template " " (name (-1))))
+         "</p>\n<p>Tight limit:"
+         (all-descendants (limit 5) (ellipsis " …") (template " " (name (-1))))
+         "</p>\n"))
+   (sidebar ""))
+(comments (backend comments list-test))
