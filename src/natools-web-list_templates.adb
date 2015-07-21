@@ -163,6 +163,15 @@ package body Natools.Web.List_Templates is
       procedure Loop_Body
         (Position : in Iterators.Cursor; Exit_Loop : out Boolean) is
       begin
+         if Param.Limit > 0 and then Rendered >= Param.Limit then
+            if not Param.Ellipsis_Suffix.Is_Empty then
+               Exchange.Append (Param.Ellipsis_Suffix.Query);
+            end if;
+
+            Exit_Loop := True;
+            return;
+         end if;
+
          Exit_Loop := False;
 
          declare
@@ -172,14 +181,6 @@ package body Natools.Web.List_Templates is
          end;
 
          Rendered := Rendered + 1;
-
-         if Param.Limit > 0 and then Rendered >= Param.Limit then
-            if not Param.Ellipsis_Suffix.Is_Empty then
-               Exchange.Append (Param.Ellipsis_Suffix.Query);
-            end if;
-
-            Exit_Loop := True;
-         end if;
       end Loop_Body;
 
       Exit_Loop : Boolean;
