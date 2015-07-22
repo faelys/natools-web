@@ -1,4 +1,4 @@
---  Generated at 2014-12-04 18:01:45 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-07-22 19:06:17 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-list_templates-maps.sx
 
 package Natools.Static_Maps.Web.List_Templates is
@@ -11,6 +11,8 @@ package Natools.Static_Maps.Web.List_Templates is
       Ellipsis_Suffix,
       Forward,
       Length_Limit,
+      Show_Beginning,
+      Show_Ending,
       Template);
 
    function To_Command (Key : String) return Command;
@@ -29,9 +31,15 @@ private
    Map_1_Key_9 : aliased constant String := "limit";
    Map_1_Key_10 : aliased constant String := "max";
    Map_1_Key_11 : aliased constant String := "maximum";
-   Map_1_Key_12 : aliased constant String := "template";
-   Map_1_Key_13 : aliased constant String := "render";
-   Map_1_Keys : constant array (0 .. 13) of access constant String
+   Map_1_Key_12 : aliased constant String := "show-beginning";
+   Map_1_Key_13 : aliased constant String := "beginning";
+   Map_1_Key_14 : aliased constant String := "show-firsts";
+   Map_1_Key_15 : aliased constant String := "show-ending";
+   Map_1_Key_16 : aliased constant String := "ending";
+   Map_1_Key_17 : aliased constant String := "show-lasts";
+   Map_1_Key_18 : aliased constant String := "template";
+   Map_1_Key_19 : aliased constant String := "render";
+   Map_1_Keys : constant array (0 .. 19) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -45,8 +53,14 @@ private
          Map_1_Key_10'Access,
          Map_1_Key_11'Access,
          Map_1_Key_12'Access,
-         Map_1_Key_13'Access);
-   Map_1_Elements : constant array (0 .. 13) of Command
+         Map_1_Key_13'Access,
+         Map_1_Key_14'Access,
+         Map_1_Key_15'Access,
+         Map_1_Key_16'Access,
+         Map_1_Key_17'Access,
+         Map_1_Key_18'Access,
+         Map_1_Key_19'Access);
+   Map_1_Elements : constant array (0 .. 19) of Command
      := (Backward,
          Backward,
          Backward,
@@ -59,6 +73,12 @@ private
          Length_Limit,
          Length_Limit,
          Length_Limit,
+         Show_Beginning,
+         Show_Beginning,
+         Show_Beginning,
+         Show_Ending,
+         Show_Ending,
+         Show_Ending,
          Template,
          Template);
 

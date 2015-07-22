@@ -32,10 +32,13 @@ package Natools.Web.List_Templates is
 
    type Direction is (Forward, Backward);
 
+   type List_End is (Beginning, Ending);
+
    type Parameters is record
       Ellipsis_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       Ellipsis_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Going : Direction := Forward;
+      Shown_End : List_End := Beginning;
       Limit : Count := 0;
       Template : S_Expressions.Caches.Cursor;
    end record;

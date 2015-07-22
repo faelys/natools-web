@@ -82,6 +82,12 @@ package body Natools.Web.List_Templates is
                end;
             end if;
 
+         when Commands.Show_Beginning =>
+            State.Shown_End := Beginning;
+
+         when Commands.Show_Ending =>
+            State.Shown_End := Ending;
+
          when Commands.Template =>
             State.Template := S_Expressions.Caches.Move (Arguments);
       end case;
@@ -115,6 +121,12 @@ package body Natools.Web.List_Templates is
 
          when Commands.Length_Limit =>
             State.Limit := 0;
+
+         when Commands.Show_Beginning =>
+            State.Shown_End := Beginning;
+
+         when Commands.Show_Ending =>
+            State.Shown_End := Ending;
 
          when Commands.Template =>
             null;
@@ -155,10 +167,35 @@ package body Natools.Web.List_Templates is
       Iterator : in Iterators.Reversible_Iterator'Class;
       Param : in Parameters)
    is
+      procedure Ending_Showing_Loop
+        (Position : in Iterators.Cursor;
+         Remaining_Depth : in Count);
       procedure Loop_Body
         (Position : in Iterators.Cursor; Exit_Loop : out Boolean);
 
       Rendered : Count := 0;
+
+      procedure Ending_Showing_Loop
+        (Position : in Iterators.Cursor;
+         Remaining_Depth : in Count) is
+      begin
+         if Remaining_Depth > 1 then
+            case Param.Going is
+               when Backward =>
+                  Ending_Showing_Loop
+                    (Iterator.Next (Position), Remaining_Depth - 1);
+               when Forward =>
+                  Ending_Showing_Loop
+                    (Iterator.Previous (Position), Remaining_Depth - 1);
+            end case;
+         end if;
+
+         declare
+            Template_Copy : S_Expressions.Caches.Cursor := Param.Template;
+         begin
+            Render (Exchange, Position, Template_Copy);
+         end;
+      end Ending_Showing_Loop;
 
       procedure Loop_Body
         (Position : in Iterators.Cursor; Exit_Loop : out Boolean) is
@@ -184,20 +221,47 @@ package body Natools.Web.List_Templates is
       end Loop_Body;
 
       Exit_Loop : Boolean;
+      Seen : Count := 0;
    begin
-      if Param.Limit > 0 and then not Param.Ellipsis_Prefix.Is_Empty then
-         declare
-            Seen : Count := 0;
-         begin
+      if Param.Shown_End = Ending and then Param.Limit > 0 then
+         if Seen = 0 then
             for I in Iterator loop
                Seen := Seen + 1;
                exit when Seen > Param.Limit;
             end loop;
+         end if;
 
-            if Seen > Param.Limit then
+         if Seen > Param.Limit then
+            if not Param.Ellipsis_Prefix.Is_Empty then
                Exchange.Append (Param.Ellipsis_Prefix.Query);
             end if;
-         end;
+
+            case Param.Going is
+               when Backward =>
+                  Ending_Showing_Loop (Iterator.First, Param.Limit);
+               when Forward =>
+                  Ending_Showing_Loop (Iterator.Last, Param.Limit);
+            end case;
+
+            if not Param.Ellipsis_Suffix.Is_Empty then
+               Exchange.Append (Param.Ellipsis_Suffix.Query);
+            end if;
+
+            return;
+         end if;
+      end if;
+
+      if Param.Limit > 0 and then not Param.Ellipsis_Prefix.Is_Empty then
+         if Seen = 0 then
+            for I in Iterator loop
+               Seen := Seen + 1;
+               exit when Seen > Param.Limit;
+            end loop;
+         end if;
+
+         if Seen > Param.Limit then
+            Exchange.Append (Param.Ellipsis_Prefix.Query);
+         end if;
       end if;
 
       case Param.Going is

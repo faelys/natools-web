@@ -9,6 +9,8 @@
       Ellipsis_Suffix,
       Forward,
       Length_Limit,
+      Show_Beginning,
+      Show_Ending,
       Template);")
    (Command
       (hash-package Natools.Static_Maps.Web.List_Templates.Commands)
@@ -20,4 +22,6 @@
          (Ellipsis_Suffix  ellipsis-suffix ellipsis)
          (Forward  forward forwards)
          (Length_Limit length-limit limit max maximum)
+         (Show_Beginning  show-beginning beginning show-firsts)
+         (Show_Ending  show-ending ending show-lasts)
          (Template  template render))))
