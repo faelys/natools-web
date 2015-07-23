@@ -14,10 +14,26 @@
          (all-descendants (limit 2) (ellipsis " …") (template " " (name (-1))))
          "</p>\n<p>Reverse beginning:"
          (all-descendants (reverse) (limit 2)
+            (show-beginning) show-ending show-beginning
             (ellipsis-prefix "[") (ellipsis-suffix "]")
             (template " " (name (-1))))
          "</p>\n<p>Tight limit:"
          (all-descendants (limit 5) (ellipsis " …") (template " " (name (-1))))
+         "</p>\n<p>Useless <code>show-ending</code>:"
+         (all-descendants (show-ending) (template " " (name (-1))))
+         "</p>\n<p>End of list:"
+         (all-descendants show-ending (limit 2)
+            (ellipsis-prefix " …") (ellipsis-suffix ".")
+            (template " " (name (-1))))
+         "</p>\n<p>End of reverse list:"
+         (all-descendants show-ending reverse (limit 2) (ellipsis-prefix " …")
+            (template " " (name (-1))))
+         "</p>\n<p>End of tightly-limited list:"
+         (all-descendants show-ending (limit 5) (ellipsis-prefix " …")
+            (template " " (name (-1))))
+         "</p>\n<p>End of smaller-than-limit list:"
+         (all-descendants show-ending (limit 6) (ellipsis-prefix " …")
+            (template " " (name (-1))))
          "</p>\n"))
    (sidebar ""))
 (comments (backend comments list-test))
