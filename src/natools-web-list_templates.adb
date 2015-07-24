@@ -31,6 +31,11 @@ package body Natools.Web.List_Templates is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
 
+   procedure Set_Or_Reset
+     (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+      --  if Expression has an atom, copy it into Ref, otherwise reset Ref
+
 
    ---------------------------
    -- Parameter Interpreter --
@@ -45,7 +50,6 @@ package body Natools.Web.List_Templates is
       pragma Unreferenced (Context);
 
       package Commands renames Natools.Static_Maps.Web.List_Templates;
-      package Constructors renames Natools.S_Expressions.Atom_Ref_Constructors;
 
       use type S_Expressions.Events.Event;
    begin
@@ -57,16 +61,10 @@ package body Natools.Web.List_Templates is
             State.Going := Backward;
 
          when Commands.Ellipsis_Prefix =>
-            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
-               State.Ellipsis_Prefix
-                 := Constructors.Create (Arguments.Current_Atom);
-            end if;
+            Set_Or_Reset (State.Ellipsis_Prefix, Arguments);
 
          when Commands.Ellipsis_Suffix =>
-            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
-               State.Ellipsis_Suffix
-                 := Constructors.Create (Arguments.Current_Atom);
-            end if;
+            Set_Or_Reset (State.Ellipsis_Suffix, Arguments);
 
          when Commands.Forward =>
             State.Going := Forward;
@@ -155,6 +153,26 @@ package body Natools.Web.List_Templates is
       Read_Parameters (Result, Expression);
       return Result;
    end Read_Parameters;
+
+
+   procedure Set_Or_Reset
+     (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      package Constructors renames Natools.S_Expressions.Atom_Ref_Constructors;
+   begin
+      case Expression.Current_Event is
+         when S_Expressions.Events.Add_Atom =>
+            Ref := Constructors.Create (Expression.Current_Atom);
+
+         when S_Expressions.Events.Open_List
+           | S_Expressions.Events.Close_List
+           | S_Expressions.Events.End_Of_Input
+           | S_Expressions.Events.Error
+         =>
+            Ref.Reset;
+      end case;
+   end Set_Or_Reset;
 
 
 
