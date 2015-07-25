@@ -27,7 +27,9 @@
             (template " " (name (-1))))
          "</p>\n<p>End of reverse list:"
          (all-descendants show-ending reverse (limit 2) (ellipsis-prefix " …")
-            (template " " (name (-1))))
+            (ellipsis-suffix ".")
+            (template " " (name (-1)))
+            (ellipsis))
          "</p>\n<p>End of tightly-limited list:"
          (all-descendants show-ending (limit 5) (ellipsis-prefix " …")
             (template " " (name (-1))))
