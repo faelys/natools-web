@@ -8,6 +8,7 @@
       Ellipsis_Prefix,
       Ellipsis_Suffix,
       Forward,
+      If_Empty,
       Length_Limit,
       Show_Beginning,
       Show_Ending,
@@ -21,6 +22,7 @@
          (Ellipsis_Prefix  ellipsis-prefix)
          (Ellipsis_Suffix  ellipsis-suffix ellipsis)
          (Forward  forward forwards)
+         (If_Empty if-empty)
          (Length_Limit length-limit limit max maximum)
          (Show_Beginning  show-beginning beginning show-firsts)
          (Show_Ending  show-ending ending show-lasts)

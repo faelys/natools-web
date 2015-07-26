@@ -39,6 +39,7 @@ package Natools.Web.List_Templates is
       Ellipsis_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Going : Direction := Forward;
       Shown_End : List_End := Beginning;
+      If_Empty : S_Expressions.Atom_Refs.Immutable_Reference;
       Limit : Count := 0;
       Template : S_Expressions.Caches.Cursor;
    end record;

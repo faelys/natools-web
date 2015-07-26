@@ -69,6 +69,9 @@ package body Natools.Web.List_Templates is
          when Commands.Forward =>
             State.Going := Forward;
 
+         when Commands.If_Empty =>
+            Set_Or_Reset (State.If_Empty, Arguments);
+
          when Commands.Length_Limit =>
             if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
                begin
@@ -116,6 +119,9 @@ package body Natools.Web.List_Templates is
 
          when Commands.Forward =>
             State.Going := Forward;
+
+         when Commands.If_Empty =>
+            State.If_Empty.Reset;
 
          when Commands.Length_Limit =>
             State.Limit := 0;
@@ -247,6 +253,14 @@ package body Natools.Web.List_Templates is
                Seen := Seen + 1;
                exit when Seen > Param.Limit;
             end loop;
+
+            if Seen = 0 then
+               if not Param.If_Empty.Is_Empty then
+                  Exchange.Append (Param.If_Empty.Query);
+               end if;
+
+               return;
+            end if;
          end if;
 
          if Seen > Param.Limit then
@@ -275,6 +289,14 @@ package body Natools.Web.List_Templates is
                Seen := Seen + 1;
                exit when Seen > Param.Limit;
             end loop;
+
+            if Seen = 0 then
+               if not Param.If_Empty.Is_Empty then
+                  Exchange.Append (Param.If_Empty.Query);
+               end if;
+
+               return;
+            end if;
          end if;
 
          if Seen > Param.Limit then
@@ -295,6 +317,12 @@ package body Natools.Web.List_Templates is
                exit when Exit_Loop;
             end loop;
       end case;
+
+      if Rendered = 0 then
+         if not Param.If_Empty.Is_Empty then
+            Exchange.Append (Param.If_Empty.Query);
+         end if;
+      end if;
    end Render;
 
 end Natools.Web.List_Templates;
