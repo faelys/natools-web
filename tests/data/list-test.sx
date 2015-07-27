@@ -3,11 +3,11 @@
    (main-text
       (comments
          "<p>Empty list:"
-         (list (limit 2) (ellipsis " …") (template " |"))
+         (list (limit 2) (ellipsis " …") (template " |") (if-empty " ∅"))
          "</p>\n")
       (tags tags
          "<p>Template list:"
-         (all-descendants (template " " (name (-1))))
+         (all-descendants (if-empty " ∅") (template " " (name (-1))))
          "</p>\n<p>Reverse:"
          (all-descendants reverse (template " " (name (-1))))
          "</p>\n<p>Beginning:"
