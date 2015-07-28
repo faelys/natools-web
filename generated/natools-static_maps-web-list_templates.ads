@@ -1,4 +1,4 @@
---  Generated at 2015-07-26 11:31:34 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-07-28 19:04:59 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-list_templates-maps.sx
 
 package Natools.Static_Maps.Web.List_Templates is
@@ -12,6 +12,7 @@ package Natools.Static_Maps.Web.List_Templates is
       Forward,
       If_Empty,
       Length_Limit,
+      Separator,
       Show_Beginning,
       Show_Ending,
       Template);
@@ -33,15 +34,16 @@ private
    Map_1_Key_10 : aliased constant String := "limit";
    Map_1_Key_11 : aliased constant String := "max";
    Map_1_Key_12 : aliased constant String := "maximum";
-   Map_1_Key_13 : aliased constant String := "show-beginning";
-   Map_1_Key_14 : aliased constant String := "beginning";
-   Map_1_Key_15 : aliased constant String := "show-firsts";
-   Map_1_Key_16 : aliased constant String := "show-ending";
-   Map_1_Key_17 : aliased constant String := "ending";
-   Map_1_Key_18 : aliased constant String := "show-lasts";
-   Map_1_Key_19 : aliased constant String := "template";
-   Map_1_Key_20 : aliased constant String := "render";
-   Map_1_Keys : constant array (0 .. 20) of access constant String
+   Map_1_Key_13 : aliased constant String := "separator";
+   Map_1_Key_14 : aliased constant String := "show-beginning";
+   Map_1_Key_15 : aliased constant String := "beginning";
+   Map_1_Key_16 : aliased constant String := "show-firsts";
+   Map_1_Key_17 : aliased constant String := "show-ending";
+   Map_1_Key_18 : aliased constant String := "ending";
+   Map_1_Key_19 : aliased constant String := "show-lasts";
+   Map_1_Key_20 : aliased constant String := "template";
+   Map_1_Key_21 : aliased constant String := "render";
+   Map_1_Keys : constant array (0 .. 21) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -62,8 +64,9 @@ private
          Map_1_Key_17'Access,
          Map_1_Key_18'Access,
          Map_1_Key_19'Access,
-         Map_1_Key_20'Access);
-   Map_1_Elements : constant array (0 .. 20) of Command
+         Map_1_Key_20'Access,
+         Map_1_Key_21'Access);
+   Map_1_Elements : constant array (0 .. 21) of Command
      := (Backward,
          Backward,
          Backward,
@@ -77,6 +80,7 @@ private
          Length_Limit,
          Length_Limit,
          Length_Limit,
+         Separator,
          Show_Beginning,
          Show_Beginning,
          Show_Beginning,

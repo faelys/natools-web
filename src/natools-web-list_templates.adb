@@ -89,6 +89,9 @@ package body Natools.Web.List_Templates is
          when Commands.Show_Ending =>
             State.Shown_End := Ending;
 
+         when Commands.Separator =>
+            Set_Or_Reset (State.Separator, Arguments);
+
          when Commands.Template =>
             State.Template := S_Expressions.Caches.Move (Arguments);
       end case;
@@ -131,6 +134,9 @@ package body Natools.Web.List_Templates is
 
          when Commands.Show_Ending =>
             State.Shown_End := Ending;
+
+         when Commands.Separator =>
+            State.Separator.Reset;
 
          when Commands.Template =>
             null;
@@ -212,6 +218,10 @@ package body Natools.Web.List_Templates is
                   Ending_Showing_Loop
                     (Iterator.Previous (Position), Remaining_Depth - 1);
             end case;
+
+            if not Param.Separator.Is_Empty then
+               Exchange.Append (Param.Separator.Query);
+            end if;
          end if;
 
          declare
@@ -234,6 +244,10 @@ package body Natools.Web.List_Templates is
          end if;
 
          Exit_Loop := False;
+
+         if Rendered > 0 and then not Param.Separator.Is_Empty then
+            Exchange.Append (Param.Separator.Query);
+         end if;
 
          declare
             Template_Copy : S_Expressions.Caches.Cursor := Param.Template;

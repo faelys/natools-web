@@ -41,6 +41,7 @@ package Natools.Web.List_Templates is
       Shown_End : List_End := Beginning;
       If_Empty : S_Expressions.Atom_Refs.Immutable_Reference;
       Limit : Count := 0;
+      Separator : S_Expressions.Atom_Refs.Immutable_Reference;
       Template : S_Expressions.Caches.Cursor;
    end record;
 

@@ -10,6 +10,7 @@
       Forward,
       If_Empty,
       Length_Limit,
+      Separator,
       Show_Beginning,
       Show_Ending,
       Template);")
@@ -24,6 +25,7 @@
          (Forward  forward forwards)
          (If_Empty if-empty)
          (Length_Limit length-limit limit max maximum)
+         (Separator  separator)
          (Show_Beginning  show-beginning beginning show-firsts)
          (Show_Ending  show-ending ending show-lasts)
          (Template  template render))))

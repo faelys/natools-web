@@ -1,4 +1,4 @@
---  Generated at 2015-07-26 11:31:34 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-07-28 19:04:59 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-list_templates-maps.sx
 
 with Natools.Static_Maps.Web.List_Templates.Commands;
