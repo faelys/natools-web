@@ -4,31 +4,35 @@
       (comments
          "<p>Empty list:"
          (list (limit 2) (ellipsis " …") (template " |") (if-empty " ∅"))
+         (list (limit 2) (ellipsis-prefix " …") (template " |") (if-empty " ∅"))
+         (list (limit 2) show-ending (template " |") (if-empty " ∅"))
          "</p>\n")
       (tags tags
          "<p>Template list:"
          (all-descendants (if-empty " ∅") (template " " (name (-1))))
-         "</p>\n<p>Reverse:"
-         (all-descendants reverse (template " " (name (-1))))
+         "</p>\n<p>Reverse: "
+         (all-descendants reverse (separator ", ") (template (name (-1))))
          "</p>\n<p>Beginning:"
          (all-descendants (limit 2) (ellipsis " …") (template " " (name (-1))))
-         "</p>\n<p>Reverse beginning:"
+         "</p>\n<p>Reverse beginning: "
          (all-descendants (reverse) (limit 2)
             (show-beginning) show-ending show-beginning
             (ellipsis-prefix "[") (ellipsis-suffix "]")
-            (template " " (name (-1))))
+            (separator " ")
+            (template (name (-1))))
          "</p>\n<p>Tight limit:"
          (all-descendants (limit 5) (ellipsis " …") (template " " (name (-1))))
          "</p>\n<p>Useless <code>show-ending</code>:"
          (all-descendants (show-ending) (template " " (name (-1))))
          "</p>\n<p>End of list:"
-         (all-descendants show-ending (limit 2)
-            (ellipsis-prefix " …") (ellipsis-suffix ".")
+         (all-descendants show-ending (limit 2) (separator ", ")
+            (ellipsis-prefix " …") (ellipsis-suffix ".") separator
             (template " " (name (-1))))
-         "</p>\n<p>End of reverse list:"
-         (all-descendants show-ending reverse (limit 2) (ellipsis-prefix " …")
-            (ellipsis-suffix ".")
-            (template " " (name (-1)))
+         "</p>\n<p>End of reverse list: "
+         (all-descendants show-ending reverse (limit 2)
+            (ellipsis-prefix "…") (ellipsis-suffix ".")
+            (separator " ")
+            (template (name (-1)))
             (ellipsis))
          "</p>\n<p>End of tightly-limited list:"
          (all-descendants show-ending (limit 5) (ellipsis-prefix " …")
