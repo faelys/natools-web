@@ -5,6 +5,8 @@
    type Command is
      (Unknown_Command,
       Backward,
+      Ellipses_Are_Items,
+      Ellipses_Are_Not_Items,
       Ellipsis_Prefix,
       Ellipsis_Suffix,
       Forward,
@@ -20,6 +22,8 @@
       (not-found Unknown_Command)
       (nodes
          (Backward  backward backwards reverse)
+         (Ellipses_Are_Items  ellipses-are-items item-ellipses)
+         (Ellipses_Are_Not_Items  ellipses-are-not-items external-ellipses)
          (Ellipsis_Prefix  ellipsis-prefix)
          (Ellipsis_Suffix  ellipsis-suffix ellipsis)
          (Forward  forward forwards)

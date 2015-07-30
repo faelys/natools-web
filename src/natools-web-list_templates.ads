@@ -35,6 +35,7 @@ package Natools.Web.List_Templates is
    type List_End is (Beginning, Ending);
 
    type Parameters is record
+      Ellipses_Are_Items : Boolean := False;
       Ellipsis_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       Ellipsis_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Going : Direction := Forward;

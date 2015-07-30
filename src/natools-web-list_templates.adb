@@ -60,6 +60,12 @@ package body Natools.Web.List_Templates is
          when Commands.Backward =>
             State.Going := Backward;
 
+         when Commands.Ellipses_Are_Items =>
+            State.Ellipses_Are_Items := True;
+
+         when Commands.Ellipses_Are_Not_Items =>
+            State.Ellipses_Are_Items := False;
+
          when Commands.Ellipsis_Prefix =>
             Set_Or_Reset (State.Ellipsis_Prefix, Arguments);
 
@@ -113,6 +119,12 @@ package body Natools.Web.List_Templates is
 
          when Commands.Backward =>
             State.Going := Backward;
+
+         when Commands.Ellipses_Are_Items =>
+            State.Ellipses_Are_Items := True;
+
+         when Commands.Ellipses_Are_Not_Items =>
+            State.Ellipses_Are_Items := False;
 
          when Commands.Ellipsis_Prefix =>
             State.Ellipsis_Prefix.Reset;
@@ -204,6 +216,11 @@ package body Natools.Web.List_Templates is
         (Position : in Iterators.Cursor; Exit_Loop : out Boolean);
 
       Rendered : Count := 0;
+      Extra_Items : constant Count
+        := (if Param.Ellipses_Are_Items
+            then (if Param.Ellipsis_Prefix.Is_Empty then 0 else 1)
+               + (if Param.Ellipsis_Suffix.Is_Empty then 0 else 1)
+            else 0);
 
       procedure Ending_Showing_Loop
         (Position : in Iterators.Cursor;
@@ -284,9 +301,11 @@ package body Natools.Web.List_Templates is
 
             case Param.Going is
                when Backward =>
-                  Ending_Showing_Loop (Iterator.First, Param.Limit);
+                  Ending_Showing_Loop
+                    (Iterator.First, Param.Limit - Extra_Items);
                when Forward =>
-                  Ending_Showing_Loop (Iterator.Last, Param.Limit);
+                  Ending_Showing_Loop
+                    (Iterator.Last, Param.Limit - Extra_Items);
             end case;
 
             if not Param.Ellipsis_Suffix.Is_Empty then
@@ -297,7 +316,9 @@ package body Natools.Web.List_Templates is
          end if;
       end if;
 
-      if Param.Limit > 0 and then not Param.Ellipsis_Prefix.Is_Empty then
+      if Param.Limit > 0
+        and then (not Param.Ellipsis_Prefix.Is_Empty or else Extra_Items > 0)
+      then
          if Seen = 0 then
             for I in Iterator loop
                Seen := Seen + 1;
@@ -314,7 +335,11 @@ package body Natools.Web.List_Templates is
          end if;
 
          if Seen > Param.Limit then
-            Exchange.Append (Param.Ellipsis_Prefix.Query);
+            if not Param.Ellipsis_Prefix.Is_Empty then
+               Exchange.Append (Param.Ellipsis_Prefix.Query);
+            end if;
+
+            Rendered := Extra_Items;
          end if;
       end if;
 
