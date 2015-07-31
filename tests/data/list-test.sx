@@ -11,11 +11,12 @@
          "<p>Template list:"
          (all-descendants (if-empty " ∅") (template " " (name (-1))))
          "</p>\n<p>Reverse: "
-         (all-descendants reverse (separator ", ") (template (name (-1))))
+         (all-descendants reverse item-ellipses (separator ", ")
+           (template (name (-1))))
          "</p>\n<p>Beginning:"
          (all-descendants (limit 2) (ellipsis " …") (template " " (name (-1))))
          "</p>\n<p>Reverse beginning: "
-         (all-descendants (reverse) (limit 2)
+         (all-descendants (reverse) (limit 2) ellipses-are-not-items
             (show-beginning) show-ending show-beginning
             (ellipsis-prefix "[") (ellipsis-suffix "]")
             (separator " ")
@@ -29,8 +30,8 @@
             (ellipsis-prefix " …") (ellipsis-suffix ".") separator
             (template " " (name (-1))))
          "</p>\n<p>End of reverse list: "
-         (all-descendants show-ending reverse (limit 2)
-            (ellipsis-prefix "…") (ellipsis-suffix ".")
+         (all-descendants show-ending reverse (limit 2) (external-ellipses)
+            (ellipsis-prefix "… ") (ellipsis-suffix ".")
             (separator " ")
             (template (name (-1)))
             (ellipsis))
@@ -39,6 +40,72 @@
             (template " " (name (-1))))
          "</p>\n<p>End of smaller-than-limit list:"
          (all-descendants show-ending (limit 6) (ellipsis-prefix " …")
+            (template " " (name (-1))))
+         "</p>\n<p>Large limit with item ellipsis suffix:"
+         (all-descendants (limit 6) (ellipsis " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Tight limit with item ellipsis suffix:"
+         (all-descendants (limit 5) (ellipsis " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Small limit with item ellipsis suffix:"
+         (all-descendants (limit 4) (ellipsis " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Large limit with item ellipsis prefix:"
+         (all-descendants (limit 6) (ellipsis-prefix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Tight limit with item ellipsis prefix:"
+         (all-descendants (limit 5) (ellipsis-prefix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Small limit with item ellipsis prefix:"
+         (all-descendants (limit 4) (ellipsis-prefix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Large limit with item ellipses:"
+         (all-descendants (limit 6) 
+            (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Tight limit with item ellipses:"
+         (all-descendants (limit 5) 
+            (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Small limit with item ellipses:"
+         (all-descendants (limit 4) 
+            (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Large ending limit with item ellipsis suffix:"
+         (all-descendants show-ending (limit 6)
+            (ellipsis " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Tight ending limit with item ellipsis suffix:"
+         (all-descendants show-ending (limit 5)
+            (ellipsis " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Small ending limit with item ellipsis suffix:"
+         (all-descendants show-ending (limit 4)
+            (ellipsis " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Large ending limit with item ellipsis prefix:"
+         (all-descendants show-ending (limit 6)
+            (ellipsis-prefix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Tight ending limit with item ellipsis prefix:"
+         (all-descendants show-ending (limit 5)
+            (ellipsis-prefix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Small ending limit with item ellipsis prefix:"
+         (all-descendants show-ending (limit 4)
+            (ellipsis-prefix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Large ending limit with item ellipses:"
+         (all-descendants show-ending (limit 6) 
+            (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Tight ending limit with item ellipses:"
+         (all-descendants show-ending (limit 5) 
+            (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
+            (template " " (name (-1))))
+         "</p>\n<p>Small ending limit with item ellipses:"
+         (all-descendants show-ending (limit 4) 
+            (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
             (template " " (name (-1))))
          "</p>\n"))
    (sidebar ""))
