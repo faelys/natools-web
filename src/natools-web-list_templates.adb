@@ -89,11 +89,17 @@ package body Natools.Web.List_Templates is
                end;
             end if;
 
+         when Commands.Prefix =>
+            Set_Or_Reset (State.Prefix, Arguments);
+
          when Commands.Show_Beginning =>
             State.Shown_End := Beginning;
 
          when Commands.Show_Ending =>
             State.Shown_End := Ending;
+
+         when Commands.Suffix =>
+            Set_Or_Reset (State.Suffix, Arguments);
 
          when Commands.Separator =>
             Set_Or_Reset (State.Separator, Arguments);
@@ -141,6 +147,9 @@ package body Natools.Web.List_Templates is
          when Commands.Length_Limit =>
             State.Limit := 0;
 
+         when Commands.Prefix =>
+            State.Prefix.Reset;
+
          when Commands.Show_Beginning =>
             State.Shown_End := Beginning;
 
@@ -149,6 +158,9 @@ package body Natools.Web.List_Templates is
 
          when Commands.Separator =>
             State.Separator.Reset;
+
+         when Commands.Suffix =>
+            State.Suffix.Reset;
 
          when Commands.Template =>
             null;
@@ -295,6 +307,10 @@ package body Natools.Web.List_Templates is
          end if;
 
          if Seen > Param.Limit then
+            if not Param.Prefix.Is_Empty then
+               Exchange.Append (Param.Prefix.Query);
+            end if;
+
             if not Param.Ellipsis_Prefix.Is_Empty then
                Exchange.Append (Param.Ellipsis_Prefix.Query);
             end if;
@@ -310,6 +326,10 @@ package body Natools.Web.List_Templates is
 
             if not Param.Ellipsis_Suffix.Is_Empty then
                Exchange.Append (Param.Ellipsis_Suffix.Query);
+            end if;
+
+            if not Param.Suffix.Is_Empty then
+               Exchange.Append (Param.Suffix.Query);
             end if;
 
             return;
@@ -334,12 +354,34 @@ package body Natools.Web.List_Templates is
             end if;
          end if;
 
+         if not Param.Prefix.Is_Empty then
+            Exchange.Append (Param.Prefix.Query);
+         end if;
+
+
          if Seen > Param.Limit then
             if not Param.Ellipsis_Prefix.Is_Empty then
                Exchange.Append (Param.Ellipsis_Prefix.Query);
             end if;
 
             Rendered := Extra_Items;
+         end if;
+      elsif not Param.Prefix.Is_Empty then
+         if Seen = 0 then
+            for I in Iterator loop
+               Seen := Seen + 1;
+               exit;
+            end loop;
+         end if;
+
+         if Seen = 0 then
+            if not Param.If_Empty.Is_Empty then
+               Exchange.Append (Param.If_Empty.Query);
+            end if;
+
+            return;
+         else
+            Exchange.Append (Param.Prefix.Query);
          end if;
       end if;
 
@@ -360,6 +402,10 @@ package body Natools.Web.List_Templates is
       if Rendered = 0 then
          if not Param.If_Empty.Is_Empty then
             Exchange.Append (Param.If_Empty.Query);
+         end if;
+      else
+         if not Param.Suffix.Is_Empty then
+            Exchange.Append (Param.Suffix.Query);
          end if;
       end if;
    end Render;

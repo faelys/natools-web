@@ -12,9 +12,11 @@
       Forward,
       If_Empty,
       Length_Limit,
+      Prefix,
       Separator,
       Show_Beginning,
       Show_Ending,
+      Suffix,
       Template);")
    (Command
       (hash-package Natools.Static_Maps.Web.List_Templates.Commands)
@@ -29,7 +31,9 @@
          (Forward  forward forwards)
          (If_Empty if-empty)
          (Length_Limit length-limit limit max maximum)
+         (Prefix  prefix)
          (Separator  separator)
          (Show_Beginning  show-beginning beginning show-firsts)
          (Show_Ending  show-ending ending show-lasts)
+         (Suffix  suffix)
          (Template  template render))))
