@@ -6,6 +6,8 @@
          (list (limit 2) (ellipsis " …") (template " |") (if-empty " ∅"))
          (list (limit 2) (ellipsis-prefix " …") (template " |") (if-empty " ∅"))
          (list (limit 2) show-ending (template " |") (if-empty " ∅"))
+         (list (limit 2) (if-empty " ∅") (prefix " [") (template "."))
+         (list (limit 2) (if-empty " ∅") (suffix "]") (template "."))
          "</p>\n")
       (tags tags
          "<p>Template list:"
@@ -18,7 +20,7 @@
          "</p>\n<p>Reverse beginning: "
          (all-descendants (reverse) (limit 2) ellipses-are-not-items
             (show-beginning) show-ending show-beginning
-            (ellipsis-prefix "[") (ellipsis-suffix "]")
+            (ellipsis-prefix "[") (ellipsis-suffix "]") suffix
             (separator " ")
             (template (name (-1))))
          "</p>\n<p>Tight limit:"
@@ -31,10 +33,10 @@
             (template " " (name (-1))))
          "</p>\n<p>End of reverse list: "
          (all-descendants show-ending reverse (limit 2) (external-ellipses)
-            (ellipsis-prefix "… ") (ellipsis-suffix ".")
+            (ellipsis-prefix "… ") (ellipsis-suffix ".") (prefix "*")
             (separator " ")
             (template (name (-1)))
-            (ellipsis))
+            (ellipsis) prefix)
          "</p>\n<p>End of tightly-limited list:"
          (all-descendants show-ending (limit 5) (ellipsis-prefix " …")
             (template " " (name (-1))))
@@ -60,15 +62,15 @@
          (all-descendants (limit 4) (ellipsis-prefix " …") (ellipses-are-items)
             (template " " (name (-1))))
          "</p>\n<p>Large limit with item ellipses:"
-         (all-descendants (limit 6) 
+         (all-descendants (limit 6)
             (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
             (template " " (name (-1))))
          "</p>\n<p>Tight limit with item ellipses:"
-         (all-descendants (limit 5) 
+         (all-descendants (limit 5)
             (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
             (template " " (name (-1))))
          "</p>\n<p>Small limit with item ellipses:"
-         (all-descendants (limit 4) 
+         (all-descendants (limit 4)
             (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
             (template " " (name (-1))))
          "</p>\n<p>Large ending limit with item ellipsis suffix:"
@@ -96,17 +98,29 @@
             (ellipsis-prefix " …") (ellipses-are-items)
             (template " " (name (-1))))
          "</p>\n<p>Large ending limit with item ellipses:"
-         (all-descendants show-ending (limit 6) 
+         (all-descendants show-ending (limit 6)
             (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
             (template " " (name (-1))))
          "</p>\n<p>Tight ending limit with item ellipses:"
-         (all-descendants show-ending (limit 5) 
+         (all-descendants show-ending (limit 5)
             (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
             (template " " (name (-1))))
          "</p>\n<p>Small ending limit with item ellipses:"
-         (all-descendants show-ending (limit 4) 
+         (all-descendants show-ending (limit 4)
             (ellipsis-prefix " …") (ellipsis-suffix " …") (ellipses-are-items)
             (template " " (name (-1))))
+         "</p>\n<p>Beginning of list with prefix and suffix:"
+         (all-descendants ellipses-are-items (limit 3)
+            (prefix " [") (suffix "]") (separator " ") (ellipsis-suffix " …")
+            (template (name (-1))))
+         "</p>\n<p>Ending of list with prefix and suffix:"
+         (all-descendants show-ending (limit 3)
+            (prefix " [") (suffix "]") (separator " ") (ellipsis-prefix "… ")
+            (template (name (-1))))
+         "</p>\n<p>Unlimited list with prefix and suffix:"
+         (all-descendants show-ending
+            (prefix " [") (suffix "]") (separator " ")
+            (template (name (-1))))
          "</p>\n"))
    (sidebar ""))
 (comments (backend comments list-test))
