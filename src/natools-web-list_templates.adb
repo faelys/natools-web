@@ -233,6 +233,7 @@ package body Natools.Web.List_Templates is
             then (if Param.Ellipsis_Prefix.Is_Empty then 0 else 1)
                + (if Param.Ellipsis_Suffix.Is_Empty then 0 else 1)
             else 0);
+      Is_First : Boolean := True;
 
       procedure Ending_Showing_Loop
         (Position : in Iterators.Cursor;
@@ -274,7 +275,7 @@ package body Natools.Web.List_Templates is
 
          Exit_Loop := False;
 
-         if Rendered > 0 and then not Param.Separator.Is_Empty then
+         if not Is_First and then not Param.Separator.Is_Empty then
             Exchange.Append (Param.Separator.Query);
          end if;
 
@@ -285,6 +286,7 @@ package body Natools.Web.List_Templates is
          end;
 
          Rendered := Rendered + 1;
+         Is_First := False;
       end Loop_Body;
 
       Exit_Loop : Boolean;
