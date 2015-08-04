@@ -17,6 +17,16 @@
 ------------------------------------------------------------------------------
 -- Natools.Web.List_Templates provides an abstraction around list rendering --
 -- parameters, and a generic procedure to use it.                           --
+-- When the list is empty, only If_Empty is output, otherwise the following --
+-- scheme is rendered:                                                      --
+-- <prefix> [<ellipsis_prefix>] <item_1> <separator> <item_2> ...           --
+--    ... <separator> <item_n> [<ellipsis_suffix>] <suffix>                 --
+-- The optional ellipses are output when the list is only partially output. --
+-- Ellipses_Are_Items controls whether the non-empty ellipses count towards --
+-- the given limit.                                                         --
+-- Shown_End controls whether partially rendered lists omit items at the    --
+-- beginning or at the end of the displayed list (i.e. after taking into    --
+-- account Going).                                                          --
 ------------------------------------------------------------------------------
 
 with Ada.Containers;
