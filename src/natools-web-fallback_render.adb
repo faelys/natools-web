@@ -104,6 +104,26 @@ begin
             end;
          end if;
 
+      when Commands.If_Has_Element =>
+         if Re_Enter = null then
+            Report_Unknown_Command;
+         elsif Arguments.Current_Event = S_Expressions.Events.Add_Atom
+           and then Elements.Contains (Arguments.Current_Atom)
+         then
+            Arguments.Next;
+            Re_Enter (Exchange, Arguments);
+         end if;
+
+      when Commands.If_Has_Not_Element =>
+         if Re_Enter = null then
+            Report_Unknown_Command;
+         elsif Arguments.Current_Event = S_Expressions.Events.Add_Atom
+           and then not Elements.Contains (Arguments.Current_Atom)
+         then
+            Arguments.Next;
+            Re_Enter (Exchange, Arguments);
+         end if;
+
       when Commands.Parameter =>
          if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
             Escapes.Write

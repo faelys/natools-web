@@ -8,6 +8,8 @@
       Element,
       Element_Or_Template,
       Filter,
+      If_Has_Element,
+      If_Has_Not_Element,
       Parameter,
       Set_MIME_Type,
       Tags,
@@ -21,6 +23,8 @@
          (Element   element)
          (Element_Or_Template   render element-or-template)
          (Filter   filter)
+         (If_Has_Element   if-has-element)
+         (If_Has_Not_Element   if-has-not-element)
          (Parameter   parameter)
          (Set_MIME_Type   mime-type)
          (Tags   pagelist page-list tag tags)
