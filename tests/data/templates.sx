@@ -20,6 +20,8 @@
 "    </div>
     <div class=\"footer\">\n"
 (element footer "<p>Default footer: <a href=\"/index\">return to index</a></p>\n")
+(if-has-element footer "<p><a href=\"/index\">/</a></p>\n")
+(if-has-not-element main-text "<p>No main text.</p>\n")
 "    </div>
   </body>
 </html>\n")
