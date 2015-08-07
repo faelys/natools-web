@@ -467,6 +467,8 @@ package body Natools.Web.Sites is
          Object.Default_Template := S_Expressions.Atom_Ref_Constructors.Create
            (S_Expressions.To_Atom ("html"));
       end if;
+
+      Object.Load_Date := Ada.Calendar.Clock;
    end Reload;
 
 
@@ -684,6 +686,12 @@ package body Natools.Web.Sites is
          return S_Expressions.Caches.Move (Expression);
       end if;
    end Get_Template;
+
+
+   function Load_Date (Object : in Site) return Ada.Calendar.Time is
+   begin
+      return Object.Load_Date;
+   end Load_Date;
 
 
    function Named_Element_Map

@@ -141,7 +141,8 @@ package body Natools.Web.Sites.Holders is
          declare
             Old_Site : constant Site_Refs.Accessor := Parent.Ref.Query;
             New_Site : constant Site_Refs.Data_Access := new Site'
-              (Backends => Old_Site.Backends,
+              (Load_Date => Old_Site.Load_Date,
+               Backends => Old_Site.Backends,
                Constructors => Old_Site.Constructors,
                Default_Template => Old_Site.Default_Template,
                File_Name => Old_Site.File_Name,

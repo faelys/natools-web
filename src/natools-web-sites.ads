@@ -19,6 +19,7 @@
 -- pages (i.e. a website).                                                  --
 ------------------------------------------------------------------------------
 
+with Ada.Calendar;
 with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
@@ -98,6 +99,9 @@ package Natools.Web.Sites is
       --  in Elements, or Object templates, or fallback on Expression.
       --  If Name is empty and Lookup_Name is true, use the current atom in
       --  Expression as name.
+
+   function Load_Date (Object : in Site) return Ada.Calendar.Time;
+      --  Return the time at which the site was finished loading
 
    function Named_Element_Map
      (Object : in Site;
@@ -218,6 +222,7 @@ private
    end record;
 
    type Site is tagged limited record
+      Load_Date : Ada.Calendar.Time;
       Backends : Backend_Maps.Updatable_Map;
       Constructors : aliased Constructors_In_Site;
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
