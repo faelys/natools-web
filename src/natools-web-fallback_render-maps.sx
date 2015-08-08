@@ -10,6 +10,7 @@
       Filter,
       If_Has_Element,
       If_Has_Not_Element,
+      Load_Date,
       Parameter,
       Set_MIME_Type,
       Tags,
@@ -25,6 +26,7 @@
          (Filter   filter)
          (If_Has_Element   if-has-element)
          (If_Has_Not_Element   if-has-not-element)
+         (Load_Date   load-date)
          (Parameter   parameter)
          (Set_MIME_Type   mime-type)
          (Tags   pagelist page-list tag tags)

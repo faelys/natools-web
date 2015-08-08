@@ -1,4 +1,4 @@
---  Generated at 2015-08-05 17:15:15 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-08-08 16:35:31 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-fallback_render-maps.sx
 
 package Natools.Static_Maps.Web.Fallback_Render is
@@ -12,6 +12,7 @@ package Natools.Static_Maps.Web.Fallback_Render is
       Filter,
       If_Has_Element,
       If_Has_Not_Element,
+      Load_Date,
       Parameter,
       Set_MIME_Type,
       Tags,
@@ -31,14 +32,15 @@ private
    Map_1_Key_7 : aliased constant String := "filter";
    Map_1_Key_8 : aliased constant String := "if-has-element";
    Map_1_Key_9 : aliased constant String := "if-has-not-element";
-   Map_1_Key_10 : aliased constant String := "parameter";
-   Map_1_Key_11 : aliased constant String := "mime-type";
-   Map_1_Key_12 : aliased constant String := "pagelist";
-   Map_1_Key_13 : aliased constant String := "page-list";
-   Map_1_Key_14 : aliased constant String := "tag";
-   Map_1_Key_15 : aliased constant String := "tags";
-   Map_1_Key_16 : aliased constant String := "template";
-   Map_1_Keys : constant array (0 .. 16) of access constant String
+   Map_1_Key_10 : aliased constant String := "load-date";
+   Map_1_Key_11 : aliased constant String := "parameter";
+   Map_1_Key_12 : aliased constant String := "mime-type";
+   Map_1_Key_13 : aliased constant String := "pagelist";
+   Map_1_Key_14 : aliased constant String := "page-list";
+   Map_1_Key_15 : aliased constant String := "tag";
+   Map_1_Key_16 : aliased constant String := "tags";
+   Map_1_Key_17 : aliased constant String := "template";
+   Map_1_Keys : constant array (0 .. 17) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -55,8 +57,9 @@ private
          Map_1_Key_13'Access,
          Map_1_Key_14'Access,
          Map_1_Key_15'Access,
-         Map_1_Key_16'Access);
-   Map_1_Elements : constant array (0 .. 16) of Command
+         Map_1_Key_16'Access,
+         Map_1_Key_17'Access);
+   Map_1_Elements : constant array (0 .. 17) of Command
      := (Current_Time,
          Current_Time,
          Current_Time,
@@ -67,6 +70,7 @@ private
          Filter,
          If_Has_Element,
          If_Has_Not_Element,
+         Load_Date,
          Parameter,
          Set_MIME_Type,
          Tags,

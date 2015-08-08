@@ -124,6 +124,10 @@ begin
             Re_Enter (Exchange, Arguments);
          end if;
 
+      when Commands.Load_Date =>
+         S_Expressions.Templates.Dates.Render
+           (Exchange, Arguments, Exchange.Site.Load_Date);
+
       when Commands.Parameter =>
          if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
             Escapes.Write
