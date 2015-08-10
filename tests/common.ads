@@ -32,6 +32,10 @@ package Common is
      (Object : in out Holder;
       Update : in Natools.Web.Sites.Updates.Site_Update'Class);
 
+   overriding procedure Load
+     (Self : in out Holder;
+      File_Name : in String);
+
 
    Site : Holder;
 

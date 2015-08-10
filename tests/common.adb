@@ -39,8 +39,10 @@
 -- requeues and should therefore be a bit more efficient.                   --
 ------------------------------------------------------------------------------
 
+with Ada.Calendar.Formatting;
 with Ada.Text_IO;
 with Natools.Web.Exchanges;
+with Natools.Web.Sites.Test_Updates;
 with Syslog;
 
 package body Common is
@@ -90,6 +92,21 @@ package body Common is
       Holders.Queue (Holders.Holder (Object), Update);
       Holders.Queue (Holders.Holder (Object), Increment_Count'(null record));
    end Queue;
+
+
+   overriding procedure Load
+     (Self : in out Holder;
+      File_Name : in String)
+   is
+      package Holders renames Natools.Web.Sites.Holders;
+   begin
+      Holders.Load (Holders.Holder (Self), File_Name);
+      Holders.Queue
+        (Holders.Holder (Self),
+         Natools.Web.Sites.Test_Updates.Load_Date_Override'
+           (New_Date => Ada.Calendar.Formatting.Time_Of
+              (1980, 1, 1,   10, 30, 42)));
+   end Load;
 
 
 
