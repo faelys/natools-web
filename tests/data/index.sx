@@ -9,5 +9,6 @@
             "</ul>\n<p>Tags:"
             (tags tags (all-children (template
                "\n<a href=\"/tags/" (name (2)) "\">" (name (2)) "</a>")))
-            "</p>\n")))
+            "</p>\n"))
+      (load-date "<p>Data loaded on " (in-zone 0 (rfc-3339)) "</p>\n"))
    (sidebar ""))
