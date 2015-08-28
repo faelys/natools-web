@@ -243,7 +243,8 @@ package body Natools.Web.Comments is
    procedure Render is new S_Expressions.Interpreter_Loop
      (Sites.Exchange, Comment_Ref, Render_Comment_Position, Append);
 
-   procedure Render_List is new List_Templates.Render (Comment_Iterators);
+   procedure Render_List is new List_Templates.Render
+     (Cursor, Comment_Iterators);
 
    procedure Update is new S_Expressions.Interpreter_Loop
      (Comment_Data, Meaningless_Type, Update_Item);

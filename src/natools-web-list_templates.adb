@@ -222,10 +222,10 @@ package body Natools.Web.List_Templates is
       Param : in Parameters)
    is
       procedure Ending_Showing_Loop
-        (Position : in Iterators.Cursor;
+        (Position : in Cursor;
          Remaining_Depth : in Count);
       procedure Loop_Body
-        (Position : in Iterators.Cursor; Exit_Loop : out Boolean);
+        (Position : in Cursor; Exit_Loop : out Boolean);
 
       Rendered : Count := 0;
       Extra_Items : constant Count
@@ -236,7 +236,7 @@ package body Natools.Web.List_Templates is
       Is_First : Boolean := True;
 
       procedure Ending_Showing_Loop
-        (Position : in Iterators.Cursor;
+        (Position : in Cursor;
          Remaining_Depth : in Count) is
       begin
          if Remaining_Depth > 1 then
@@ -262,7 +262,7 @@ package body Natools.Web.List_Templates is
       end Ending_Showing_Loop;
 
       procedure Loop_Body
-        (Position : in Iterators.Cursor; Exit_Loop : out Boolean) is
+        (Position : in Cursor; Exit_Loop : out Boolean) is
       begin
          if Param.Limit > 0 and then Rendered >= Param.Limit then
             if not Param.Ellipsis_Suffix.Is_Empty then

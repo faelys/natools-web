@@ -200,13 +200,13 @@ package body Natools.Web.Tags is
      (Sites.Exchange, Tag_DB_Context, Render_Tag);
 
    procedure Render_Pages is new List_Templates.Render
-     (Page_Maps.Map_Iterator_Interfaces, Render_Page);
+     (Page_Maps.Cursor, Page_Maps.Map_Iterator_Interfaces, Render_Page);
 
    procedure Render_List is new List_Templates.Render
-     (Tag_List_Iterators);
+     (Tag_List_Cursor, Tag_List_Iterators);
 
    procedure Render_Tags is new List_Templates.Render
-     (Tag_Iterators);
+     (Tag_Contents, Tag_Iterators);
 
 
 
