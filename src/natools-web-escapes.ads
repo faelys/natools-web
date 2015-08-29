@@ -113,7 +113,7 @@ private
       --  Convert an escape set to an octet set
 
 
-   HTML_Attribute : constant Escape_Set := (others => True);
+   HTML_Attribute : constant Escape_Set := (Apos => False, others => True);
 
    HTML_Body : constant Escape_Set
      := (Gt_Lt | Amp => True, others => False);
