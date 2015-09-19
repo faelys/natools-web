@@ -9,6 +9,7 @@
       All_Elements,
       All_Leaves,
       Current_Element,
+      Current_Tag_List,
       Element_Count,
       Greater_Children,
       Greater_Descendants,
@@ -33,6 +34,7 @@
          (All_Elements   all-elements)
          (All_Leaves   all-leaves)
          (Current_Element   current-element)
+         (Current_Tag_List   current-tag-list)
          (Element_Count   element-count)
          (Greater_Children   greater-children)
          (Greater_Descendants   greater-descendants)

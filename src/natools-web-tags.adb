@@ -510,6 +510,7 @@ package body Natools.Web.Tags is
       end Re_Enter;
 
       package Commands renames Natools.Static_Maps.Web.Tags;
+      use type S_Expressions.Events.Event;
    begin
       case Commands.To_List_Command (S_Expressions.To_String (Name)) is
          when Commands.Unknown_List_Command =>
@@ -580,6 +581,17 @@ package body Natools.Web.Tags is
               (Exchange,
                Arguments,
                Integer (Tag_Maps.Element (Tag.Position).Length));
+
+         when Commands.Current_Tag_List =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               Render_List
+                 (Exchange,
+                  Tag_List_Iterator'
+                    (DB => Tag.DB,
+                     List => Tag.Caller_Tags.Internal,
+                     Prefix => Create_Ref (Arguments.Current_Atom)),
+                  List_Templates.Read_Parameters (Arguments));
+            end if;
 
          when Commands.Greater_Children =>
             Render_Tags
