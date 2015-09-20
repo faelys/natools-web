@@ -11,6 +11,17 @@
 (tag-page tags)
 (test-page test)
 (named-elements
+   (pages/news
+      (sidebar-extra
+         "<p>Tags:" (current-tag-list tags/ (render
+               " <a href=\"/tags/" (name (2)) "\">"
+               (element description (name (2)))
+               "</a>")) "</p>\n"
+         (tags pages/news
+            (lesser-elements reverse (limit 1)
+               (render "<p>Previous: " (render href) "</p>\n"))
+            (greater-elements (limit 1)
+               (render "<p>Next: " (render href) "</p>\n")))))
    (tags/topic1
       (description "topic I"))
    (tags/topic1/subtopic

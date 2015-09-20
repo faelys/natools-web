@@ -10,13 +10,7 @@
 (render sidebar
    "<h1>Side bar</h1>\n"
    (optional-date published "<p>Published on " (rfc-3339) "</p>\n")
-   "<p>Tags:" (tag-list tags/ (render
-         " <a href=\"/tags/" (name (2)) "\">"
-         (element description (name (2)))
-         "</a>")) "</p>\n"
-   (tags pages/news
-      (lesser-elements reverse (limit 1) (render "<p>Previous: " (render href) "</p>\n"))
-      (greater-elements (limit 1) (render "<p>Next: " (render href) "</p>\n"))))
+   (tag-list pages (render (element sidebar-extra ""))))
 "    </div>
     <div class=\"footer\">\n"
 (element footer "<p>Default footer: <a href=\"/index\">return to index</a></p>\n")
