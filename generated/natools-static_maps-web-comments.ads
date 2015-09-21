@@ -1,4 +1,4 @@
---  Generated at 2015-07-19 17:50:07 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2015-09-21 16:53:18 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -114,19 +114,25 @@ private
    Map_4_Key_0 : aliased constant String := "c_date";
    Map_4_Key_1 : aliased constant String := "c_filter";
    Map_4_Key_2 : aliased constant String := "c_name";
-   Map_4_Key_3 : aliased constant String := "c_mail";
-   Map_4_Key_4 : aliased constant String := "c_link";
-   Map_4_Key_5 : aliased constant String := "c_text";
-   Map_4_Keys : constant array (0 .. 5) of access constant String
+   Map_4_Key_3 : aliased constant String := "c_note";
+   Map_4_Key_4 : aliased constant String := "c_mail";
+   Map_4_Key_5 : aliased constant String := "c_link";
+   Map_4_Key_6 : aliased constant String := "c_text";
+   Map_4_Key_7 : aliased constant String := "c_title";
+   Map_4_Keys : constant array (0 .. 7) of access constant String
      := (Map_4_Key_0'Access,
          Map_4_Key_1'Access,
          Map_4_Key_2'Access,
          Map_4_Key_3'Access,
          Map_4_Key_4'Access,
-         Map_4_Key_5'Access);
-   Map_4_Elements : constant array (0 .. 5) of Item.Form.Enum
+         Map_4_Key_5'Access,
+         Map_4_Key_6'Access,
+         Map_4_Key_7'Access);
+   Map_4_Elements : constant array (0 .. 7) of Item.Form.Enum
      := (Item.Form.Date,
          Item.Form.Filter,
+         Item.Form.Atom,
+         Item.Form.Atom,
          Item.Form.Atom,
          Item.Form.Atom,
          Item.Form.Atom,

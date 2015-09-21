@@ -1298,7 +1298,7 @@ package body Natools.Web.Comments is
                   end;
                end if;
 
-            when Name | Mail =>
+            when Name | Mail | Class | Note | Title =>
                Preprocess_Atom (Comment.Atoms (I));
          end case;
       end loop;

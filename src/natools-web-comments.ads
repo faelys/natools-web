@@ -73,7 +73,7 @@ package Natools.Web.Comments is
 private
 
    package Comment_Atoms is
-      type Enum is (Name, Mail, Link, Text, Filter);
+      type Enum is (Name, Mail, Link, Text, Class, Note, Title, Filter);
       type Set is array (Enum) of S_Expressions.Atom_Refs.Immutable_Reference;
    end Comment_Atoms;
 

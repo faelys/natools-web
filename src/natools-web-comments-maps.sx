@@ -81,7 +81,7 @@
       (nodes
          (Item.Form.Date  c_date)
          (Item.Form.Filter  c_filter)
-         (Item.Form.Atom  c_name c_mail c_link c_text)))
+         (Item.Form.Atom  c_name c_note c_mail c_link c_text c_title)))
 
    (Item.Post_Action.Enum
       (hash-package Natools.Static_Maps.Web.Comments.Item_Actions)
