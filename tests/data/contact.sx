@@ -1,0 +1,31 @@
+(elements
+   (title "Contact Page")
+   (main-text (comments (list
+      (if-empty "<p>No entry.</p>\n")
+      (prefix "<table>\n  <tr>\n"
+         "    <th>Name</th>\n"
+         "    <th>Mail</th>\n"
+         "    <th>Link</th>\n"
+         "    <th>Class</th>\n"
+         "    <th>Note</th>\n"
+         "    <th>Title</th>\n"
+         "  </tr>\n")
+      (template
+         "  </tr>\n    <td>"
+         (name)
+         "</td>\n    <td>"
+         (mail)
+         "</td>\n    <td>"
+         (link)
+         "</td>\n    <td>"
+         (class)
+         "</td>\n    <td>"
+         (note)
+         "</td>\n    <td>"
+         (title)
+         "</td>\n  </tr>\n")
+      (suffix "</table>\n")))))
+(comments
+   (backend comments contact)
+   (filter comment-filter-blind)
+   (tags comments))

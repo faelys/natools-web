@@ -189,3 +189,13 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_text=Spam comment with wrong filter'
 chain_last_spam spam-wrong-filter.sx
 chain /fifth fifth-commented-2.html
+
+check /test version-4.txt
+chain /contact contact-0.html
+chain /contact/comments contact-303.html \
+    -F 'c_mail=nat@localhost' -F 'c_name=nat' \
+    -F 'c_note=Comment with all atoms' -F 'c_title=Test' \
+    -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_text=Full comment in test'
+chain_curl -F 'wait_version=5' "${BASE_URL}/test"
+chain /contact contact-1.html
