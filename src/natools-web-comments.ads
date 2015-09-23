@@ -93,6 +93,7 @@ private
       Id : S_Expressions.Atom_Refs.Immutable_Reference;
       Atoms : Comment_Atoms.Set;
       Flags : Comment_Flags.Set := (others => False);
+      Parent : Tags.Visible_Access;
    end record;
 
    procedure Preprocess
@@ -115,13 +116,16 @@ private
 
    type Comment_Container (Size : S_Expressions.Count) is record
       Data : Comment_Array (1 .. Size);
-      Parent : Tags.Visible_Access;
    end record;
 
    package Comment_Array_Refs is new References
      (Comment_Container,
       Storage_Pools.Access_In_Default_Pool'Storage_Pool,
       Storage_Pools.Access_In_Default_Pool'Storage_Pool);
+
+   procedure Set_Parent
+     (Container : in Comment_Array_Refs.Reference;
+      Parent : in Tags.Visible_Access);
 
 
    type Comment_Ref is new Tags.Visible with record
@@ -140,6 +144,7 @@ private
       Text_Filters : Containers.Atom_Array_Refs.Immutable_Reference;
       Default_Text_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
       Flags : List_Flags.Set := (others => False);
+      Parent : Web.Tags.Visible_Access;
    end record;
 
    overriding procedure Finalize (Object : in out Comment_List);
@@ -184,6 +189,7 @@ private
          Backend_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Parent_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Comments => Comment_Array_Refs.Null_Reference,
+         Parent => null,
          Post_Filter => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Tags => Containers.Atom_Array_Refs.Null_Immutable_Reference,
          Text_Filters => Containers.Atom_Array_Refs.Null_Immutable_Reference,

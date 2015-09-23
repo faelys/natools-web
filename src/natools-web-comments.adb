@@ -406,8 +406,8 @@ package body Natools.Web.Comments is
             Exchange.Append (Comment.Id.Query);
 
          when Parent =>
-            if Accessor.Parent /= null then
-               Tags.Render (Exchange, Accessor.Parent.all, Arguments);
+            if Comment.Parent /= null then
+               Tags.Render (Exchange, Comment.Parent.all, Arguments);
             end if;
 
          when Rank =>
@@ -460,16 +460,9 @@ package body Natools.Web.Comments is
                List_Templates.Read_Parameters (Arguments));
 
          when Parent =>
-            declare
-               use type Tags.Visible_Access;
-
-               Accessor : constant Comment_Array_Refs.Accessor
-                 := List.Comments.Query;
-            begin
-               if Accessor.Parent /= null then
-                  Tags.Render (Exchange, Accessor.Parent.all, Arguments);
-               end if;
-            end;
+            if not Tags."=" (List.Parent, null) then
+               Tags.Render (Exchange, List.Parent.all, Arguments);
+            end if;
 
          when Preview =>
             if Exchange.Parameter (Preview_Button) = ""
@@ -482,8 +475,7 @@ package body Natools.Web.Comments is
                Ref : constant Comment_Ref
                  := (List => Comment_Array_Refs.Create (new Comment_Container'
                        (Size => 1,
-                        Data => (1 => <>),
-                        Parent => List.Comments.Query.Parent)),
+                        Data => (1 => <>))),
                      Position => 1);
                Builder : Comment_Builder;
             begin
@@ -491,6 +483,7 @@ package body Natools.Web.Comments is
                Builder.Core.Offset := Ada.Calendar.Time_Zones.UTC_Time_Offset
                  (Builder.Core.Date);
                Builder.Core.Id := Preview_Id;
+               Builder.Core.Parent := List.Parent;
                Process_Form (Builder, Exchange, List);
                Preprocess (Builder.Core, List, Exchange.Site.all);
                Ref.List.Update.Data (1) := Builder.Core;
@@ -1532,7 +1525,7 @@ package body Natools.Web.Comments is
    overriding procedure Finalize (Object : in out Comment_List) is
    begin
       if not Object.Comments.Is_Empty then
-         Object.Comments.Update.Parent := null;
+         Set_Parent (Object.Comments, null);
          Object.Comments.Reset;
       end if;
    end Finalize;
@@ -1567,7 +1560,6 @@ package body Natools.Web.Comments is
             return Result : Comment_Container
               (S_Expressions.Offset (Map.Length))
             do
-               Result.Parent := Parent;
                for I in Result.Data'Range loop
                   Result.Data (I) := Comment_Maps.Element (Cursor);
                   Comment_Maps.Next (Cursor);
@@ -1589,6 +1581,7 @@ package body Natools.Web.Comments is
 
             if not Comment.Flags (Comment_Flags.Ignored) then
                Comment.Id := Create (Name);
+               Comment.Parent := Parent;
                Preprocess (Comment, Object, Builder);
 
                Map.Insert (Name, Comment, Position, Inserted);
@@ -1602,6 +1595,7 @@ package body Natools.Web.Comments is
       begin
          Backend.Iterate (Directory, Process'Access);
          Object.Comments := Comment_Array_Refs.Create (Create'Access);
+         Object.Parent := Parent;
       end;
 
       if not Object.Tags.Is_Empty then
@@ -1696,8 +1690,8 @@ package body Natools.Web.Comments is
       end Check_Method;
 
       if Exchange.Parameter (Preview_Button) /= "" then
-         if not Tags."=" (List.Comments.Query.Parent, null) then
-            Render_Default (Exchange, List.Comments.Query.Parent.all);
+         if not Tags."=" (List.Parent, null) then
+            Render_Default (Exchange, List.Parent.all);
          end if;
          return;
       elsif Exchange.Parameter (Submit_Button) = "" then
@@ -1724,8 +1718,8 @@ package body Natools.Web.Comments is
 
       case Builder.Action is
          when Force_Preview =>
-            if not Tags."=" (List.Comments.Query.Parent, null) then
-               Render_Default (Exchange, List.Comments.Query.Parent.all);
+            if not Tags."=" (List.Parent, null) then
+               Render_Default (Exchange, List.Parent.all);
             end if;
 
          when Parent_Redirect =>
@@ -1765,6 +1759,24 @@ package body Natools.Web.Comments is
       List := Empty_List;
       Update (Expression, List, Meaningless_Value);
    end Set;
+
+
+   procedure Set_Parent
+     (Container : in Comment_Array_Refs.Reference;
+      Parent : in Tags.Visible_Access) is
+   begin
+      if Container.Is_Empty then
+         return;
+      end if;
+
+      declare
+         Mutator : constant Comment_Array_Refs.Mutator := Container.Update;
+      begin
+         for I in Mutator.Data.Data'Range loop
+            Mutator.Data (I).Parent := Parent;
+         end loop;
+      end;
+   end Set_Parent;
 
 
 
