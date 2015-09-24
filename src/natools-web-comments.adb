@@ -136,6 +136,9 @@ package body Natools.Web.Comments is
    function Image (Name : Comment_Atoms.Enum) return String;
       --  Return a string representation of Name
 
+   function Next_Rank (List : Comment_List) return Positive;
+      --  Return the next rank for a comment in List (i.e. length + 1)
+
    procedure Parse_Action
      (Builder : in out Comment_Builder;
       Site : in Sites.Site;
@@ -263,6 +266,16 @@ package body Natools.Web.Comments is
       return Ada.Characters.Handling.To_Lower
         (Comment_Atoms.Enum'Image (Name));
    end Image;
+
+
+   function Next_Rank (List : Comment_List) return Positive is
+   begin
+      if List.Comments.Is_Empty then
+         return 1;
+      else
+         return List.Comments.Query.Data.Data'Length + 1;
+      end if;
+   end Next_Rank;
 
 
    function Value (Name : S_Expressions.Atom) return Comment_Atoms.Enum is
@@ -412,9 +425,7 @@ package body Natools.Web.Comments is
 
          when Rank =>
             S_Expressions.Templates.Integers.Render
-              (Exchange,
-               Arguments,
-               Integer (Context.Position));
+              (Exchange, Arguments, Comment.Rank);
       end case;
    end Render_Comment_Position;
 
@@ -484,6 +495,7 @@ package body Natools.Web.Comments is
                  (Builder.Core.Date);
                Builder.Core.Id := Preview_Id;
                Builder.Core.Parent := List.Parent;
+               Builder.Core.Rank := Next_Rank (List);
                Process_Form (Builder, Exchange, List);
                Preprocess (Builder.Core, List, Exchange.Site.all);
                Ref.List.Update.Data (1) := Builder.Core;
@@ -1595,6 +1607,7 @@ package body Natools.Web.Comments is
       begin
          Backend.Iterate (Directory, Process'Access);
          Object.Comments := Comment_Array_Refs.Create (Create'Access);
+         Update_Ranks (Object.Comments);
          Object.Parent := Parent;
       end;
 
@@ -1777,6 +1790,26 @@ package body Natools.Web.Comments is
          end loop;
       end;
    end Set_Parent;
+
+
+   procedure Update_Ranks (Container : in Comment_Array_Refs.Reference) is
+      Current_Rank : Positive := 1;
+   begin
+      if Container.Is_Empty then
+         return;
+      end if;
+
+      declare
+         Mutator : constant Comment_Array_Refs.Mutator := Container.Update;
+      begin
+         for I in Mutator.Data.Data'Range loop
+            Mutator.Data (I).Rank := Current_Rank;
+            Current_Rank := Current_Rank + 1;
+         end loop;
+
+         pragma Assert (Current_Rank = Mutator.Data.Data'Length + 1);
+      end;
+   end Update_Ranks;
 
 
 

@@ -94,6 +94,7 @@ private
       Atoms : Comment_Atoms.Set;
       Flags : Comment_Flags.Set := (others => False);
       Parent : Tags.Visible_Access;
+      Rank : Positive;
    end record;
 
    procedure Preprocess
@@ -126,6 +127,8 @@ private
    procedure Set_Parent
      (Container : in Comment_Array_Refs.Reference;
       Parent : in Tags.Visible_Access);
+
+   procedure Update_Ranks (Container : in Comment_Array_Refs.Reference);
 
 
    type Comment_Ref is new Tags.Visible with record
