@@ -98,7 +98,7 @@ package body Natools.Web.Comments is
 
    procedure Append
      (Exchange : in out Sites.Exchange;
-      Context : in Comment_Ref;
+      Context : in Comment_Data;
       Data : in S_Expressions.Atom);
       --  Append Data to Exchange, ignoring Context
 
@@ -172,9 +172,9 @@ package body Natools.Web.Comments is
       List : in Comment_List);
       --  Read form data in Exchange to fill Data
 
-   procedure Render_Comment_Position
+   procedure Render_Comment
      (Exchange : in out Sites.Exchange;
-      Context : in Comment_Ref;
+      Comment : in Comment_Data;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
 
@@ -244,7 +244,7 @@ package body Natools.Web.Comments is
      (Sites.Exchange, Comment_List, Render_List_Element, Append);
 
    procedure Render is new S_Expressions.Interpreter_Loop
-     (Sites.Exchange, Comment_Ref, Render_Comment_Position, Append);
+     (Sites.Exchange, Comment_Data, Render_Comment, Append);
 
    procedure Render_List is new List_Templates.Render
      (Cursor, Comment_Iterators);
@@ -302,7 +302,7 @@ package body Natools.Web.Comments is
 
    procedure Append
      (Exchange : in out Sites.Exchange;
-      Context : in Comment_Ref;
+      Context : in Comment_Data;
       Data : in S_Expressions.Atom)
    is
       pragma Unreferenced (Context);
@@ -311,9 +311,9 @@ package body Natools.Web.Comments is
    end Append;
 
 
-   procedure Render_Comment_Position
+   procedure Render_Comment
      (Exchange : in out Sites.Exchange;
-      Context : in Comment_Ref;
+      Comment : in Comment_Data;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
@@ -336,7 +336,7 @@ package body Natools.Web.Comments is
         (Exchange : in out Sites.Exchange;
          Expression : in out S_Expressions.Lockable.Descriptor'Class) is
       begin
-         Render (Expression, Exchange, Context);
+         Render (Expression, Exchange, Comment);
       end Re_Enter;
 
       procedure Render_Ref
@@ -347,7 +347,7 @@ package body Natools.Web.Comments is
          elsif Arguments.Current_Event
            in S_Expressions.Events.Add_Atom | S_Expressions.Events.Open_List
          then
-            Render (Arguments, Exchange, Context);
+            Render (Arguments, Exchange, Comment);
          end if;
       end Render_Ref;
 
@@ -363,8 +363,6 @@ package body Natools.Web.Comments is
             Found := False;
       end Value;
 
-      Accessor : constant Comment_Array_Refs.Accessor := Context.List.Query;
-      Comment : Comment_Data renames Accessor.Data.Data (Context.Position);
       S_Name : constant String := S_Expressions.To_String (Name);
    begin
       pragma Assert (Comment.Flags (Comment_Flags.Preprocessed));
@@ -383,7 +381,7 @@ package body Natools.Web.Comments is
                      Has_Id, Atom_Id);
 
                   if Has_Id and then Comment.Atoms (Atom_Id).Is_Empty then
-                     Render (Arguments, Exchange, Context);
+                     Render (Arguments, Exchange, Comment);
                   end if;
 
                elsif S_Name'Length > 3
@@ -394,7 +392,7 @@ package body Natools.Web.Comments is
                      Has_Id, Atom_Id);
 
                   if Has_Id and then not Comment.Atoms (Atom_Id).Is_Empty then
-                     Render (Arguments, Exchange, Context);
+                     Render (Arguments, Exchange, Comment);
                   end if;
 
                elsif S_Name /= "filter" then
@@ -427,7 +425,7 @@ package body Natools.Web.Comments is
             S_Expressions.Templates.Integers.Render
               (Exchange, Arguments, Comment.Rank);
       end case;
-   end Render_Comment_Position;
+   end Render_Comment;
 
 
    procedure Render_List_Element
@@ -483,11 +481,6 @@ package body Natools.Web.Comments is
             end if;
 
             declare
-               Ref : constant Comment_Ref
-                 := (List => Comment_Array_Refs.Create (new Comment_Container'
-                       (Size => 1,
-                        Data => (1 => <>))),
-                     Position => 1);
                Builder : Comment_Builder;
             begin
                Builder.Core.Date := Ada.Calendar.Clock;
@@ -498,8 +491,7 @@ package body Natools.Web.Comments is
                Builder.Core.Rank := Next_Rank (List);
                Process_Form (Builder, Exchange, List);
                Preprocess (Builder.Core, List, Exchange.Site.all);
-               Ref.List.Update.Data (1) := Builder.Core;
-               Render (Arguments, Exchange, Ref);
+               Render (Arguments, Exchange, Builder.Core);
             end;
 
          when Size =>
@@ -1387,7 +1379,9 @@ package body Natools.Web.Comments is
       Object : in Comment_Ref;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
-      Render (Expression, Exchange, Object);
+      Render
+        (Expression, Exchange,
+         Object.List.Query.Data.Data (Object.Position));
    end Render;
 
 
@@ -1822,7 +1816,7 @@ package body Natools.Web.Comments is
       Position : in Cursor;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
-      Render (Expression, Exchange, Position.Value);
+      Render (Exchange, Position.Value, Expression);
    end Render;
 
 
