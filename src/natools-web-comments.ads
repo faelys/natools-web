@@ -27,9 +27,7 @@ with Natools.Web.Tags;
 
 private with Ada.Calendar.Time_Zones;
 private with Ada.Finalization;
-private with Ada.Iterator_Interfaces;
-private with Natools.References;
-private with Natools.Storage_Pools;
+private with Natools.Constant_Indefinite_Ordered_Maps;
 private with Natools.Web.Containers;
 
 package Natools.Web.Comments is
@@ -113,27 +111,18 @@ private
       --  Serialize a comment into the given S_Expression stream
 
 
-   type Comment_Array is array (S_Expressions.Offset range <>) of Comment_Data;
-
-   type Comment_Container (Size : S_Expressions.Count) is record
-      Data : Comment_Array (1 .. Size);
-   end record;
-
-   package Comment_Array_Refs is new References
-     (Comment_Container,
-      Storage_Pools.Access_In_Default_Pool'Storage_Pool,
-      Storage_Pools.Access_In_Default_Pool'Storage_Pool);
+   package Comment_Maps is new Natools.Constant_Indefinite_Ordered_Maps
+     (S_Expressions.Atom, Comment_Data, S_Expressions."<");
 
    procedure Set_Parent
-     (Container : in Comment_Array_Refs.Reference;
+     (Container : in out Comment_Maps.Updatable_Map;
       Parent : in Tags.Visible_Access);
 
-   procedure Update_Ranks (Container : in Comment_Array_Refs.Reference);
+   procedure Update_Ranks (Container : in out Comment_Maps.Updatable_Map);
 
 
    type Comment_Ref is new Tags.Visible with record
-      List : Comment_Array_Refs.Reference;
-      Position : S_Expressions.Offset;
+      Position : Comment_Maps.Cursor;
    end record;
 
 
@@ -141,7 +130,7 @@ private
       Backend_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Backend_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Parent_Path : S_Expressions.Atom_Refs.Immutable_Reference;
-      Comments : Comment_Array_Refs.Reference;
+      Comments : Comment_Maps.Updatable_Map;
       Post_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
       Tags : Containers.Atom_Array_Refs.Immutable_Reference;
       Text_Filters : Containers.Atom_Array_Refs.Immutable_Reference;
@@ -153,45 +142,12 @@ private
    overriding procedure Finalize (Object : in out Comment_List);
 
 
-   type Cursor is record
-      Value : Comment_Ref;
-   end record;
-
-   function Has_Element (Position : Cursor) return Boolean
-     is (not Position.Value.List.Is_Empty
-         and then Position.Value.Position
-               in Position.Value.List.Query.Data.Data'Range);
-
-   procedure Render
-     (Exchange : in out Sites.Exchange;
-      Position : in Cursor;
-      Expression : in out S_Expressions.Lockable.Descriptor'Class);
-
-   package Comment_Iterators is new Ada.Iterator_Interfaces
-     (Cursor, Has_Element);
-
-   type Comment_Range is new Comment_Iterators.Reversible_Iterator with record
-      List : Comment_Array_Refs.Reference;
-   end record;
-
-   overriding function First (Object : Comment_Range) return Cursor;
-   overriding function Last (Object : Comment_Range) return Cursor;
-   overriding function Next (Object : Comment_Range; Position : Cursor)
-     return Cursor;
-   overriding function Previous (Object : Comment_Range; Position : Cursor)
-     return Cursor;
-
-
-   No_Comment : constant Comment_Ref
-     := (List => Comment_Array_Refs.Null_Reference,
-         Position => 0);
-
    Empty_List : constant Comment_List
      := (Ada.Finalization.Controlled with
          Backend_Name => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Backend_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Parent_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
-         Comments => Comment_Array_Refs.Null_Reference,
+         Comments => Comment_Maps.Empty_Updatable_Map,
          Parent => null,
          Post_Filter => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Tags => Containers.Atom_Array_Refs.Null_Immutable_Reference,
