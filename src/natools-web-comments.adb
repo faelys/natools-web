@@ -272,7 +272,7 @@ package body Natools.Web.Comments is
 
    function Next_Rank (List : Comment_List) return Positive is
    begin
-      return Natural (List.Comments.Length) + 1;
+      return List.Comments.Query.Length + 1;
    end Next_Rank;
 
 
@@ -472,7 +472,7 @@ package body Natools.Web.Comments is
          when Static_Maps.List.Command.List =>
             Render_List
               (Exchange,
-               List.Comments.Iterate,
+               List.Comments.Query.Iterate,
                List_Templates.Read_Parameters (Arguments));
 
          when Parent =>
@@ -503,9 +503,7 @@ package body Natools.Web.Comments is
 
          when Size =>
             S_Expressions.Templates.Integers.Render
-              (Exchange,
-               Arguments,
-               Integer (List.Comments.Length));
+              (Exchange, Arguments, List.Comments.Query.Length);
       end case;
    end Render_List_Element;
 
@@ -1386,7 +1384,9 @@ package body Natools.Web.Comments is
       Object : in Comment_Ref;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
-      Render (Expression, Exchange, Comment_Maps.Element (Object.Position));
+      Render
+        (Expression, Exchange,
+         Comment_Maps.Element (Object.Container.Query.Find (Object.Id)));
    end Render;
 
 
@@ -1536,8 +1536,8 @@ package body Natools.Web.Comments is
    overriding procedure Finalize (Object : in out Comment_List) is
    begin
       if not Object.Comments.Is_Empty then
-         Set_Parent (Object.Comments, null);
-         Object.Comments.Clear;
+         Object.Comments.Update.Orphan;
+         Object.Comments.Reset;
       end if;
    end Finalize;
 
@@ -1590,20 +1590,22 @@ package body Natools.Web.Comments is
          end Process;
       begin
          Backend.Iterate (Directory, Process'Access);
-         Object.Comments := Comment_Maps.Create (Map);
-         Update_Ranks (Object.Comments);
+         Object.Comments := Container_Refs.Create (new Comment_Container);
+         Object.Comments.Update.Initialize (Map, Parent);
          Object.Parent := Parent;
       end;
 
       if not Object.Tags.Is_Empty then
          declare
-            C : Comment_Maps.Cursor := Object.Comments.First;
+            C : Comment_Maps.Cursor := Object.Comments.Query.First;
+            Id : S_Expressions.Atom_Refs.Immutable_Reference;
          begin
             while Comment_Maps.Has_Element (C) loop
+               Id := Comment_Maps.Element (C).Id;
                Sites.Insert
                  (Builder,
-                  Tags.Create (Object.Tags.Query, Comment_Maps.Element (C).Id),
-                  Comment_Ref'(Position => C));
+                  Tags.Create (Object.Tags.Query, Id),
+                  Comment_Ref'(Object.Comments, Id));
                Comment_Maps.Next (C);
             end loop;
          end;
@@ -1780,5 +1782,57 @@ package body Natools.Web.Comments is
 
       pragma Assert (Current_Rank = Natural (Container.Length) + 1);
    end Update_Ranks;
+
+
+
+   -----------------------
+   -- Comment Container --
+   -----------------------
+
+   protected body Comment_Container is
+
+      procedure Initialize
+        (Data : in Comment_Maps.Unsafe_Maps.Map;
+         Parent : in Tags.Visible_Access) is
+      begin
+         Map := Comment_Maps.Create (Data);
+         Set_Parent (Map, Parent);
+         Update_Ranks (Map);
+         Comment_Container.Parent := Parent;
+      end Initialize;
+
+
+      procedure Orphan is
+      begin
+         Set_Parent (Map, null);
+         Parent := null;
+      end Orphan;
+
+      function Find (Id : S_Expressions.Atom_Refs.Immutable_Reference)
+        return Comment_Maps.Cursor is
+      begin
+         return Map.Find (Id.Query);
+      end Find;
+
+
+      function First return Comment_Maps.Cursor is
+      begin
+         return Map.First;
+      end First;
+
+
+      function Iterate return
+        Comment_Maps.Map_Iterator_Interfaces.Reversible_Iterator'Class is
+      begin
+         return Map.Iterate;
+      end Iterate;
+
+
+      function Length return Natural is
+      begin
+         return Natural (Map.Length);
+      end Length;
+
+   end Comment_Container;
 
 end Natools.Web.Comments;

@@ -28,6 +28,8 @@ with Natools.Web.Tags;
 private with Ada.Calendar.Time_Zones;
 private with Ada.Finalization;
 private with Natools.Constant_Indefinite_Ordered_Maps;
+private with Natools.References;
+private with Natools.Storage_Pools;
 private with Natools.Web.Containers;
 
 package Natools.Web.Comments is
@@ -121,8 +123,36 @@ private
    procedure Update_Ranks (Container : in out Comment_Maps.Updatable_Map);
 
 
+   protected type Comment_Container is
+      procedure Initialize
+        (Data : in Comment_Maps.Unsafe_Maps.Map;
+         Parent : in Tags.Visible_Access);
+
+      procedure Orphan;
+
+      function Find (Id : S_Expressions.Atom_Refs.Immutable_Reference)
+        return Comment_Maps.Cursor;
+
+      function First return Comment_Maps.Cursor;
+
+      function Iterate
+        return Comment_Maps.Map_Iterator_Interfaces.Reversible_Iterator'Class;
+
+      function Length return Natural;
+   private
+      Map : Comment_Maps.Updatable_Map;
+      Parent : Tags.Visible_Access;
+   end Comment_Container;
+
+   package Container_Refs is new References
+     (Comment_Container,
+      Storage_Pools.Access_In_Default_Pool'Storage_Pool,
+      Storage_Pools.Access_In_Default_Pool'Storage_Pool);
+
+
    type Comment_Ref is new Tags.Visible with record
-      Position : Comment_Maps.Cursor;
+      Container : Container_Refs.Reference;
+      Id : S_Expressions.Atom_Refs.Immutable_Reference;
    end record;
 
 
@@ -130,7 +160,7 @@ private
       Backend_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Backend_Path : S_Expressions.Atom_Refs.Immutable_Reference;
       Parent_Path : S_Expressions.Atom_Refs.Immutable_Reference;
-      Comments : Comment_Maps.Updatable_Map;
+      Comments : Container_Refs.Reference;
       Post_Filter : S_Expressions.Atom_Refs.Immutable_Reference;
       Tags : Containers.Atom_Array_Refs.Immutable_Reference;
       Text_Filters : Containers.Atom_Array_Refs.Immutable_Reference;
@@ -147,7 +177,7 @@ private
          Backend_Name => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Backend_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Parent_Path => S_Expressions.Atom_Refs.Null_Immutable_Reference,
-         Comments => Comment_Maps.Empty_Updatable_Map,
+         Comments => Container_Refs.Null_Reference,
          Parent => null,
          Post_Filter => S_Expressions.Atom_Refs.Null_Immutable_Reference,
          Tags => Containers.Atom_Array_Refs.Null_Immutable_Reference,
