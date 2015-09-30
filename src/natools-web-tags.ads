@@ -77,6 +77,12 @@ package Natools.Web.Tags is
 
    function Create (Builder : Tag_DB_Builder) return Tag_DB;
 
+   procedure Live_Register
+     (DB : in out Tag_DB;
+      Keys : in Tag_List;
+      Element : in Visible'Class);
+      --  Inefficiently register Element with the given Keys into DB
+
    procedure Render
      (Exchange : in out Sites.Exchange;
       DB : in Tag_DB;
