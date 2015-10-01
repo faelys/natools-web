@@ -50,6 +50,12 @@ package Natools.Web.Sites is
       Updater : in Updaters.Updater_Access);
       --  Register an updater to handle updates for Object
 
+   procedure Insert
+     (Object : in out Site;
+      Tags : in Web.Tags.Tag_List;
+      Visible : in Web.Tags.Visible'Class);
+      --  Inefficiently add to Object a new Visible with the given tags
+
    procedure Register
      (Object : in out Site;
       Name : in String;

@@ -399,6 +399,15 @@ package body Natools.Web.Sites is
    end Queue_Update;
 
 
+   procedure Insert
+     (Object : in out Site;
+      Tags : in Web.Tags.Tag_List;
+      Visible : in Web.Tags.Visible'Class) is
+   begin
+      Web.Tags.Live_Register (Object.Tags, Tags, Visible);
+   end Insert;
+
+
    procedure Register
      (Object : in out Site;
       Name : in String;
