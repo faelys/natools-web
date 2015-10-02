@@ -31,6 +31,7 @@ private with Natools.Constant_Indefinite_Ordered_Maps;
 private with Natools.References;
 private with Natools.Storage_Pools;
 private with Natools.Web.Containers;
+private with Natools.Web.Sites.Updates;
 
 package Natools.Web.Comments is
 
@@ -128,6 +129,8 @@ private
         (Data : in Comment_Maps.Unsafe_Maps.Map;
          Parent : in Tags.Visible_Access);
 
+      procedure Insert (Data : in Comment_Data);
+
       procedure Orphan;
 
       function Find (Id : S_Expressions.Atom_Refs.Immutable_Reference)
@@ -170,6 +173,17 @@ private
    end record;
 
    overriding procedure Finalize (Object : in out Comment_List);
+
+
+   type Comment_Inserter is new Sites.Updates.Site_Update with record
+      Container : Container_Refs.Reference;
+      New_Item : Comment_Data;
+      Tags : Containers.Atom_Array_Refs.Immutable_Reference;
+   end record;
+
+   overriding procedure Update
+     (Self : in Comment_Inserter;
+      Site : in out Sites.Site);
 
 
    Empty_List : constant Comment_List

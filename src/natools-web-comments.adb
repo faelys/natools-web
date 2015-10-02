@@ -48,7 +48,6 @@ with Natools.Web.Filters.Text_Blocks;
 with Natools.Web.Is_Valid_URL;
 with Natools.Web.List_Templates;
 with Natools.Web.Render_Default;
-with Natools.Web.Sites.Updates;
 
 package body Natools.Web.Comments is
 
@@ -1747,7 +1746,11 @@ package body Natools.Web.Comments is
                Redirect_Location (Builder.Core.Id.Query));
 
             if not Builder.Core.Flags (Comment_Flags.Ignored) then
-               Sites.Updates.Reload (Exchange.Site.all);
+               Preprocess (Builder.Core, List, Exchange.Site.all);
+               Exchange.Site.Queue_Update (Comment_Inserter'
+                 (Container => List.Comments,
+                  New_Item => Builder.Core,
+                  Tags => List.Tags));
             end if;
       end case;
    end Respond;
@@ -1802,11 +1805,21 @@ package body Natools.Web.Comments is
       end Initialize;
 
 
+      procedure Insert (Data : in Comment_Data) is
+         New_Item : Comment_Data := Data;
+      begin
+         New_Item.Parent := Parent;
+         Map := Comment_Maps.Insert (Map, New_Item.Id.Query, New_Item);
+         Update_Ranks (Map);
+      end Insert;
+
+
       procedure Orphan is
       begin
          Set_Parent (Map, null);
          Parent := null;
       end Orphan;
+
 
       function Find (Id : S_Expressions.Atom_Refs.Immutable_Reference)
         return Comment_Maps.Cursor is
@@ -1834,5 +1847,24 @@ package body Natools.Web.Comments is
       end Length;
 
    end Comment_Container;
+
+
+
+   ------------------
+   -- Site Updater --
+   ------------------
+
+   overriding procedure Update
+     (Self : in Comment_Inserter;
+      Site : in out Sites.Site) is
+   begin
+      Self.Container.Update.Insert (Self.New_Item);
+
+      if not Self.Tags.Is_Empty then
+         Site.Insert
+           (Tags.Create (Self.Tags.Query, Self.New_Item.Id),
+            Comment_Ref'(Self.Container, Self.New_Item.Id));
+      end if;
+   end Update;
 
 end Natools.Web.Comments;
