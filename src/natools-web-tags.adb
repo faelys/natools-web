@@ -847,7 +847,14 @@ package body Natools.Web.Tags is
             Render (Arguments, Exchange, Create (Tag_Maps.Key (Tag.Position)));
 
          when Commands.Parent =>
-            Render (Arguments, Exchange, Parent (Tag));
+            declare
+               Parent_Tag : constant Tag_Contents := Parent (Tag);
+            begin
+               if Tag_Maps.Has_Element (Parent_Tag.Position) then
+                  Render (Arguments, Exchange, Parent (Tag));
+               end if;
+            end;
+
 
          when Commands.Tags =>
             Render (Exchange, Tag.DB, Arguments, Tag.Caller_Tags);
