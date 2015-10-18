@@ -591,19 +591,41 @@ package body Natools.Web.Tags is
      (Exchange : in out Sites.Exchange;
       Name : in Processed_Name;
       First_Index : in S_Expressions.Atom;
-      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
-   is
-      use type S_Expressions.Events.Event;
-
-      First : constant S_Expressions.Offset
-        := To_Component_Index (Name, First_Index);
-      Last : constant S_Expressions.Offset
-        := (if Arguments.Current_Event = S_Expressions.Events.Add_Atom
-            then To_Component_Index (Name, Arguments.Current_Atom)
-            else First);
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
-      if First > 0 and Last > 0 then
-         Exchange.Append (Name_Components (Name, First, Last));
+      if First_Index'Length >= 1
+        and then First_Index (First_Index'First) = Character'Pos ('i')
+      then
+         declare
+            Index : constant S_Expressions.Offset := To_Component_Index
+              (Name, First_Index (First_Index'First + 1 .. First_Index'Last));
+            Image : constant String := S_Expressions.To_String
+              (Name_Components (Name, Index, Index));
+         begin
+            S_Expressions.Templates.Integers.Render
+              (Exchange, Arguments, Integer'Value (Image));
+         exception
+            when Constraint_Error =>
+               Log (Severities.Error, "Invalid numeric name """
+                 & Image & """ at index"
+                 & S_Expressions.Offset'Image (Index)
+                 & " (""" & S_Expressions.To_String (First_Index) & """)");
+         end;
+      else
+         declare
+            use type S_Expressions.Events.Event;
+
+            First : constant S_Expressions.Offset
+              := To_Component_Index (Name, First_Index);
+            Last : constant S_Expressions.Offset
+              := (if Arguments.Current_Event = S_Expressions.Events.Add_Atom
+                  then To_Component_Index (Name, Arguments.Current_Atom)
+                  else First);
+         begin
+            if First > 0 and Last > 0 then
+               Exchange.Append (Name_Components (Name, First, Last));
+            end if;
+         end;
       end if;
    end Render_Components;
 
