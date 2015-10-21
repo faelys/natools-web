@@ -17,6 +17,10 @@
                " <a href=\"/tags/" (name (2)) "\">"
                (element description (name (2)))
                "</a>")) "</p>\n"
+         (current-tag-list group (template
+            "<p>"
+            (name (i2 (suffix th (st 1) (nd 2) (rd 3))))
+            " group</p>\n"))
          (tags pages/news
             (lesser-elements reverse (limit 1)
                (render "<p>Previous: " (render href) "</p>\n"))

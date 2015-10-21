@@ -4,5 +4,5 @@
 <p>Data in the first page.</p>\n"
 (render page-comments))
    (title "First Page"))
-(tags (1 pages/news tags/topic1/subtopic))
+(tags (1 group/1 pages/news tags/topic1/subtopic))
 (comments (backend comments 1) (tags comments) (filter comment-filter-bad))
