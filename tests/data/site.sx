@@ -17,6 +17,11 @@
                " <a href=\"/tags/" (name (2)) "\">"
                (element description (name (2)))
                "</a>")) "</p>\n"
+         (current-tag-list reverse
+            (prefix "<p>Current_Tag_List issue test: ")
+            (suffix "</p>\n")
+            (separator " ")
+            (template (name (-1))))
          (current-tag-list group (template
             "<p>"
             (name (i2 (suffix th (st 1) (nd 2) (rd 3))))
