@@ -722,13 +722,20 @@ package body Natools.Web.Tags is
 
          when Commands.Current_Tag_List =>
             if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
-               Render_List
-                 (Exchange,
-                  Tag_List_Iterator'
-                    (DB => Tag.DB,
-                     List => Tag.Caller_Tags.Internal,
-                     Prefix => Create_Ref (Arguments.Current_Atom)),
-                  List_Templates.Read_Parameters (Arguments));
+               declare
+                  Prefix : constant S_Expressions.Atom_Refs.Immutable_Reference
+                    := Create_Ref (Arguments.Current_Atom);
+               begin
+                  Arguments.Next;
+
+                  Render_List
+                    (Exchange,
+                     Tag_List_Iterator'
+                       (DB => Tag.DB,
+                        List => Tag.Caller_Tags.Internal,
+                        Prefix => Prefix),
+                     List_Templates.Read_Parameters (Arguments));
+               end;
             end if;
 
          when Commands.Greater_Children =>
