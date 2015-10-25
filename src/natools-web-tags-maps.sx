@@ -15,6 +15,12 @@
       Greater_Descendants,
       Greater_Elements,
       Greater_Leaves,
+      If_Current,
+      If_Current_Leaf,
+      If_Current_Parent,
+      If_Not_Current,
+      If_Not_Current_Leaf,
+      If_Not_Current_Parent,
       Full_Name,
       Last_Name,
       Lesser_Children,
@@ -40,6 +46,12 @@
          (Greater_Descendants   greater-descendants)
          (Greater_Elements   greater-elements)
          (Greater_Leaves   greater-leaves)
+         (If_Current   if-current)
+         (If_Current_Leaf   if-current-leaf)
+         (If_Current_Parent   if-current-parent)
+         (If_Not_Current   if-not-current)
+         (If_Not_Current_Leaf   if-not-current-leaf)
+         (If_Not_Current_Parent   if-not-current-parent)
          (Full_Name   full-name)
          (Last_Name   last-name)
          (Lesser_Children   lesser-children)

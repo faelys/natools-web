@@ -31,6 +31,8 @@ package body Natools.Web.Tags is
    package Atom_Maps is new Ada.Containers.Indefinite_Ordered_Maps
      (S_Expressions.Atom, S_Expressions.Atom, S_Expressions.Less_Than);
 
+   type Tag_Status is (Not_In_Caller, Parent_In_Caller, Leaf_In_Caller);
+
    type Offset_Array is
      array (S_Expressions.Count range <>) of S_Expressions.Offset;
 
@@ -195,6 +197,9 @@ package body Natools.Web.Tags is
       Tag_Name : in S_Expressions.Atom;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
       --  Look-up for the tag named Tag_Name and render it
+
+   function Status (Tag : Tag_Contents) return Tag_Status;
+      --  Return tag status with regard to caller tag list
 
    function To_Component_Index
      (Name : Processed_Name;
@@ -796,6 +801,36 @@ package body Natools.Web.Tags is
                   Recursion => Leaves),
                List_Templates.Read_Parameters (Arguments));
 
+         when Commands.If_Current =>
+            if Status (Tag) /= Not_In_Caller then
+               Render (Arguments, Exchange, Tag);
+            end if;
+
+         when Commands.If_Current_Leaf =>
+            if Status (Tag) = Leaf_In_Caller then
+               Render (Arguments, Exchange, Tag);
+            end if;
+
+         when Commands.If_Current_Parent =>
+            if Status (Tag) = Parent_In_Caller then
+               Render (Arguments, Exchange, Tag);
+            end if;
+
+         when Commands.If_Not_Current =>
+            if Status (Tag) = Not_In_Caller then
+               Render (Arguments, Exchange, Tag);
+            end if;
+
+         when Commands.If_Not_Current_Leaf =>
+            if Status (Tag) /= Leaf_In_Caller then
+               Render (Arguments, Exchange, Tag);
+            end if;
+
+         when Commands.If_Not_Current_Parent =>
+            if Status (Tag) /= Parent_In_Caller then
+               Render (Arguments, Exchange, Tag);
+            end if;
+
          when Commands.Full_Name =>
             Exchange.Append (Tag_Maps.Key (Tag.Position));
 
@@ -917,6 +952,46 @@ package body Natools.Web.Tags is
    begin
       Render (Exchange, Page_Maps.Element (Position), Expression);
    end Render_Page;
+
+
+   function Status (Tag : Tag_Contents) return Tag_Status is
+      Found : Boolean := False;
+   begin
+      if Tag.Caller_Tags.Internal.Is_Empty then
+         return Not_In_Caller;
+      end if;
+
+      declare
+         Name : constant S_Expressions.Atom := Tag_Maps.Key (Tag.Position);
+         Caller_Tags : constant Tag_Lists.Accessor
+           := Tag.Caller_Tags.Internal.Query;
+      begin
+         for I in Caller_Tags.Data'Range loop
+            declare
+               Caller_Tag : constant S_Expressions.Atom_Refs.Accessor
+                 := Caller_Tags (I).Tag.Query;
+               L : constant S_Expressions.Offset
+                 := Caller_Tag.Data'First + Name'Length - 1;
+            begin
+               if L in Caller_Tag.Data'Range
+                 and then Caller_Tag (Caller_Tag.Data'First .. L) = Name
+               then
+                  if L + 1 not in Caller_Tag.Data'Range then
+                     Found := True;
+                  elsif Caller_Tag (L + 1) = Path_Separator then
+                     return Parent_In_Caller;
+                  end if;
+               end if;
+            end;
+         end loop;
+      end;
+
+      if Found then
+         return Leaf_In_Caller;
+      else
+         return Not_In_Caller;
+      end if;
+   end Status;
 
 
    function To_Component_Index
