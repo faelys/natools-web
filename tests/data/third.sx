@@ -3,6 +3,21 @@
 (if-no-date published "<p>Data in the third page.</p>\n")
 (date validated "<p>Validated on " (rfc-3339) "</p>\n")
 (tag-list pages (render (parent (parent (parent "<p>Parent of root is \"" (name) "\"</p>\n")))))
+(tags tags (all-descendants
+   (prefix "<table>\n  <tr>\n    <th>Tag name</th>\n    <th>Current</th>\n\
+    <th>Current leaf</th>\n    <th>Current parent</th>\n  </tr>\n")
+   (template
+      "  <tr>\n    <td>"
+      (name (2 -1))
+      "</td>\n    <td>"
+      (if-current Y) (if-not-current N)
+      "</td>\n    <td>"
+      (if-current-leaf Y) (if-not-current-leaf N)
+      "</td>\n    <td>"
+      (if-current-parent Y) (if-not-current-parent N)
+      "</td>\n  </tr>\n")
+   (separator " ")
+   (suffix "</table>\n")))
 (render page-comments))
    (title "Third Page"))
 (tags (3 group/2 pages/news tags/topic1/other-subtopic tags/topic3
