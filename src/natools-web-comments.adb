@@ -1264,10 +1264,16 @@ package body Natools.Web.Comments is
 
       procedure Preprocess_Link
         (Ref : in out S_Expressions.Atom_Refs.Immutable_Reference;
-         Value : in S_Expressions.Atom) is
+         Value : in S_Expressions.Atom)
+      is
+         use type S_Expressions.Atom;
       begin
          if Is_Valid_URL (S_Expressions.To_String (Value)) then
             Ref := Escapes.Escape (Ref, Escapes.HTML_Attribute);
+         elsif Is_Valid_URL ("//" & S_Expressions.To_String (Value)) then
+            Comment.Link := Escapes.Escape
+              ((1 .. 2 => Character'Pos ('/')) & Value,
+               Escapes.HTML_Attribute);
          else
             Ref.Reset;
          end if;
