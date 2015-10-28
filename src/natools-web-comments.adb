@@ -1271,7 +1271,7 @@ package body Natools.Web.Comments is
          if Is_Valid_URL (S_Expressions.To_String (Value)) then
             Ref := Escapes.Escape (Ref, Escapes.HTML_Attribute);
          elsif Is_Valid_URL ("//" & S_Expressions.To_String (Value)) then
-            Comment.Link := Escapes.Escape
+            Ref := Escapes.Escape
               ((1 .. 2 => Character'Pos ('/')) & Value,
                Escapes.HTML_Attribute);
          else
