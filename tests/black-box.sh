@@ -158,7 +158,7 @@ chain /test base_version.txt
 chain_curl -F 'sleep_update=2' "${BASE_URL}/test"
 chain /fourth/comments fourth-303.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \
-    -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
+    -F 'c_link=instinctive.eu' -F 'submit=Submit' \
     -F 'c_text=Brand new comment posted during the test suite'
 chain /fourth fourth.html
 chain_curl -F 'wait_version=2' "${BASE_URL}/test"
