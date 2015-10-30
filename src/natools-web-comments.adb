@@ -1753,10 +1753,14 @@ package body Natools.Web.Comments is
 
             if not Builder.Core.Flags (Comment_Flags.Ignored) then
                Preprocess (Builder.Core, List, Exchange.Site.all);
-               Exchange.Site.Queue_Update (Comment_Inserter'
-                 (Container => List.Comments,
-                  New_Item => Builder.Core,
-                  Tags => List.Tags));
+               List.Comments.Update.Insert (Builder.Core);
+
+               if not List.Tags.Is_Empty then
+                  Exchange.Site.Queue_Update (Comment_Inserter'
+                    (Container => List.Comments,
+                     New_Item => Builder.Core,
+                     Tags => List.Tags));
+               end if;
             end if;
       end case;
    end Respond;
@@ -1864,13 +1868,11 @@ package body Natools.Web.Comments is
      (Self : in Comment_Inserter;
       Site : in out Sites.Site) is
    begin
-      Self.Container.Update.Insert (Self.New_Item);
+      pragma Assert (not Self.Tags.Is_Empty);
 
-      if not Self.Tags.Is_Empty then
-         Site.Insert
-           (Tags.Create (Self.Tags.Query, Self.New_Item.Id),
-            Comment_Ref'(Self.Container, Self.New_Item.Id));
-      end if;
+      Site.Insert
+        (Tags.Create (Self.Tags.Query, Self.New_Item.Id),
+         Comment_Ref'(Self.Container, Self.New_Item.Id));
    end Update;
 
 end Natools.Web.Comments;
