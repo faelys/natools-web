@@ -160,7 +160,7 @@ chain /fourth/comments fourth-303.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \
     -F 'c_link=instinctive.eu' -F 'submit=Submit' \
     -F 'c_text=Brand new comment posted during the test suite'
-chain /fourth fourth.html
+chain /fourth fourth-half-commented.html
 chain_curl -F 'wait_version=2' "${BASE_URL}/test"
 chain /fourth fourth-commented.html
 

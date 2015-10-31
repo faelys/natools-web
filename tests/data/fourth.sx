@@ -1,6 +1,15 @@
 (elements
    (main-text "\
 <p>Data in the fourth page.</p>\n"
+(tags comments (all-elements
+   (if-empty "<p>No comment yet.</p>\n")
+   reverse (limit 1)
+   (template
+      "<p>Latest comment is from "
+      (if-link "<a href=\"" (link) "\">")
+      (name "an anonymous")
+      (if-link "</a>")
+      "</p>\n")))
 (comments
    "<h1>Timeless Comments</h1>\n<ol>\n"
    (list (render
