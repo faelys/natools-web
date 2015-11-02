@@ -80,6 +80,14 @@ chain_last_spam(){
 	fi
 }
 
+# get_version
+#    Return the current version of site internal data
+get_version(){
+	curl -s "${BASE_URL}/test" \
+	    | sed -n '/^Version:/s/[^0-9]//gp' \
+	    | grep '[0-9]'
+}
+
 
 check /first first.html
 check /second second.html
@@ -109,6 +117,7 @@ check /second/comments second-404.html -F 'c_mail=' \
     -F 'c_text=Valid comment sent to a closed comment list'
 chain /second second.html
 
+BASE_VERSION=$(get_version)
 check /fourth fourth.html
 chain /fourth/comments 405.html
 chain /fourth fourth.html
@@ -154,18 +163,17 @@ chain /fourth/comments fourth-303-newcomment.html -F 'c_mail=' \
     -F 'c_name=Random Troll' -F 'c_link=' -F 'submit=Submit' \
     -F 'c_text=Moderated comment text because of suspicious content.'
 chain /fourth fourth.html
-chain /test base_version.txt
 chain_curl -F 'sleep_update=2' "${BASE_URL}/test"
 chain /fourth/comments fourth-303.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \
     -F 'c_link=instinctive.eu' -F 'submit=Submit' \
     -F 'c_text=Brand new comment posted during the test suite'
 chain /fourth fourth-half-commented.html
-chain_curl -F 'wait_version=2' "${BASE_URL}/test"
+chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"
 chain /fourth fourth-commented.html
 
+BASE_VERSION=$(get_version)
 check /fifth fifth.html
-chain /test version-2.txt
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Nobody' \
     -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Perfectly valid comment set to be ignored in the page.'
@@ -174,14 +182,14 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:10:00Z' \
     -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' --form-string \
     'c_text=<p>Administrator comments that bypasses default ignore</p>'
-chain_curl -F 'wait_version=3' "${BASE_URL}/test"
+chain_curl -F 'wait_version='$((BASE_VERSION + 1)) "${BASE_URL}/test"
 chain /fifth fifth-commented.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:12:00Z' \
     -F 'c_link=http://users.example.com/admin/' -F 'submit=Submit' \
     -F 'c_filter=pass-through' --form-string \
     'c_text=<p>Administrator comment in <strong>raw</strong> HTML mode.</p>'
-chain_curl -F 'wait_version=4' "${BASE_URL}/test"
+chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"
 chain /fifth fifth-commented-2.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:10:00Z' -F 'c_link=/dev/null' -F 'submit=Submit' \
@@ -190,12 +198,12 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
 chain_last_spam spam-wrong-filter.sx
 chain /fifth fifth-commented-2.html
 
-check /test version-4.txt
-chain /contact contact-0.html
+BASE_VERSION=$(get_version)
+check /contact contact-0.html
 chain /contact/comments contact-303.html \
     -F 'c_mail=nat@localhost' -F 'c_name=nat' \
     -F 'c_note=Comment with all atoms' -F 'c_title=Test' \
     -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
     -F 'c_text=Full comment in test'
-chain_curl -F 'wait_version=5' "${BASE_URL}/test"
+chain_curl -F 'wait_version='$((BASE_VERSION + 1)) "${BASE_URL}/test"
 chain /contact contact-1.html
