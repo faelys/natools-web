@@ -171,6 +171,9 @@ chain /fourth/comments fourth-303.html -F 'c_mail=' \
 chain /fourth fourth-half-commented.html
 chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"
 chain /fourth fourth-commented.html
+chain /reload reload-redirect.html -F 'submit=Submit'
+chain_curl -F 'wait_version='$((BASE_VERSION + 3)) "${BASE_URL}/test"
+chain /fourth fourth-commented.html
 
 BASE_VERSION=$(get_version)
 check /fifth fifth.html
@@ -197,6 +200,7 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_text=Spam comment with wrong filter'
 chain_last_spam spam-wrong-filter.sx
 chain /fifth fifth-commented-2.html
+FIFTH_STOPPED="${STOPPED}"
 
 BASE_VERSION=$(get_version)
 check /contact contact-0.html
@@ -207,3 +211,9 @@ chain /contact/comments contact-303.html \
     -F 'c_text=Full comment in test'
 chain_curl -F 'wait_version='$((BASE_VERSION + 1)) "${BASE_URL}/test"
 chain /contact contact-1.html
+
+BASE_VERSION=$(get_version)
+STOPPED="${FIFTH_STOPPED}"
+chain /reload reload-redirect.html -F 'submit=Submit'
+chain_curl -F 'wait_version='$((BASE_VERSION + 1)) "${BASE_URL}/test"
+chain /fifth fifth-commented-2.html

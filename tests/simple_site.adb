@@ -26,6 +26,7 @@ with Natools.Web.Backends.Filesystem;
 with Natools.Web.Escapes.Filters;
 with Natools.Web.Filters.Pass_Through;
 with Natools.Web.Filters.Text_Blocks;
+with Natools.Web.Reload_Pages;
 with Natools.Web.Simple_Pages;
 with Natools.Web.Tag_Pages;
 with Syslog.Guess.App_Name;
@@ -51,6 +52,8 @@ begin
       Natools.Web.Log := Common.Syslog_Log'Access;
    end if;
 
+   Common.Site.Register
+     ("reload-page", Natools.Web.Reload_Pages.Create'Access);
    Common.Site.Register
      ("simple-page", Natools.Web.Simple_Pages.Create'Access);
    Common.Site.Register
