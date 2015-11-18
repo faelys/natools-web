@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -14,6 +14,7 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Ada.Calendar;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
@@ -24,6 +25,10 @@ with Natools.Web.Exchanges;
 with Natools.Web.Fallback_Render;
 
 package body Natools.Web.Simple_Pages is
+
+   Expiration_Date_Key : constant S_Expressions.Atom
+     := S_Expressions.To_Atom ("!expire");
+
 
    procedure Append
      (Exchange : in out Sites.Exchange;
@@ -366,6 +371,21 @@ package body Natools.Web.Simple_Pages is
         (Object.File_Path,
          S_Expressions.Atom_Ref_Constructors.Create (Path));
    begin
+      Expiration_Check :
+      declare
+         use type Ada.Calendar.Time;
+         Accessor : constant Data_Refs.Accessor := Page.Ref.Query;
+         Cursor : constant Containers.Date_Maps.Cursor
+           := Accessor.Dates.Find (Expiration_Date_Key);
+      begin
+         if Containers.Date_Maps.Has_Element (Cursor)
+           and then Containers.Date_Maps.Element (Cursor).Time
+              < Ada.Calendar.Clock
+         then
+            return;
+         end if;
+      end Expiration_Check;
+
       Sites.Insert (Builder, Path, Page);
       Sites.Insert (Builder, Page.Get_Tags, Page);
 
