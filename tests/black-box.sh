@@ -104,6 +104,7 @@ check /tags tags-redirect.html
 check /comments comments.html
 check /comment-feed comments.atom
 check /list-test list-test.html
+check /expired expired.html
 
 check /first/comments first-spam.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \

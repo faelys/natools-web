@@ -8,7 +8,7 @@
 (static-paths data/maintenance data/static)
 (template-file data/templates.sx)
 (simple-pages index comments comment-feed first second third fourth fifth
-   list-test contact)
+   list-test contact expired)
 (tag-page tags)
 (test-page test)
 (named-elements

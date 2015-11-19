@@ -22,4 +22,6 @@
    (title "Third Page"))
 (tags (3 group/2 pages/news tags/topic1/other-subtopic tags/topic3
       reverse/1 reverse/2))
-(dates (validated "2015-02-01T01:02:03+04:00"))
+(dates
+   (validated "2015-02-01T01:02:03+04:00")
+   ("!expire" "2100-01-01T00:00:00Z"))

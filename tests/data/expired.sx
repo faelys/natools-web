@@ -1,0 +1,11 @@
+(elements
+   (main-text "<p>Data in the expired page.</p>\n"
+(render page-comments))
+   (title "Expired Page"))
+(tags (expired pages/news))
+(comments
+   (filter comment-filter)
+   (backend comments expired)
+   (tags comments))
+(dates
+   ("!expire" "2015-01-01T00:00:00Z"))
