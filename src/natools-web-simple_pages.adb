@@ -28,6 +28,8 @@ package body Natools.Web.Simple_Pages is
 
    Expiration_Date_Key : constant S_Expressions.Atom
      := S_Expressions.To_Atom ("!expire");
+   Publication_Date_Key : constant S_Expressions.Atom
+     := S_Expressions.To_Atom ("!publish");
 
 
    procedure Append
@@ -371,20 +373,28 @@ package body Natools.Web.Simple_Pages is
         (Object.File_Path,
          S_Expressions.Atom_Ref_Constructors.Create (Path));
    begin
-      Expiration_Check :
+      Time_Check :
       declare
          use type Ada.Calendar.Time;
+         Now : constant Ada.Calendar.Time := Ada.Calendar.Clock;
          Accessor : constant Data_Refs.Accessor := Page.Ref.Query;
-         Cursor : constant Containers.Date_Maps.Cursor
+         Cursor : Containers.Date_Maps.Cursor
            := Accessor.Dates.Find (Expiration_Date_Key);
       begin
          if Containers.Date_Maps.Has_Element (Cursor)
-           and then Containers.Date_Maps.Element (Cursor).Time
-              < Ada.Calendar.Clock
+           and then Containers.Date_Maps.Element (Cursor).Time < Now
          then
             return;
          end if;
-      end Expiration_Check;
+
+         Cursor := Accessor.Dates.Find (Publication_Date_Key);
+
+         if Containers.Date_Maps.Has_Element (Cursor)
+           and then Containers.Date_Maps.Element (Cursor).Time >= Now
+         then
+            return;
+         end if;
+      end Time_Check;
 
       Sites.Insert (Builder, Path, Page);
       Sites.Insert (Builder, Page.Get_Tags, Page);
