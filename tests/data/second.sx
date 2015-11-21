@@ -6,4 +6,6 @@
    (title "Second Page"))
 (tags (2 group/1 pages/news tags/topic2 tags/topic3))
 (comments (backend comments 2) (tags comments) (flags closed))
-(dates (published "2015-01-01T09:50:00-08:00"))
+(dates
+   (published "2015-01-01T09:50:00-08:00")
+   ("!publish" "2015-01-01T09:50:00-08:00"))
