@@ -14,7 +14,6 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
-with Ada.Calendar;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
@@ -279,6 +278,36 @@ package body Natools.Web.Simple_Pages is
    end Create;
 
 
+   procedure Get_Lifetime
+     (Page : in Page_Ref;
+      Publication : out Ada.Calendar.Time;
+      Has_Publication : out Boolean;
+      Expiration : out Ada.Calendar.Time;
+      Has_Expiration : out Boolean)
+   is
+      Accessor : constant Data_Refs.Accessor := Page.Ref.Query;
+      Cursor : Containers.Date_Maps.Cursor;
+   begin
+      Cursor := Accessor.Dates.Find (Expiration_Date_Key);
+
+      if Containers.Date_Maps.Has_Element (Cursor) then
+         Has_Expiration := True;
+         Expiration := Containers.Date_Maps.Element (Cursor).Time;
+      else
+         Has_Expiration := False;
+      end if;
+
+      Cursor := Accessor.Dates.Find (Publication_Date_Key);
+
+      if Containers.Date_Maps.Has_Element (Cursor) then
+         Has_Publication := True;
+         Publication := Containers.Date_Maps.Element (Cursor).Time;
+      else
+         Has_Publication := False;
+      end if;
+   end Get_Lifetime;
+
+
    overriding procedure Render
      (Exchange : in out Sites.Exchange;
       Object : in Page_Ref;
@@ -377,20 +406,16 @@ package body Natools.Web.Simple_Pages is
       declare
          use type Ada.Calendar.Time;
          Now : constant Ada.Calendar.Time := Ada.Calendar.Clock;
-         Accessor : constant Data_Refs.Accessor := Page.Ref.Query;
-         Cursor : Containers.Date_Maps.Cursor
-           := Accessor.Dates.Find (Expiration_Date_Key);
+         Publication : Ada.Calendar.Time;
+         Has_Publication : Boolean;
+         Expiration : Ada.Calendar.Time;
+         Has_Expiration : Boolean;
       begin
-         if Containers.Date_Maps.Has_Element (Cursor)
-           and then Containers.Date_Maps.Element (Cursor).Time < Now
-         then
-            return;
-         end if;
+         Get_Lifetime
+           (Page, Publication, Has_Publication, Expiration, Has_Expiration);
 
-         Cursor := Accessor.Dates.Find (Publication_Date_Key);
-
-         if Containers.Date_Maps.Has_Element (Cursor)
-           and then Containers.Date_Maps.Element (Cursor).Time >= Now
+         if (Has_Publication and then Publication >= Now)
+           or else (Has_Expiration and then Expiration < Now)
          then
             return;
          end if;

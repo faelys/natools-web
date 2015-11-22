@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2015, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -20,6 +20,7 @@
 -- static site.                                                             --
 ------------------------------------------------------------------------------
 
+with Ada.Calendar;
 with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Lockable;
 with Natools.Web.Sites;
@@ -42,6 +43,13 @@ package Natools.Web.Simple_Pages is
    function Create
      (Expression : in out S_Expressions.Lockable.Descriptor'Class)
      return Page_Ref;
+
+   procedure Get_Lifetime
+     (Page : in Page_Ref;
+      Publication : out Ada.Calendar.Time;
+      Has_Publication : out Boolean;
+      Expiration : out Ada.Calendar.Time;
+      Has_Expiration : out Boolean);
 
    function Get_Tags (Page : Page_Ref) return Tags.Tag_List;
 
