@@ -53,6 +53,11 @@ package Natools.Web.Simple_Pages is
 
    function Get_Tags (Page : Page_Ref) return Tags.Tag_List;
 
+   procedure Register
+     (Page : in Page_Ref;
+      Builder : in out Sites.Site_Builder;
+      Path : in S_Expressions.Atom);
+
    overriding procedure Render
      (Exchange : in out Sites.Exchange;
       Object : in Page_Ref;

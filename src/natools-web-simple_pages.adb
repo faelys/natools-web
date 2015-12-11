@@ -308,6 +308,42 @@ package body Natools.Web.Simple_Pages is
    end Get_Lifetime;
 
 
+   procedure Register
+     (Page : in Page_Ref;
+      Builder : in out Sites.Site_Builder;
+      Path : in S_Expressions.Atom) is
+   begin
+      Time_Check :
+      declare
+         use type Ada.Calendar.Time;
+         Now : constant Ada.Calendar.Time := Ada.Calendar.Clock;
+         Publication : Ada.Calendar.Time;
+         Has_Publication : Boolean;
+         Expiration : Ada.Calendar.Time;
+         Has_Expiration : Boolean;
+      begin
+         Get_Lifetime
+           (Page, Publication, Has_Publication, Expiration, Has_Expiration);
+
+         if (Has_Publication and then Publication >= Now)
+           or else (Has_Expiration and then Expiration < Now)
+         then
+            return;
+         end if;
+      end Time_Check;
+
+      Sites.Insert (Builder, Path, Page);
+      Sites.Insert (Builder, Page.Get_Tags, Page);
+
+      Load_Comments :
+      declare
+         Mutator : constant Data_Refs.Mutator := Page.Ref.Update;
+      begin
+         Mutator.Comment_List.Load (Builder, Mutator.Self, Mutator.Web_Path);
+      end Load_Comments;
+   end Register;
+
+
    overriding procedure Render
      (Exchange : in out Sites.Exchange;
       Object : in Page_Ref;
@@ -402,33 +438,7 @@ package body Natools.Web.Simple_Pages is
         (Object.File_Path,
          S_Expressions.Atom_Ref_Constructors.Create (Path));
    begin
-      Time_Check :
-      declare
-         use type Ada.Calendar.Time;
-         Now : constant Ada.Calendar.Time := Ada.Calendar.Clock;
-         Publication : Ada.Calendar.Time;
-         Has_Publication : Boolean;
-         Expiration : Ada.Calendar.Time;
-         Has_Expiration : Boolean;
-      begin
-         Get_Lifetime
-           (Page, Publication, Has_Publication, Expiration, Has_Expiration);
-
-         if (Has_Publication and then Publication >= Now)
-           or else (Has_Expiration and then Expiration < Now)
-         then
-            return;
-         end if;
-      end Time_Check;
-
-      Sites.Insert (Builder, Path, Page);
-      Sites.Insert (Builder, Page.Get_Tags, Page);
-
-      declare
-         Mutator : constant Data_Refs.Mutator := Page.Ref.Update;
-      begin
-         Mutator.Comment_List.Load (Builder, Mutator.Self, Mutator.Web_Path);
-      end;
+      Register (Page, Builder, Path);
    end Load;
 
 
