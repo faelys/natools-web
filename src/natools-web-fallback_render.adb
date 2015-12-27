@@ -124,6 +124,26 @@ begin
             Re_Enter (Exchange, Arguments);
          end if;
 
+      when Commands.If_Parameter_Is =>
+         if Re_Enter = null then
+            Report_Unknown_Command;
+         elsif Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+            declare
+               Param_Value : constant String := Exchange.Parameter
+                 (S_Expressions.To_String (Arguments.Current_Atom));
+               Event : S_Expressions.Events.Event;
+            begin
+               Arguments.Next (Event);
+               if Event = S_Expressions.Events.Add_Atom
+                 and then Param_Value
+                    = S_Expressions.To_String (Arguments.Current_Atom)
+               then
+                  Arguments.Next;
+                  Re_Enter (Exchange, Arguments);
+               end if;
+            end;
+         end if;
+
       when Commands.Load_Date =>
          S_Expressions.Templates.Dates.Render
            (Exchange, Arguments, Exchange.Site.Load_Date);
