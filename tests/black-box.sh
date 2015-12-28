@@ -179,6 +179,8 @@ chain /fourth fourth-commented.html
 
 BASE_VERSION=$(get_version)
 check /fifth fifth.html
+chain "/fifth?extra=no" fifth.html
+chain "/fifth?extra=yes" fifth-extra.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Nobody' \
     -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Perfectly valid comment set to be ignored in the page.'

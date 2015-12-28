@@ -1,6 +1,8 @@
 (elements
    (main-text "\
 <p>Data in the fifth page.</p>\n"
+      (if-parameter-is extra yes
+         "<p>With an extra paragraph, as requested.</p>\n")
 (render page-comments))
    (title "Fifth Page"))
 (tags (5 pages/news))
