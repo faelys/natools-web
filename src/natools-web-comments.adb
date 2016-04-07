@@ -1296,6 +1296,8 @@ package body Natools.Web.Comments is
                end if;
 
             when Text =>
+               Reset_If_Blank (Comment.Atoms (I));
+
                if not Comment.Atoms (I).Is_Empty then
                   declare
                      Buffer : S_Expressions.Atom_Buffers.Atom_Buffer;
