@@ -1,4 +1,4 @@
---  Generated at 2015-09-21 16:53:18 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2016-07-04 19:19:16 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -26,7 +26,7 @@ package Natools.Static_Maps.Web.Comments is
 
       package Post_Action is
          type Enum is
-           (Unknown, Save, Force_Preview, Reject, Dump,
+           (Unknown, Save, Force_Preview, Force_Redirect, Reject, Dump,
             Reason, Append_Reason, Set_Reason, Ignore, Unignore, Anchor);
       end Post_Action;
    end Item;
@@ -147,15 +147,17 @@ private
    Map_5_Key_6 : aliased constant String := "write";
    Map_5_Key_7 : aliased constant String := "preview";
    Map_5_Key_8 : aliased constant String := "force-preview";
-   Map_5_Key_9 : aliased constant String := "ignore";
-   Map_5_Key_10 : aliased constant String := "reason";
-   Map_5_Key_11 : aliased constant String := "reject";
-   Map_5_Key_12 : aliased constant String := "accept";
-   Map_5_Key_13 : aliased constant String := "save";
-   Map_5_Key_14 : aliased constant String := "set-reason";
-   Map_5_Key_15 : aliased constant String := "reset-reason";
-   Map_5_Key_16 : aliased constant String := "unignore";
-   Map_5_Keys : constant array (0 .. 16) of access constant String
+   Map_5_Key_9 : aliased constant String := "redirect";
+   Map_5_Key_10 : aliased constant String := "force-redirect";
+   Map_5_Key_11 : aliased constant String := "ignore";
+   Map_5_Key_12 : aliased constant String := "reason";
+   Map_5_Key_13 : aliased constant String := "reject";
+   Map_5_Key_14 : aliased constant String := "accept";
+   Map_5_Key_15 : aliased constant String := "save";
+   Map_5_Key_16 : aliased constant String := "set-reason";
+   Map_5_Key_17 : aliased constant String := "reset-reason";
+   Map_5_Key_18 : aliased constant String := "unignore";
+   Map_5_Keys : constant array (0 .. 18) of access constant String
      := (Map_5_Key_0'Access,
          Map_5_Key_1'Access,
          Map_5_Key_2'Access,
@@ -172,8 +174,10 @@ private
          Map_5_Key_13'Access,
          Map_5_Key_14'Access,
          Map_5_Key_15'Access,
-         Map_5_Key_16'Access);
-   Map_5_Elements : constant array (0 .. 16) of Item.Post_Action.Enum
+         Map_5_Key_16'Access,
+         Map_5_Key_17'Access,
+         Map_5_Key_18'Access);
+   Map_5_Elements : constant array (0 .. 18) of Item.Post_Action.Enum
      := (Item.Post_Action.Anchor,
          Item.Post_Action.Anchor,
          Item.Post_Action.Append_Reason,
@@ -183,6 +187,8 @@ private
          Item.Post_Action.Dump,
          Item.Post_Action.Force_Preview,
          Item.Post_Action.Force_Preview,
+         Item.Post_Action.Force_Redirect,
+         Item.Post_Action.Force_Redirect,
          Item.Post_Action.Ignore,
          Item.Post_Action.Reason,
          Item.Post_Action.Reject,

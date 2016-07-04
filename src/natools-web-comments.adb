@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015, Natacha Porté                                        --
+-- Copyright (c) 2015-2016, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -75,6 +75,7 @@ package body Natools.Web.Comments is
       Action : Post_Action;
       Reason : S_Expressions.Atom_Refs.Immutable_Reference;
       Anchor : S_Expressions.Atom_Refs.Immutable_Reference;
+      Redirect_Base : S_Expressions.Atom_Refs.Immutable_Reference;
    end record;
 
 
@@ -1011,6 +1012,13 @@ package body Natools.Web.Comments is
             Builder.Action := Force_Preview;
             Update_Reason;
 
+         when Force_Redirect =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               Builder.Redirect_Base := Create (Arguments.Current_Atom);
+            else
+               Builder.Redirect_Base.Reset;
+            end if;
+
          when Ignore =>
             Builder.Core.Flags (Comment_Flags.Ignored) := True;
             Update_Reason;
@@ -1059,6 +1067,9 @@ package body Natools.Web.Comments is
 
          when Force_Preview =>
             Builder.Action := Force_Preview;
+
+         when Force_Redirect =>
+            Builder.Redirect_Base.Reset;
 
          when Ignore =>
             Builder.Core.Flags (Comment_Flags.Ignored) := True;
@@ -1642,6 +1653,9 @@ package body Natools.Web.Comments is
         (Builder : Comment_Builder;
          Default : S_Expressions.Atom)
         return S_Expressions.Atom;
+      function Redirect_Base
+        (Builder : Comment_Builder)
+        return S_Expressions.Atom;
       function Redirect_Location
         (Default_Anchor : S_Expressions.Atom := S_Expressions.Null_Atom)
         return S_Expressions.Atom;
@@ -1658,6 +1672,17 @@ package body Natools.Web.Comments is
          end if;
       end Get_Anchor;
 
+      function Redirect_Base
+        (Builder : Comment_Builder)
+        return S_Expressions.Atom is
+      begin
+         if Builder.Redirect_Base.Is_Empty then
+            return List.Parent_Path.Query;
+         else
+            return Builder.Redirect_Base.Query;
+         end if;
+      end Redirect_Base;
+
       Builder : Comment_Builder;
 
       function Redirect_Location
@@ -1666,14 +1691,13 @@ package body Natools.Web.Comments is
       is
          use type Ada.Streams.Stream_Element_Array;
 
-         Parent : constant S_Expressions.Atom := List.Parent_Path.Query;
          Anchor : constant S_Expressions.Atom
            := Get_Anchor (Builder, Default_Anchor);
       begin
          if Anchor'Length > 0 then
-            return Parent & Character'Pos ('#') & Anchor;
+            return Redirect_Base (Builder) & Character'Pos ('#') & Anchor;
          else
-            return Parent;
+            return Redirect_Base (Builder);
          end if;
       end Redirect_Location;
    begin

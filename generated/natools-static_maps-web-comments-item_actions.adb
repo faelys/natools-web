@@ -2,18 +2,18 @@ with Interfaces; use Interfaces;
 
 package body Natools.Static_Maps.Web.Comments.Item_Actions is
 
-   P : constant array (0 .. 1) of Natural :=
-     (2, 3);
+   P : constant array (0 .. 2) of Natural :=
+     (2, 3, 7);
 
-   T1 : constant array (0 .. 1) of Unsigned_8 :=
-     (27, 19);
+   T1 : constant array (0 .. 2) of Unsigned_8 :=
+     (38, 19, 3);
 
-   T2 : constant array (0 .. 1) of Unsigned_8 :=
-     (14, 9);
+   T2 : constant array (0 .. 2) of Unsigned_8 :=
+     (3, 37, 38);
 
-   G : constant array (0 .. 34) of Unsigned_8 :=
-     (0, 0, 0, 0, 12, 8, 0, 2, 9, 0, 0, 0, 14, 0, 0, 0, 0, 9, 5, 0, 13, 0,
-      0, 11, 0, 3, 0, 11, 0, 4, 16, 5, 0, 6, 1);
+   G : constant array (0 .. 38) of Unsigned_8 :=
+     (15, 0, 16, 0, 4, 0, 14, 0, 6, 6, 8, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 7,
+      1, 0, 3, 0, 0, 7, 7, 5, 10, 12, 8, 0, 0, 0, 0, 11, 0);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -24,10 +24,10 @@ package body Natools.Static_Maps.Web.Comments.Item_Actions is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 35;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 35;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 39;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 39;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 17;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 19;
    end Hash;
 
 end Natools.Static_Maps.Web.Comments.Item_Actions;
