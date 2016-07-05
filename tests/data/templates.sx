@@ -117,7 +117,7 @@
    (if (name (unknown-string-command with argument)) accept)
    (if (name unknown-string-simple-command) accept))
 
-(comment-filter-blind accept (anchor ""))
+(comment-filter-blind accept (anchor "") (redirect "/elsewhere"))
 
 (error-page "\
 <html>
