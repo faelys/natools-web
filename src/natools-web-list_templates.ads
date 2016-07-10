@@ -69,7 +69,7 @@ package Natools.Web.List_Templates is
 
 
    generic
-      type Cursor (<>) is limited private;
+      type Cursor (<>) is private;
       with package Iterators is new Ada.Iterator_Interfaces
         (Cursor => Cursor, others => <>);
       with procedure Render
