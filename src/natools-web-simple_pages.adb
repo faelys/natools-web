@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -332,7 +332,10 @@ package body Natools.Web.Simple_Pages is
          end if;
       end Time_Check;
 
-      Sites.Insert (Builder, Path, Page);
+      if Path'Length > 0 then
+         Sites.Insert (Builder, Path, Page);
+      end if;
+
       Sites.Insert (Builder, Page.Get_Tags, Page);
 
       Load_Comments :
