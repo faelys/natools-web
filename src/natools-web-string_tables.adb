@@ -15,12 +15,92 @@
 ------------------------------------------------------------------------------
 
 with Ada.Containers.Doubly_Linked_Lists;
+with Natools.S_Expressions.Interpreter_Loop;
 
 package body Natools.Web.String_Tables is
 
    package Row_Lists is new Ada.Containers.Doubly_Linked_Lists
      (Containers.Atom_Array_Refs.Immutable_Reference,
       Containers.Atom_Array_Refs."=");
+
+
+   procedure Append
+     (Exchange : in out Sites.Exchange;
+      Context : in Containers.Atom_Array_Refs.Immutable_Reference;
+      Data : in S_Expressions.Atom);
+
+   procedure Execute
+     (Exchange : in out Sites.Exchange;
+      Row : in Containers.Atom_Array_Refs.Immutable_Reference;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class);
+
+
+   procedure Render_Row is new S_Expressions.Interpreter_Loop
+     (Sites.Exchange, Containers.Atom_Array_Refs.Immutable_Reference,
+      Execute, Append);
+
+
+   ------------------------
+   -- Renderer Fragments --
+   ------------------------
+
+   procedure Append
+     (Exchange : in out Sites.Exchange;
+      Context : in Containers.Atom_Array_Refs.Immutable_Reference;
+      Data : in S_Expressions.Atom)
+   is
+      pragma Unreferenced (Context);
+   begin
+      Exchange.Append (Data);
+   end Append;
+
+
+   procedure Execute
+     (Exchange : in out Sites.Exchange;
+      Row : in Containers.Atom_Array_Refs.Immutable_Reference;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      pragma Unreferenced (Arguments);
+
+      Column : S_Expressions.Offset;
+      S_Name : constant String := S_Expressions.To_String (Name);
+   begin
+      To_Column :
+      begin
+         if S_Name'Length > 6
+           and then S_Name (S_Name'First .. S_Name'First + 5) = "value-"
+         then
+            Column := S_Expressions.Offset'Value
+              (S_Name (S_Name'First + 6 .. S_Name'Last));
+         else
+            Column := S_Expressions.Offset'Value (S_Name);
+         end if;
+      exception
+         when Constraint_Error =>
+            Log (Severities.Error, "Invalid row command """ & S_Name & '"');
+            return;
+      end To_Column;
+
+      declare
+         Atoms : constant Containers.Atom_Array_Refs.Accessor := Row.Query;
+      begin
+         if Column in Atoms.Data'Range then
+            Exchange.Append (Atoms (Column).Query);
+         else
+            Log
+              (Severities.Error,
+               "Column"
+               & S_Expressions.Offset'Image (Column)
+               & " not in row range"
+               & S_Expressions.Offset'Image (Atoms.Data'First)
+               & " .."
+               & S_Expressions.Offset'Image (Atoms.Data'Last));
+         end if;
+      end;
+   end Execute;
+
 
 
    ------------------
@@ -108,13 +188,11 @@ package body Natools.Web.String_Tables is
    overriding procedure Render
      (Exchange : in out Sites.Exchange;
       Object : in String_Table;
-      Expression : in out S_Expressions.Lockable.Descriptor'Class)
-   is
-      pragma Unreferenced (Exchange);
-      pragma Unreferenced (Object);
-      pragma Unreferenced (Expression);
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
-      raise Program_Error with "Not implemented yet";
+      for Row of Object.Ref.Query.Data.all loop
+         Render_Row (Expression, Exchange, Row);
+      end loop;
    end Render;
 
 end Natools.Web.String_Tables;
