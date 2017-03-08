@@ -25,6 +25,7 @@ with Natools.S_Expressions.Lockable;
 with Natools.Web.Sites;
 with Natools.Web.Tags;
 
+private with Ada.Iterator_Interfaces;
 private with Natools.References;
 private with Natools.Storage_Pools;
 private with Natools.Web.Containers;
@@ -58,6 +59,44 @@ private
    function Create
      (Expression : in out S_Expressions.Lockable.Descriptor'Class)
      return Table_References.Immutable_Reference;
+
+
+   type Cursor is record
+      Ref : Table_References.Immutable_Reference;
+      Index : S_Expressions.Offset;
+   end record;
+
+   function Has_Element (Position : in Cursor) return Boolean
+     is (Position.Index in Position.Ref.Query.Data.all'Range);
+
+   procedure Render
+     (Exchange : in out Sites.Exchange;
+      Position : in Cursor;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+   package Iterator_Interfaces is new Ada.Iterator_Interfaces
+     (Cursor, Has_Element);
+
+   type Table_Iterator is new Iterator_Interfaces.Reversible_Iterator
+   with record
+      Ref : Table_References.Immutable_Reference;
+   end record;
+
+   overriding function First (Object : in Table_Iterator)
+     return Cursor;
+
+   overriding function Last (Object : in Table_Iterator)
+     return Cursor;
+
+   overriding function Next
+     (Object : in Table_Iterator;
+      Position : in Cursor)
+     return Cursor;
+
+   overriding function Previous
+     (Object : in Table_Iterator;
+      Position : in Cursor)
+     return Cursor;
 
 
    type String_Table is new Tags.Visible with record

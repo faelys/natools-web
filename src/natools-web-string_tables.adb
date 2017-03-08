@@ -16,6 +16,7 @@
 
 with Ada.Containers.Doubly_Linked_Lists;
 with Natools.S_Expressions.Interpreter_Loop;
+with Natools.Web.List_Templates;
 
 package body Natools.Web.String_Tables is
 
@@ -39,6 +40,9 @@ package body Natools.Web.String_Tables is
    procedure Render_Row is new S_Expressions.Interpreter_Loop
      (Sites.Exchange, Containers.Atom_Array_Refs.Immutable_Reference,
       Execute, Append);
+
+   procedure Render_Table is new List_Templates.Render
+     (Cursor, Iterator_Interfaces);
 
 
    ------------------------
@@ -100,6 +104,47 @@ package body Natools.Web.String_Tables is
          end if;
       end;
    end Execute;
+
+
+
+   -------------------------------
+   -- Table Iterator Primitives --
+   -------------------------------
+
+   overriding function First (Object : in Table_Iterator)
+     return Cursor is
+   begin
+      return (Ref => Object.Ref, Index => Object.Ref.Query.Data'First);
+   end First;
+
+
+   overriding function Last (Object : in Table_Iterator)
+     return Cursor is
+   begin
+      return (Ref => Object.Ref, Index => Object.Ref.Query.Data'Last);
+   end Last;
+
+
+   overriding function Next
+     (Object : in Table_Iterator;
+      Position : in Cursor)
+     return Cursor
+   is
+      pragma Unreferenced (Object);
+   begin
+      return (Ref => Position.Ref, Index => Position.Index + 1);
+   end Next;
+
+
+   overriding function Previous
+     (Object : in Table_Iterator;
+      Position : in Cursor)
+     return Cursor
+   is
+      pragma Unreferenced (Object);
+   begin
+      return (Ref => Position.Ref, Index => Position.Index - 1);
+   end Previous;
 
 
 
@@ -190,9 +235,22 @@ package body Natools.Web.String_Tables is
       Object : in String_Table;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
-      for Row of Object.Ref.Query.Data.all loop
-         Render_Row (Expression, Exchange, Row);
-      end loop;
+      Render_Table
+        (Exchange,
+         Table_Iterator'(Ref => Object.Ref),
+         List_Templates.Read_Parameters (Expression));
+   end Render;
+
+
+   procedure Render
+     (Exchange : in out Sites.Exchange;
+      Position : in Cursor;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+   begin
+      Render_Row
+        (Expression,
+         Exchange,
+         Position.Ref.Query.Data (Position.Index));
    end Render;
 
 end Natools.Web.String_Tables;
