@@ -28,6 +28,7 @@ with Natools.Web.Tags;
 private with Ada.Iterator_Interfaces;
 private with Natools.References;
 private with Natools.Storage_Pools;
+private with Natools.Constant_Indefinite_Ordered_Maps;
 private with Natools.Web.Containers;
 
 package Natools.Web.String_Tables is
@@ -41,6 +42,18 @@ package Natools.Web.String_Tables is
    overriding procedure Render
      (Exchange : in out Sites.Exchange;
       Object : in String_Table;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+
+   type String_Table_Map is new Tags.Visible with private;
+
+   not overriding function Create
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     return String_Table_Map;
+
+   overriding procedure Render
+     (Exchange : in out Sites.Exchange;
+      Object : in String_Table_Map;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
 
 private
@@ -101,6 +114,14 @@ private
 
    type String_Table is new Tags.Visible with record
       Ref : Table_References.Immutable_Reference;
+   end record;
+
+   package Table_Maps is new Constant_Indefinite_Ordered_Maps
+     (S_Expressions.Atom, Table_References.Immutable_Reference,
+      S_Expressions."<", Table_References."=");
+
+   type String_Table_Map is new Tags.Visible with record
+      Map : Table_Maps.Constant_Map;
    end record;
 
 end Natools.Web.String_Tables;

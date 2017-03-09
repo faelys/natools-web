@@ -30,12 +30,27 @@ package body Natools.Web.String_Tables is
       Context : in Containers.Atom_Array_Refs.Immutable_Reference;
       Data : in S_Expressions.Atom);
 
+   procedure Append_Table_Node
+     (Map : in out Table_Maps.Unsafe_Maps.Map;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class);
+
    procedure Execute
      (Exchange : in out Sites.Exchange;
       Row : in Containers.Atom_Array_Refs.Immutable_Reference;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
 
+   procedure Render
+     (Exchange : in out Sites.Exchange;
+      Table_Map : in Table_Maps.Constant_Map;
+      Name : in S_Expressions.Atom;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+
+   procedure Append_Table is new S_Expressions.Interpreter_Loop
+     (Table_Maps.Unsafe_Maps.Map, Meaningless_Type, Append_Table_Node);
 
    procedure Render_Row is new S_Expressions.Interpreter_Loop
      (Sites.Exchange, Containers.Atom_Array_Refs.Immutable_Reference,
@@ -43,6 +58,27 @@ package body Natools.Web.String_Tables is
 
    procedure Render_Table is new List_Templates.Render
      (Cursor, Iterator_Interfaces);
+
+
+   ------------------------------
+   -- Local Helper Subprograms --
+   ------------------------------
+
+   procedure Append_Table_Node
+     (Map : in out Table_Maps.Unsafe_Maps.Map;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      pragma Unreferenced (Context);
+      Table_Ref : constant Table_References.Immutable_Reference
+        := Create (Arguments);
+   begin
+      if not Table_References.Is_Empty (Table_Ref) then
+         Table_Maps.Unsafe_Maps.Include (Map, Name, Table_Ref);
+      end if;
+   end Append_Table_Node;
+
 
 
    ------------------------
@@ -225,6 +261,17 @@ package body Natools.Web.String_Tables is
    end Create;
 
 
+   not overriding function Create
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     return String_Table_Map
+   is
+      Map : Table_Maps.Unsafe_Maps.Map;
+   begin
+      Append_Table (Expression, Map, Meaningless_Value);
+      return (Map => Table_Maps.Create (Map));
+   end Create;
+
+
 
    ---------------
    -- Renderers --
@@ -251,6 +298,73 @@ package body Natools.Web.String_Tables is
         (Expression,
          Exchange,
          Position.Ref.Query.Data (Position.Index));
+   end Render;
+
+
+   procedure Render
+     (Exchange : in out Sites.Exchange;
+      Table_Map : in Table_Maps.Constant_Map;
+      Name : in S_Expressions.Atom;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      Cursor : constant Table_Maps.Cursor := Table_Maps.Find (Table_Map, Name);
+   begin
+      if Table_Maps.Has_Element (Cursor) then
+         Render_Table
+           (Exchange,
+            Table_Iterator'(Ref => Table_Maps.Element (Cursor)),
+            List_Templates.Read_Parameters (Expression));
+      else
+         Log (Severities.Error, "Unable to find string map """
+           & S_Expressions.To_String (Name) & '"');
+      end if;
+   end Render;
+
+
+   overriding procedure Render
+     (Exchange : in out Sites.Exchange;
+      Object : in String_Table_Map;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      use type S_Expressions.Events.Event;
+      Event : S_Expressions.Events.Event;
+      Lock : S_Expressions.Lockable.Lock_State;
+   begin
+      case Expression.Current_Event is
+         when S_Expressions.Events.Add_Atom =>
+            declare
+               Name : constant S_Expressions.Atom := Expression.Current_Atom;
+            begin
+               Expression.Next;
+               Render (Exchange, Object.Map, Name, Expression);
+            end;
+
+         when S_Expressions.Events.Open_List =>
+            loop
+               Expression.Lock (Lock);
+               Expression.Next (Event);
+
+               if Event = S_Expressions.Events.Add_Atom then
+                  declare
+                     Name : constant S_Expressions.Atom
+                       := Expression.Current_Atom;
+                  begin
+                     Expression.Next;
+                     Render (Exchange, Object.Map, Name, Expression);
+                  end;
+               end if;
+
+               Expression.Unlock (Lock);
+               Expression.Next (Event);
+               exit when Event /= S_Expressions.Events.Open_List;
+            end loop;
+
+         when S_Expressions.Events.Close_List
+           | S_Expressions.Events.Error
+           | S_Expressions.Events.End_Of_Input
+         =>
+            null;
+      end case;
    end Render;
 
 end Natools.Web.String_Tables;
