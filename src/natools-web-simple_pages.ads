@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -31,6 +31,7 @@ private with Natools.S_Expressions.Caches;
 private with Natools.Storage_Pools;
 private with Natools.Web.Containers;
 private with Natools.Web.Comments;
+private with Natools.Web.String_Tables;
 
 package Natools.Web.Simple_Pages is
 
@@ -91,6 +92,7 @@ private
       Tags : Web.Tags.Tag_List;
       Dates : Containers.Date_Maps.Constant_Map;
       Comment_List : Comments.Comment_List;
+      Maps : String_Tables.String_Table_Map;
    end record;
 
    not overriding procedure Get_Element

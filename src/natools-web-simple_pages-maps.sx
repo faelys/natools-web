@@ -6,6 +6,7 @@
      (Unknown_Command,
       Comment_List,
       Date, Optional_Date, If_No_Date,
+      Maps,
       My_Tags,
       Path,
       Tags);
@@ -15,6 +16,7 @@
       Comment_List,
       Dates,
       Elements,
+      Maps,
       Tags);")
    (Command
       (hash-package Natools.Static_Maps.Web.Simple_Pages.Commands)
@@ -24,6 +26,7 @@
          (Comment_List comments comment-list)
          (Date  date)
          (If_No_Date  if-no-date)
+         (Maps  maps)
          (My_Tags  my-tags my-tag-list tag-list)
          (Optional_Date  optional-date)
          (Path  path)
@@ -36,4 +39,5 @@
          (Dates dates)
          (Tags tags)
          (Comment_List comments comment-list)
+         (Maps  maps)
          (Elements  elements layout))))

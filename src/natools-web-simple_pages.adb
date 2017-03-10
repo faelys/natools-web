@@ -83,6 +83,9 @@ package body Natools.Web.Simple_Pages is
          when Components.Elements =>
             Containers.Set_Expressions (Data.Elements, Arguments);
 
+         when Components.Maps =>
+            Data.Maps := String_Tables.Create (Arguments);
+
          when Components.Tags =>
             Tags.Append (Data.Tags, Arguments);
       end case;
@@ -195,6 +198,9 @@ package body Natools.Web.Simple_Pages is
                Render_Page (Arguments, Exchange, Page);
             end if;
 
+         when Commands.Maps =>
+            String_Tables.Render (Exchange, Page.Maps, Arguments);
+
          when Commands.Optional_Date =>
             Render_Date (False);
 
@@ -260,7 +266,7 @@ package body Natools.Web.Simple_Pages is
          Web_Path => Web_Path,
          Tags => <>,
          Self => null,
-         Comment_List | Elements | Dates => <>);
+         Comment_List | Elements | Dates | Maps => <>);
       Result : constant Page_Ref := (Ref => Data_Refs.Create (Page));
    begin
       Page.Self := Tags.Visible_Access (Page);
