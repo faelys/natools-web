@@ -1,6 +1,11 @@
 (elements
    (main-text "\
 <p>Data in the second page.</p>\n"
+(maps (costs
+   (prefix "<table>\n")
+   (suffix "</table>\n")
+   (template "  <tr>\n    <td>" (value-1) "</td>\n    <td>" (value-2)
+      "</td>\n  </tr>\n")))
 (render page-comments))
    (footer "<p>Special footer</p>\n")
    (title "Second Page"))
@@ -9,3 +14,8 @@
 (dates
    (published "2015-01-01T09:50:00-08:00")
    ("!publish" "2015-01-01T09:50:00-08:00"))
+(maps
+   (costs
+      (Load 10)
+      (Display 5 5)
+      (Update 2)))
