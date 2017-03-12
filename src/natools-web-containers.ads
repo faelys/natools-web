@@ -90,4 +90,8 @@ package Natools.Web.Containers is
    function Create (Source : Unsafe_Atom_Lists.List)
      return Atom_Array_Refs.Immutable_Reference;
 
+   function Create
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     return Atom_Array_Refs.Immutable_Reference;
+
 end Natools.Web.Containers;

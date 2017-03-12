@@ -215,4 +215,15 @@ package body Natools.Web.Containers is
       return Atom_Array_Refs.Create (Create_Array'Access);
    end Create;
 
+
+   function Create
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     return Atom_Array_Refs.Immutable_Reference
+   is
+      List : Unsafe_Atom_Lists.List;
+   begin
+      Append_Atoms (List, Expression);
+      return Create (List);
+   end Create;
+
 end Natools.Web.Containers;
