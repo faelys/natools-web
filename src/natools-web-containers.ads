@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -20,6 +20,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Calendar.Time_Zones;
+with Ada.Containers.Doubly_Linked_Lists;
 with Ada.Containers.Indefinite_Doubly_Linked_Lists;
 with Ada.Streams;
 with Natools.Constant_Indefinite_Ordered_Maps;
@@ -93,5 +94,27 @@ package Natools.Web.Containers is
    function Create
      (Expression : in out S_Expressions.Lockable.Descriptor'Class)
      return Atom_Array_Refs.Immutable_Reference;
+
+
+
+   package Atom_Row_Lists is new Ada.Containers.Doubly_Linked_Lists
+     (Atom_Array_Refs.Immutable_Reference,
+      Atom_Array_Refs."=");
+
+   type Atom_Table is array (S_Expressions.Offset range <>)
+     of Atom_Array_Refs.Immutable_Reference;
+
+   package Atom_Table_Refs is new References
+     (Atom_Table,
+      Natools.Storage_Pools.Access_In_Default_Pool'Storage_Pool,
+      Natools.Storage_Pools.Access_In_Default_Pool'Storage_Pool);
+
+   function Create
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     return Atom_Table_Refs.Immutable_Reference;
+
+   function Create
+     (Row_List : in Atom_Row_Lists.List)
+     return Atom_Table_Refs.Immutable_Reference;
 
 end Natools.Web.Containers;

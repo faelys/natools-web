@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014, Natacha Porté                                        --
+-- Copyright (c) 2014-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -224,6 +224,85 @@ package body Natools.Web.Containers is
    begin
       Append_Atoms (List, Expression);
       return Create (List);
+   end Create;
+
+
+
+   --------------------------
+   -- Atom Table Interface --
+   --------------------------
+
+   function Create
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     return Atom_Table_Refs.Immutable_Reference
+   is
+      List : Atom_Row_Lists.List;
+      Event : S_Expressions.Events.Event := Expression.Current_Event;
+      Lock : S_Expressions.Lockable.Lock_State;
+   begin
+      Read_Expression :
+      loop
+         case Event is
+            when S_Expressions.Events.Close_List
+              | S_Expressions.Events.End_Of_Input
+              | S_Expressions.Events.Error
+            =>
+               exit Read_Expression;
+
+            when S_Expressions.Events.Add_Atom => null;
+
+            when S_Expressions.Events.Open_List =>
+               Expression.Lock (Lock);
+               begin
+                  Expression.Next (Event);
+
+                  if Event in S_Expressions.Events.Add_Atom
+                            | S_Expressions.Events.Open_List
+                  then
+                     List.Append (Create (Expression));
+                  end if;
+
+                  Expression.Unlock (Lock);
+               exception
+                  when others =>
+                     Expression.Unlock (Lock, False);
+                     raise;
+               end;
+         end case;
+
+         Expression.Next (Event);
+      end loop Read_Expression;
+
+      return Create (List);
+   end Create;
+
+
+   function Create
+     (Row_List : in Atom_Row_Lists.List)
+     return Atom_Table_Refs.Immutable_Reference is
+   begin
+      if Atom_Row_Lists.Is_Empty (Row_List) then
+         return Atom_Table_Refs.Null_Immutable_Reference;
+      end if;
+
+      Build_Table :
+      declare
+         Data : constant Atom_Table_Refs.Data_Access
+           := new Atom_Table (1 .. S_Expressions.Count
+                                     (Atom_Row_Lists.Length (Row_List)));
+         Ref : constant Atom_Table_Refs.Immutable_Reference
+           := Atom_Table_Refs.Create (Data);
+         Cursor : Atom_Row_Lists.Cursor := Atom_Row_Lists.First (Row_List);
+      begin
+         for I in Data.all'Range loop
+            Data (I) := Atom_Row_Lists.Element (Cursor);
+            Atom_Row_Lists.Next (Cursor);
+         end loop;
+
+         pragma Assert (not Atom_Row_Lists.Has_Element (Cursor));
+
+         return Ref;
+      end Build_Table;
    end Create;
 
 end Natools.Web.Containers;
