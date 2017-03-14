@@ -26,8 +26,6 @@ with Natools.Web.Sites;
 with Natools.Web.Tags;
 
 private with Ada.Iterator_Interfaces;
-private with Natools.References;
-private with Natools.Storage_Pools;
 private with Natools.Constant_Indefinite_Ordered_Maps;
 private with Natools.Web.Containers;
 
@@ -60,22 +58,9 @@ private
 
    use type S_Expressions.Offset;
 
-   type Table is array (S_Expressions.Offset range <>)
-     of Containers.Atom_Array_Refs.Immutable_Reference;
-
-   package Table_References is new Natools.References
-     (Table,
-      Natools.Storage_Pools.Access_In_Default_Pool'Storage_Pool,
-      Natools.Storage_Pools.Access_In_Default_Pool'Storage_Pool);
-
-
-   function Create
-     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
-     return Table_References.Immutable_Reference;
-
 
    type Cursor is record
-      Ref : Table_References.Immutable_Reference;
+      Ref : Containers.Atom_Table_Refs.Immutable_Reference;
       Index : S_Expressions.Offset;
    end record;
 
@@ -92,7 +77,7 @@ private
 
    type Table_Iterator is new Iterator_Interfaces.Reversible_Iterator
    with record
-      Ref : Table_References.Immutable_Reference;
+      Ref : Containers.Atom_Table_Refs.Immutable_Reference;
    end record;
 
    overriding function First (Object : in Table_Iterator)
@@ -113,12 +98,12 @@ private
 
 
    type String_Table is new Tags.Visible with record
-      Ref : Table_References.Immutable_Reference;
+      Ref : Containers.Atom_Table_Refs.Immutable_Reference;
    end record;
 
    package Table_Maps is new Constant_Indefinite_Ordered_Maps
-     (S_Expressions.Atom, Table_References.Immutable_Reference,
-      S_Expressions."<", Table_References."=");
+     (S_Expressions.Atom, Containers.Atom_Table_Refs.Immutable_Reference,
+      S_Expressions."<", Containers.Atom_Table_Refs."=");
 
    type String_Table_Map is new Tags.Visible with record
       Map : Table_Maps.Constant_Map;
