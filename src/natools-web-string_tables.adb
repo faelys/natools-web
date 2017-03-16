@@ -191,6 +191,14 @@ package body Natools.Web.String_Tables is
 
 
    not overriding function Create
+     (Table : in Containers.Atom_Table_Refs.Immutable_Reference)
+     return String_Table is
+   begin
+      return String_Table'(Ref => Table);
+   end Create;
+
+
+   not overriding function Create
      (Expression : in out S_Expressions.Lockable.Descriptor'Class)
      return String_Table_Map
    is

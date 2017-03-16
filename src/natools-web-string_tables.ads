@@ -22,12 +22,12 @@
 
 with Natools.S_Expressions;
 with Natools.S_Expressions.Lockable;
+with Natools.Web.Containers;
 with Natools.Web.Sites;
 with Natools.Web.Tags;
 
 private with Ada.Iterator_Interfaces;
 private with Natools.Constant_Indefinite_Ordered_Maps;
-private with Natools.Web.Containers;
 
 package Natools.Web.String_Tables is
 
@@ -35,6 +35,10 @@ package Natools.Web.String_Tables is
 
    not overriding function Create
      (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     return String_Table;
+
+   not overriding function Create
+     (Table : in Containers.Atom_Table_Refs.Immutable_Reference)
      return String_Table;
 
    overriding procedure Render
