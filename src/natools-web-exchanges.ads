@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -26,6 +26,7 @@ with Ada.Streams;
 with AWS.Response;
 with AWS.Status;
 with Natools.S_Expressions.Atom_Refs;
+with Natools.Web.Containers;
 with Natools.Web.Filters;
 
 private with AWS.Messages;
@@ -53,6 +54,11 @@ package Natools.Web.Exchanges is
      (Stream : in out Exchange;
       Item : out Ada.Streams.Stream_Element_Array;
       Last : out Ada.Streams.Stream_Element_Offset);
+
+   function Cookie_Table
+     (Object : in Exchange)
+     return Containers.Atom_Table_Refs.Immutable_Reference;
+      --  Return all the cookies as a two-column table
 
    procedure Iterate_Parameters
      (Object : in Exchange;

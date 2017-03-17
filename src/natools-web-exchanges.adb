@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -14,9 +14,11 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Ada.Strings.Unbounded;
+with AWS.Headers.Values;
+with AWS.MIME;
 with AWS.Parameters;
 with AWS.Response.Set;
-with AWS.MIME;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 
 package body Natools.Web.Exchanges is
@@ -27,6 +29,10 @@ package body Natools.Web.Exchanges is
      (Object : in out Exchange;
       Kind : in Responses.Kind);
       --  Switch Object.Kind to Kind, resetting internal state if needed
+
+   function Make_Row (Key, Value : in String)
+     return Containers.Atom_Array_Refs.Immutable_Reference;
+      --  Create an atom table row from key and value
 
 
    ------------------------------
@@ -44,6 +50,20 @@ package body Natools.Web.Exchanges is
          Object.Response_Body.Soft_Reset;
       end if;
    end Ensure_Kind;
+
+
+   function Make_Row (Key, Value : in String)
+     return Containers.Atom_Array_Refs.Immutable_Reference
+   is
+      Data : constant Containers.Atom_Array_Refs.Data_Access
+        := new Containers.Atom_Array (1 .. 2);
+      Result : constant Containers.Atom_Array_Refs.Immutable_Reference
+        := Containers.Atom_Array_Refs.Create (Data);
+   begin
+      Data (1) := Constructors.Create (S_Expressions.To_Atom (Key));
+      Data (2) := Constructors.Create (S_Expressions.To_Atom (Value));
+      return Result;
+   end Make_Row;
 
 
 
@@ -107,6 +127,33 @@ package body Natools.Web.Exchanges is
    -----------------------
    -- Request Accessors --
    -----------------------
+
+   function Cookie_Table
+     (Object : in Exchange)
+     return Containers.Atom_Table_Refs.Immutable_Reference
+   is
+      Headers : constant AWS.Headers.List
+        := AWS.Status.Header (Object.Request.all);
+      Cookies : constant String
+        := AWS.Headers.Get_Values (Headers, AWS.Messages.Cookie_Token);
+      Headers_Set : constant AWS.Headers.Values.Set
+        := AWS.Headers.Values.Split (Cookies);
+      List : Containers.Atom_Row_Lists.List;
+   begin
+      for I in Headers_Set'Range loop
+         if Headers_Set (I).Named_Value then
+            List.Append (Make_Row
+              (Ada.Strings.Unbounded.To_String (Headers_Set (I).Name),
+               Ada.Strings.Unbounded.To_String (Headers_Set (I).Value)));
+         else
+            Log (Severities.Error, "Nameless cookie """
+              & Ada.Strings.Unbounded.To_String (Headers_Set (I).Value) & '"');
+         end if;
+      end loop;
+
+      return Containers.Create (List);
+   end Cookie_Table;
+
 
    procedure Iterate_Parameters
      (Object : in Exchange;
