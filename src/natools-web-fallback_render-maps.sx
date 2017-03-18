@@ -5,6 +5,7 @@
    type Command is
      (Unknown,
       Current_Time,
+      Cookies,
       Element,
       Element_Or_Template,
       Filter,
@@ -22,6 +23,7 @@
       (not-found Unknown)
       (nodes
          (Current_Time   now today current-time current-date)
+         (Cookies   cookies cookie-table)
          (Element   element)
          (Element_Or_Template   render element-or-template)
          (Filter   filter)

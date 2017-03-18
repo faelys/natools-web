@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015, Natacha Porté                                        --
+-- Copyright (c) 2015-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -21,6 +21,7 @@ with Natools.Static_Maps.Web.Fallback_Render;
 with Natools.Web.Escapes;
 with Natools.Web.Filters.Stores;
 with Natools.Web.Tags;
+with Natools.Web.String_Tables;
 
 procedure Natools.Web.Fallback_Render
   (Exchange : in out Natools.Web.Sites.Exchange;
@@ -57,6 +58,12 @@ begin
       when Commands.Current_Time =>
          S_Expressions.Templates.Dates.Render
            (Exchange, Arguments, Ada.Calendar.Clock);
+
+      when Commands.Cookies =>
+         String_Tables.Render
+           (Exchange,
+            String_Tables.Create (Exchange.Cookie_Table),
+            Arguments);
 
       when Commands.Element =>
          if Re_Enter = null then
