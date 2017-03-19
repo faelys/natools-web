@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2014-2015, Natacha Porté
+# Copyright (c) 2014-2017, Natacha Porté
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -90,7 +90,7 @@ get_version(){
 
 
 check /first first.html
-check /second second.html
+check /second second.html -b 'foo=bar; others=/meow+meow'
 check /third third.html
 check /style.css ../data/static/style.css
 check /non-existant 404.html
@@ -117,7 +117,7 @@ check /second/comments second-404.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \
     -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Valid comment sent to a closed comment list'
-chain /second second.html
+chain /second second.html -b 'foo=bar; others=/meow+meow'
 
 BASE_VERSION=$(get_version)
 check /fourth fourth.html

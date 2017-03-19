@@ -6,6 +6,11 @@
    (suffix "</table>\n")
    (template "  <tr>\n    <td>" (value-1) "</td>\n    <td>" (value-2)
       "</td>\n  </tr>\n")))
+(cookies
+   (prefix "<p>Cookies:</p>\n<table>\n")
+   (suffix "</table>\n")
+   (template "  <tr>\n    <td>" (value-1) "</td>\n    <td>" (value-2)
+      "</td>\n  </tr>\n"))
 (render page-comments))
    (footer "<p>Special footer</p>\n")
    (title "Second Page"))
