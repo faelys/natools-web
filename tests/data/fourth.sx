@@ -1,6 +1,11 @@
 (elements
    (main-text "\
 <p>Data in the fourth page.</p>\n"
+(cookies
+   (prefix "<p>Cookies:</p>\n<table>\n")
+   (suffix "</table>\n")
+   (template "  <tr>\n    <td>" (value-1) "</td>\n    <td>" (value-2)
+      "</td>\n  </tr>\n"))
 (tags comments (all-elements
    (if-empty "<p>No comment yet.</p>\n")
    reverse (limit 1)
