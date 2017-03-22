@@ -281,10 +281,6 @@ package body Natools.Web.Containers is
      (Row_List : in Atom_Row_Lists.List)
      return Atom_Table_Refs.Immutable_Reference is
    begin
-      if Atom_Row_Lists.Is_Empty (Row_List) then
-         return Atom_Table_Refs.Null_Immutable_Reference;
-      end if;
-
       Build_Table :
       declare
          Data : constant Atom_Table_Refs.Data_Access
