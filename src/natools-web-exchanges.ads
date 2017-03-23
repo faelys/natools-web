@@ -55,6 +55,9 @@ package Natools.Web.Exchanges is
       Item : out Ada.Streams.Stream_Element_Array;
       Last : out Ada.Streams.Stream_Element_Offset);
 
+   function Cookie (Object : in Exchange; Name : in String) return String;
+      --  Return a specific cookie, or the empty string if it is not set
+
    function Cookie_Table
      (Object : in Exchange)
      return Containers.Atom_Table_Refs.Immutable_Reference;

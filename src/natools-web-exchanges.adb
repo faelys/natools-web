@@ -15,6 +15,7 @@
 ------------------------------------------------------------------------------
 
 with Ada.Strings.Unbounded;
+with AWS.Cookie;
 with AWS.Headers.Values;
 with AWS.MIME;
 with AWS.Parameters;
@@ -127,6 +128,12 @@ package body Natools.Web.Exchanges is
    -----------------------
    -- Request Accessors --
    -----------------------
+
+   function Cookie (Object : in Exchange; Name : in String) return String is
+   begin
+      return AWS.Cookie.Get (Object.Request.all, Name);
+   end Cookie;
+
 
    function Cookie_Table
      (Object : in Exchange)
