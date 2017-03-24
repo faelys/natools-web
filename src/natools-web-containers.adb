@@ -14,6 +14,7 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Ada.Containers.Generic_Array_Sort;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Printers;
@@ -48,6 +49,18 @@ package body Natools.Web.Containers is
       Value : in out S_Expressions.Lockable.Descriptor'Class);
       --  Insert a new node (Name -> Expression_Map (Value)) in Map
 
+   function Less_Than
+     (Left, Right : S_Expressions.Atom_Refs.Immutable_Reference)
+     return Boolean
+     is (S_Expressions.Less_Than (Left.Query, Right.Query));
+      --  Compare the contents of two non-empty immutable references
+
+
+   procedure Atom_Array_Sort is new Ada.Containers.Generic_Array_Sort
+     (S_Expressions.Count,
+      S_Expressions.Atom_Refs.Immutable_Reference,
+      Atom_Array,
+      Less_Than);
 
    procedure Date_Reader is new S_Expressions.Interpreter_Loop
      (Date_Maps.Unsafe_Maps.Map, Meaningless_Type, Add_Date);
@@ -300,5 +313,82 @@ package body Natools.Web.Containers is
          return Ref;
       end Build_Table;
    end Create;
+
+
+
+   ------------------------
+   -- Atom Set Interface --
+   ------------------------
+
+   function Create (Source : in Atom_Array) return Atom_Set is
+      Data : constant Atom_Array_Refs.Data_Access := new Atom_Array'(Source);
+      Ref : constant Atom_Array_Refs.Immutable_Reference
+        := Atom_Array_Refs.Create (Data);
+   begin
+      Atom_Array_Sort (Data.all);
+      return (Elements => Ref);
+   end Create;
+
+
+   function Create (Source : in Unsafe_Atom_Lists.List) return Atom_Set is
+   begin
+      return Create (Create (Source).Query);
+   end Create;
+
+
+   function Contains
+     (Set : in Atom_Set;
+      Value : in S_Expressions.Atom)
+     return Boolean
+   is
+      use type S_Expressions.Offset;
+      Upper, Middle, Lower : S_Expressions.Offset;
+   begin
+      if Set.Elements.Is_Empty then
+         return False;
+      end if;
+
+      declare
+         Elements : constant Atom_Array_Refs.Accessor := Set.Elements.Query;
+      begin
+         if Elements.Data'Length = 0 then
+            return False;
+         end if;
+
+         Lower := Elements.Data'First - 1;
+         Upper := Elements.Data'Last + 1;
+
+         loop
+            pragma Assert (Upper - Lower >= 2);
+            Middle := Lower + (Upper - Lower) / 2;
+
+            declare
+               Middle_Value : constant S_Expressions.Atom_Refs.Accessor
+                 := Elements (Middle).Query;
+            begin
+               if S_Expressions.Less_Than (Middle_Value, Value) then
+                  Lower := Middle;
+               elsif S_Expressions.Less_Than (Value, Middle_Value) then
+                  Upper := Middle;
+               else
+                  return True;
+               end if;
+            end;
+
+            if Lower + 1 >= Upper then
+               return False;
+            end if;
+         end loop;
+      end;
+   end Contains;
+
+
+   function Contains
+     (Set : in Atom_Set;
+      Value : in String)
+     return Boolean is
+   begin
+      return Contains (Set, S_Expressions.To_Atom (Value));
+   end Contains;
 
 end Natools.Web.Containers;

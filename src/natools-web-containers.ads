@@ -117,4 +117,28 @@ package Natools.Web.Containers is
      (Row_List : in Atom_Row_Lists.List)
      return Atom_Table_Refs.Immutable_Reference;
 
+
+
+   type Atom_Set is private;
+
+   Null_Atom_Set : constant Atom_Set;
+
+   function Create (Source : in Atom_Array) return Atom_Set;
+   function Create (Source : in Unsafe_Atom_Lists.List) return Atom_Set;
+
+   function Contains
+     (Set : in Atom_Set;
+      Value : in S_Expressions.Atom)
+     return Boolean;
+   function Contains
+     (Set : in Atom_Set;
+      Value : in String)
+     return Boolean;
+
+private
+
+   type Atom_Set is record
+      Elements : Atom_Array_Refs.Immutable_Reference;
+   end record;
+
 end Natools.Web.Containers;
