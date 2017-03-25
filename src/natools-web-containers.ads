@@ -121,8 +121,6 @@ package Natools.Web.Containers is
 
    type Atom_Set is private;
 
-   Null_Atom_Set : constant Atom_Set;
-
    function Create (Source : in Atom_Array) return Atom_Set;
    function Create (Source : in Unsafe_Atom_Lists.List) return Atom_Set;
 
@@ -134,6 +132,12 @@ package Natools.Web.Containers is
      (Set : in Atom_Set;
       Value : in String)
      return Boolean;
+
+
+   type Identity is record
+      User : S_Expressions.Atom_Refs.Immutable_Reference;
+      Groups : Atom_Set;
+   end record;
 
 private
 
