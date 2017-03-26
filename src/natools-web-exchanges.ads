@@ -81,6 +81,19 @@ package Natools.Web.Exchanges is
       --  Path part of the requested URL
 
 
+   function Has_Identity (Object : Exchange) return Boolean;
+      --  Return whether an identity has been stored in Object
+
+   function Identity (Object : Exchange) return Containers.Identity
+     with Pre => Has_Identity (Object);
+      --  Return the identity stored in Objet
+
+   procedure Set_Identity
+     (Object : in out Exchange;
+      Identity : in Containers.Identity);
+      --  Store an identity inside Object
+
+
    function Has_Response (Object : Exchange) return Boolean;
       --  Return whether a response has been built in Object
 
@@ -163,9 +176,14 @@ private
       MIME_Type : S_Expressions.Atom_Refs.Immutable_Reference;
       Response_Body : S_Expressions.Atom_Buffers.Atom_Buffer;
       Status_Code : AWS.Messages.Status_Code := AWS.Messages.S200;
+      Has_Identity : Boolean := False;
+      Identity : Containers.Identity;
    end record;
 
    function Has_Response (Object : Exchange) return Boolean
      is (not Responses."=" (Object.Kind, Responses.Empty));
+
+   function Has_Identity (Object : Exchange) return Boolean
+     is (Object.Has_Identity);
 
 end Natools.Web.Exchanges;

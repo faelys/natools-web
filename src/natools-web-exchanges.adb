@@ -216,6 +216,26 @@ package body Natools.Web.Exchanges is
 
 
 
+   -------------------------
+   -- Identity Management --
+   -------------------------
+
+   function Identity (Object : Exchange) return Containers.Identity is
+   begin
+      return Object.Identity;
+   end Identity;
+
+
+   procedure Set_Identity
+     (Object : in out Exchange;
+      Identity : in Containers.Identity) is
+   begin
+      Object.Has_Identity := True;
+      Object.Identity := Identity;
+   end Set_Identity;
+
+
+
    ---------------------------
    -- Response Construction --
    ---------------------------
