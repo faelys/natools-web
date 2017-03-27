@@ -1,0 +1,17 @@
+(Natools.Static_Maps.Web.ACL
+   pure
+   (test-function T)
+   (extra-decl "\
+   type Command is
+     (Unknown_Command,
+      Is_In_All_Groups,
+      Is_In_Any_Group,
+      Is_User);")
+   (Command
+      (hash-package Natools.Static_Maps.Web.ACL.Commands)
+      (function To_Command)
+      (not-found Unknown_Command)
+      (nodes
+         (Is_In_All_Groups   is-in-groups is-in-all-groups)
+         (Is_In_Any_Group   is-in-group is-in-any-group)
+         (Is_User   is is-user is-any-of))))
