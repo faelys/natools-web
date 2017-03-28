@@ -437,6 +437,15 @@ package body Natools.Web.Sites is
    end Register;
 
 
+   procedure Register
+     (Self : in out Site;
+      Name : in String;
+      Constructor : in ACL_Constructor) is
+   begin
+      Self.Constructors.ACL.Insert (S_Expressions.To_Atom (Name), Constructor);
+   end Register;
+
+
    procedure Reload (Object : in out Site) is
       Reader : S_Expressions.File_Readers.S_Reader
         := S_Expressions.File_Readers.Reader

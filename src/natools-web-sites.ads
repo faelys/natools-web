@@ -24,6 +24,7 @@ with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
 with Natools.S_Expressions.Printers.Pretty;
+with Natools.Web.ACL;
 with Natools.Web.Backends;
 with Natools.Web.Containers;
 with Natools.Web.Exchanges;
@@ -202,6 +203,18 @@ package Natools.Web.Sites is
       --  Register Constructor for Name in Self
       --  WARNING: it is not safe to call this procedure concurrently
 
+
+   type ACL_Constructor is not null access function
+     (Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+     return ACL.Backend'Class;
+
+   procedure Register
+     (Self : in out Site;
+      Name : in String;
+      Constructor : in ACL_Constructor);
+      --  Register Constructor for Name in Self
+      --  WARNING: it is not safe to call this procedure concurrently
+
 private
 
    type Exchange
@@ -209,12 +222,15 @@ private
       Site : not null access Sites.Site)
      is limited null record;
 
-   package Backend_Maps is new Constant_Indefinite_Ordered_Maps
-     (S_Expressions.Atom,      Backends.Backend'Class,
-      S_Expressions.Less_Than, Backends."=");
+   package ACL_Constructors is new Ada.Containers.Indefinite_Ordered_Maps
+     (S_Expressions.Atom, ACL_Constructor, S_Expressions.Less_Than);
 
    package Backend_Constructors is new Ada.Containers.Indefinite_Ordered_Maps
      (S_Expressions.Atom, Backend_Constructor, S_Expressions.Less_Than);
+
+   package Backend_Maps is new Constant_Indefinite_Ordered_Maps
+     (S_Expressions.Atom,      Backends.Backend'Class,
+      S_Expressions.Less_Than, Backends."=");
 
    package Page_Loaders is new Constant_Indefinite_Ordered_Maps
      (S_Expressions.Atom, Page_Loader'Class, S_Expressions.Less_Than);
@@ -223,6 +239,7 @@ private
      (S_Expressions.Atom, Page_Constructor, S_Expressions.Less_Than);
 
    type Constructors_In_Site is record
+      ACL : ACL_Constructors.Map;
       Backend : Backend_Constructors.Map;
       Page : Page_Constructors.Map;
    end record;
