@@ -246,6 +246,7 @@ private
 
    type Site is tagged limited record
       Load_Date : Ada.Calendar.Time;
+      ACL : Web.ACL.Backend_Refs.Reference;
       Backends : Backend_Maps.Updatable_Map;
       Constructors : aliased Constructors_In_Site;
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
@@ -264,6 +265,7 @@ private
    type Site_Builder
      (Constructors : not null access Constructors_In_Site)
    is limited record
+      ACL : Web.ACL.Backend_Refs.Reference;
       Backends : Backend_Maps.Unsafe_Maps.Map;
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;

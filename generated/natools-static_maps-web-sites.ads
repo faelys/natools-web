@@ -1,4 +1,4 @@
---  Generated at 2015-03-21 21:27:24 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2017-03-29 14:57:31 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-sites-maps.sx
 
 package Natools.Static_Maps.Web.Sites is
@@ -6,6 +6,7 @@ package Natools.Static_Maps.Web.Sites is
 
    type Command is
      (Error,
+      Set_ACL,
       Set_Backends,
       Set_Default_Template,
       Set_File_Prefix,
@@ -24,24 +25,26 @@ package Natools.Static_Maps.Web.Sites is
 
 private
 
-   Map_1_Key_0 : aliased constant String := "backends";
-   Map_1_Key_1 : aliased constant String := "back-ends";
-   Map_1_Key_2 : aliased constant String := "default-template";
-   Map_1_Key_3 : aliased constant String := "file-prefix";
-   Map_1_Key_4 : aliased constant String := "file-suffix";
-   Map_1_Key_5 : aliased constant String := "filters";
-   Map_1_Key_6 : aliased constant String := "named-element-file";
-   Map_1_Key_7 : aliased constant String := "named-elements";
-   Map_1_Key_8 : aliased constant String := "path-prefix";
-   Map_1_Key_9 : aliased constant String := "path-suffix";
-   Map_1_Key_10 : aliased constant String := "printer";
-   Map_1_Key_11 : aliased constant String := "printer-parameters";
-   Map_1_Key_12 : aliased constant String := "static";
-   Map_1_Key_13 : aliased constant String := "static-path";
-   Map_1_Key_14 : aliased constant String := "static-paths";
-   Map_1_Key_15 : aliased constant String := "template-file";
-   Map_1_Key_16 : aliased constant String := "templates";
-   Map_1_Keys : constant array (0 .. 16) of access constant String
+   Map_1_Key_0 : aliased constant String := "acl";
+   Map_1_Key_1 : aliased constant String := "users";
+   Map_1_Key_2 : aliased constant String := "backends";
+   Map_1_Key_3 : aliased constant String := "back-ends";
+   Map_1_Key_4 : aliased constant String := "default-template";
+   Map_1_Key_5 : aliased constant String := "file-prefix";
+   Map_1_Key_6 : aliased constant String := "file-suffix";
+   Map_1_Key_7 : aliased constant String := "filters";
+   Map_1_Key_8 : aliased constant String := "named-element-file";
+   Map_1_Key_9 : aliased constant String := "named-elements";
+   Map_1_Key_10 : aliased constant String := "path-prefix";
+   Map_1_Key_11 : aliased constant String := "path-suffix";
+   Map_1_Key_12 : aliased constant String := "printer";
+   Map_1_Key_13 : aliased constant String := "printer-parameters";
+   Map_1_Key_14 : aliased constant String := "static";
+   Map_1_Key_15 : aliased constant String := "static-path";
+   Map_1_Key_16 : aliased constant String := "static-paths";
+   Map_1_Key_17 : aliased constant String := "template-file";
+   Map_1_Key_18 : aliased constant String := "templates";
+   Map_1_Keys : constant array (0 .. 18) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -58,9 +61,13 @@ private
          Map_1_Key_13'Access,
          Map_1_Key_14'Access,
          Map_1_Key_15'Access,
-         Map_1_Key_16'Access);
-   Map_1_Elements : constant array (0 .. 16) of Command
-     := (Set_Backends,
+         Map_1_Key_16'Access,
+         Map_1_Key_17'Access,
+         Map_1_Key_18'Access);
+   Map_1_Elements : constant array (0 .. 18) of Command
+     := (Set_ACL,
+         Set_ACL,
+         Set_Backends,
          Set_Backends,
          Set_Default_Template,
          Set_File_Prefix,

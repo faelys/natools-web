@@ -284,6 +284,33 @@ package body Natools.Web.Sites is
                end if;
             end;
 
+         when Commands.Set_ACL =>
+            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+               declare
+                  Cursor : constant ACL_Constructors.Cursor
+                    := Builder.Constructors.ACL.Find (Arguments.Current_Atom);
+               begin
+                  if ACL_Constructors.Has_Element (Cursor) then
+                     declare
+                        function Create return ACL.Backend'Class;
+
+                        function Create return ACL.Backend'Class is
+                           Constructor : constant ACL_Constructor
+                             := ACL_Constructors.Element (Cursor);
+                        begin
+                           return Constructor.all (Arguments);
+                        end Create;
+                     begin
+                        Arguments.Next;
+                        Builder.ACL := ACL.Backend_Refs.Create (Create'Access);
+                     end;
+                  else
+                     Log (Severities.Error, "Unknown ACL type """
+                       & S_Expressions.To_String (Arguments.Current_Atom));
+                  end if;
+               end;
+            end if;
+
          when Commands.Set_Backends =>
             Add_Backends (Arguments, Builder, Meaningless_Value);
 
@@ -464,12 +491,13 @@ package body Natools.Web.Sites is
             Old_Loaders => Object.Loaders,
             Path_Prefix => Empty_Atom,
             Path_Suffix => Empty_Atom,
-            Backends | Named_Elements | Pages | Static | Tags | Templates
+            ACL | Backends | Named_Elements | Pages | Static | Tags | Templates
               | Printer_Parameters
               => <>);
    begin
       Update (Builder, Reader);
 
+      Object.ACL := Builder.ACL;
       Object.Backends := Backend_Maps.Create (Builder.Backends);
       Object.Default_Template := Builder.Default_Template;
       Object.Filters := Builder.Filters;

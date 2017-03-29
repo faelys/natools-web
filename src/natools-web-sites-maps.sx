@@ -4,6 +4,7 @@
    (extra-decl "\
    type Command is
      (Error,
+      Set_ACL,
       Set_Backends,
       Set_Default_Template,
       Set_File_Prefix,
@@ -22,6 +23,7 @@
       (function To_Command)
       (not-found Error)
       (nodes
+         (Set_ACL               acl users)
          (Set_Backends          backends back-ends)
          (Set_Default_Template  default-template)
          (Set_File_Prefix       file-prefix)
