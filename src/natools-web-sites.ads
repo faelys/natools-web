@@ -131,6 +131,8 @@ package Natools.Web.Sites is
      is limited private
      with Implicit_Dereference => Backend;
 
+   function Identity (Ex : Exchange) return Containers.Identity;
+
 
    type Page is interface;
 

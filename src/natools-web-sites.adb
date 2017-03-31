@@ -426,6 +426,22 @@ package body Natools.Web.Sites is
    end Queue_Update;
 
 
+   function Identity (Ex : Exchange) return Containers.Identity is
+   begin
+      if not Exchanges.Has_Identity (Ex.Backend.all) then
+         if Ex.Site.ACL.Is_Empty then
+            Exchanges.Set_Identity (Ex.Backend.all, Containers.Null_Identity);
+         else
+            Ex.Site.ACL.Update.Authenticate (Ex.Backend.all);
+         end if;
+
+         pragma Assert (Exchanges.Has_Identity (Ex.Backend.all));
+      end if;
+
+      return Exchanges.Identity (Ex.Backend.all);
+   end Identity;
+
+
    procedure Insert
      (Object : in out Site;
       Tags : in Web.Tags.Tag_List;
