@@ -16,7 +16,8 @@
       Parameter,
       Set_MIME_Type,
       Tags,
-      Template);")
+      Template,
+      User);")
    (Command
       (hash-package Natools.Static_Maps.Web.Fallback_Render.Commands)
       (function To_Command)
@@ -34,4 +35,5 @@
          (Parameter   parameter)
          (Set_MIME_Type   mime-type)
          (Tags   pagelist page-list tag tags)
-         (Template   template))))
+         (Template   template)
+         (User   user))))

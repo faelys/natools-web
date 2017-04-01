@@ -1,4 +1,4 @@
---  Generated at 2017-03-18 19:46:19 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2017-04-01 17:51:32 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-fallback_render-maps.sx
 
 package Natools.Static_Maps.Web.Fallback_Render is
@@ -18,7 +18,8 @@ package Natools.Static_Maps.Web.Fallback_Render is
       Parameter,
       Set_MIME_Type,
       Tags,
-      Template);
+      Template,
+      User);
 
    function To_Command (Key : String) return Command;
 
@@ -45,7 +46,8 @@ private
    Map_1_Key_18 : aliased constant String := "tag";
    Map_1_Key_19 : aliased constant String := "tags";
    Map_1_Key_20 : aliased constant String := "template";
-   Map_1_Keys : constant array (0 .. 20) of access constant String
+   Map_1_Key_21 : aliased constant String := "user";
+   Map_1_Keys : constant array (0 .. 21) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -66,8 +68,9 @@ private
          Map_1_Key_17'Access,
          Map_1_Key_18'Access,
          Map_1_Key_19'Access,
-         Map_1_Key_20'Access);
-   Map_1_Elements : constant array (0 .. 20) of Command
+         Map_1_Key_20'Access,
+         Map_1_Key_21'Access);
+   Map_1_Elements : constant array (0 .. 21) of Command
      := (Current_Time,
          Current_Time,
          Current_Time,
@@ -88,6 +91,7 @@ private
          Tags,
          Tags,
          Tags,
-         Template);
+         Template,
+         User);
 
 end Natools.Static_Maps.Web.Fallback_Render;

@@ -18,6 +18,7 @@ with Ada.Calendar;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Templates.Dates;
 with Natools.Static_Maps.Web.Fallback_Render;
+with Natools.Web.ACL;
 with Natools.Web.Escapes;
 with Natools.Web.Filters.Stores;
 with Natools.Web.Tags;
@@ -184,6 +185,22 @@ begin
                      Lookup_Element => False);
             begin
                Re_Enter (Exchange, Template);
+            end;
+         end if;
+
+      when Commands.User =>
+         if Re_Enter = null then
+            Report_Unknown_Command;
+         else
+            declare
+               Match : Boolean := False;
+            begin
+               ACL.Match (Sites.Identity (Exchange), Arguments, Match);
+
+               if Match then
+                  Arguments.Next;
+                  Re_Enter (Exchange, Arguments);
+               end if;
             end;
          end if;
    end case;
