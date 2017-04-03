@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015, Natacha Porté                                        --
+-- Copyright (c) 2015-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -70,6 +70,16 @@ package body Natools.Web.Sites.Holders is
       Constructor : in Backend_Constructor) is
    begin
       Self.Constructors.Backend.Insert
+        (S_Expressions.To_Atom (Name), Constructor);
+   end Register;
+
+
+   not overriding procedure Register
+     (Self : in out Holder;
+      Name : in String;
+      Constructor : in ACL_Constructor) is
+   begin
+      Self.Constructors.ACL.Insert
         (S_Expressions.To_Atom (Name), Constructor);
    end Register;
 
