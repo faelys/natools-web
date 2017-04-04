@@ -1,6 +1,7 @@
 (backends
    (comments directory data/comments/))
 (default-template html)
+(users s-expr data/users.sx)
 (reload-pages ("/" /reload))
 (file-prefix data/)
 (file-suffix .sx)

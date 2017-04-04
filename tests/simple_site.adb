@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -22,6 +22,7 @@ with AWS.Server;
 with Common;
 with Common.Pages;
 with Common.Test_Maps;
+with Natools.Web.ACL.Sx_Backends;
 with Natools.Web.Backends.Filesystem;
 with Natools.Web.Escapes.Filters;
 with Natools.Web.Filters.Pass_Through;
@@ -67,6 +68,8 @@ begin
      ("pass-through", Natools.Web.Filters.Pass_Through.Create'Access);
    Common.Site.Register
      ("text-block", Natools.Web.Filters.Text_Blocks.Create'Access);
+   Common.Site.Register
+     ("s-expr", Natools.Web.ACL.Sx_Backends.Create'Access);
 
    if Ada.Command_Line.Argument_Count >= 1 then
       Common.Site.Load (Ada.Command_Line.Argument (1));

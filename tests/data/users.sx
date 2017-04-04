@@ -1,0 +1,6 @@
+(test-user
+   (tokens glaglagla hello)
+   (groups admin))
+(normal
+   (tokens hi)
+   (groups user bar))
