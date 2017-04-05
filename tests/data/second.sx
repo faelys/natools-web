@@ -11,6 +11,8 @@
    (suffix "</table>\n")
    (template "  <tr>\n    <td>" (value-1) "</td>\n    <td>" (value-2)
       "</td>\n  </tr>\n"))
+(user (is-in-group admin) "<p>Admin user</p>\n")
+(user (is-in-group user)  "<p>Standard user</p>\n")
 (render page-comments))
    (footer "<p>Special footer</p>\n")
    (title "Second Page"))

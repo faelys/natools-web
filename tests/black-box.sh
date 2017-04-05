@@ -90,7 +90,7 @@ get_version(){
 
 
 check /first first.html
-check /second second.html -b 'foo=bar; others=/meow+meow'
+check /second second.html -b 'foo=bar; User-Token=glaglagla'
 check /third third.html
 check /style.css ../data/static/style.css
 check /non-existant 404.html
@@ -117,7 +117,7 @@ check /second/comments second-404.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \
     -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
     -F 'c_text=Valid comment sent to a closed comment list'
-chain /second second.html -b 'foo=bar; others=/meow+meow'
+chain /second second.html -b 'foo=bar; User-Token=glaglagla'
 
 BASE_VERSION=$(get_version)
 check /fourth fourth.html
