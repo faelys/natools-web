@@ -20,6 +20,7 @@
 ------------------------------------------------------------------------------
 
 with Natools.S_Expressions.Atom_Refs;
+with Natools.S_Expressions.Lockable;
 
 package Natools.Web.Comment_Cookies is
    pragma Preelaborate;
@@ -33,6 +34,10 @@ package Natools.Web.Comment_Cookies is
       Mail : in S_Expressions.Atom_Refs.Immutable_Reference;
       Link : in S_Expressions.Atom_Refs.Immutable_Reference;
       Filter : in S_Expressions.Atom_Refs.Immutable_Reference)
+     return Comment_Info;
+
+   function Create
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
      return Comment_Info;
 
 
