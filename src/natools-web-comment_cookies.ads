@@ -53,6 +53,13 @@ package Natools.Web.Comment_Cookies is
    function Filter (Info : in Comment_Info)
      return S_Expressions.Atom_Refs.Immutable_Reference;
 
+
+   function Named_Serialization (Info : in Comment_Info)
+     return S_Expressions.Atom;
+
+   function Positional_Serialization (Info : in Comment_Info)
+     return S_Expressions.Atom;
+
 private
 
    type Atom_Kind is (Name, Mail, Link, Filter);
