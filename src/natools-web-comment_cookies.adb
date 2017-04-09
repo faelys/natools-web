@@ -107,9 +107,9 @@ package body Natools.Web.Comment_Cookies is
 
 
 
-   ----------------------
-   -- Public Interface --
-   ----------------------
+   -----------------------------------
+   -- Comment Info Public Interface --
+   -----------------------------------
 
    function Create
      (Name : in S_Expressions.Atom_Refs.Immutable_Reference;
@@ -207,5 +207,62 @@ package body Natools.Web.Comment_Cookies is
 
       return Buffer.Data;
    end Positional_Serialization;
+
+
+
+   -------------------------------
+   -- Codec DB Public Interface --
+   -------------------------------
+
+   function Decode
+     (DB : in Codec_DB;
+      Cookie : in String)
+     return Comment_Info
+   is
+      pragma Unreferenced (DB);
+      pragma Unreferenced (Cookie);
+   begin
+      raise Program_Error with "Not Implemented yet";
+      return Null_Info;
+   end Decode;
+
+
+   function Encode
+     (DB : in Codec_DB;
+      Info : in Comment_Info)
+     return String is
+   begin
+      if DB.Enc = null then
+         raise Program_Error
+           with "Comment_Cookie.Encode called before Set_Encoder";
+      end if;
+
+      case DB.Serialization is
+         when Named =>
+            return DB.Enc.all (Named_Serialization (Info));
+
+         when Positional =>
+            return DB.Enc.all (Positional_Serialization (Info));
+      end case;
+   end Encode;
+
+
+   procedure Register
+     (DB : in out Codec_DB;
+      Key : in Character;
+      Filter : in not null Decoder) is
+   begin
+      DB.Dec := Decoder_Maps.Include (DB.Dec, Key, Filter);
+   end Register;
+
+
+   procedure Set_Encoder
+     (DB : in out Codec_DB;
+      Filter : in not null Encoder;
+      Serialization : in Serialization_Kind) is
+   begin
+      DB.Enc := Filter;
+      DB.Serialization := Serialization;
+   end Set_Encoder;
 
 end Natools.Web.Comment_Cookies;

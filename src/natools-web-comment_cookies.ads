@@ -22,6 +22,8 @@
 with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Lockable;
 
+private with Natools.Constant_Indefinite_Ordered_Maps;
+
 package Natools.Web.Comment_Cookies is
    pragma Preelaborate;
 
@@ -60,6 +62,36 @@ package Natools.Web.Comment_Cookies is
    function Positional_Serialization (Info : in Comment_Info)
      return S_Expressions.Atom;
 
+
+   type Serialization_Kind is (Named, Positional);
+
+   type Encoder is access function (Data : in S_Expressions.Atom)
+     return String;
+   type Decoder is access function (Data : in String)
+     return S_Expressions.Atom;
+
+   type Codec_DB is private;
+
+   procedure Register
+     (DB : in out Codec_DB;
+      Key : in Character;
+      Filter : in not null Decoder);
+
+   procedure Set_Encoder
+     (DB : in out Codec_DB;
+      Filter : in not null Encoder;
+      Serialization : in Serialization_Kind);
+
+   function Encode
+     (DB : in Codec_DB;
+      Info : in Comment_Info)
+     return String;
+
+   function Decode
+     (DB : in Codec_DB;
+      Cookie : in String)
+     return Comment_Info;
+
 private
 
    type Atom_Kind is (Name, Mail, Link, Filter);
@@ -69,6 +101,16 @@ private
 
    type Comment_Info is record
       Refs : Ref_Array;
+   end record;
+
+
+   package Decoder_Maps is new Constant_Indefinite_Ordered_Maps
+     (Character, Decoder);
+
+   type Codec_DB is record
+      Enc : Encoder := null;
+      Dec : Decoder_Maps.Constant_Map;
+      Serialization : Serialization_Kind := Named;
    end record;
 
 
