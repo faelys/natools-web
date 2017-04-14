@@ -17,6 +17,7 @@
 with Natools.S_Expressions.Atom_Buffers;
 with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Interpreter_Loop;
+with Natools.S_Expressions.Parsers;
 with Natools.S_Expressions.Printers.Pretty;
 
 package body Natools.Web.Comment_Cookies is
@@ -219,11 +220,25 @@ package body Natools.Web.Comment_Cookies is
       Cookie : in String)
      return Comment_Info
    is
-      pragma Unreferenced (DB);
-      pragma Unreferenced (Cookie);
+      Cursor : Decoder_Maps.Cursor;
    begin
-      raise Program_Error with "Not Implemented yet";
-      return Null_Info;
+      if Cookie'Length = 0 then
+         return Null_Info;
+      end if;
+
+      Cursor := DB.Dec.Find (Cookie (Cookie'First));
+
+      if not Decoder_Maps.Has_Element (Cursor) then
+         return Null_Info;
+      end if;
+
+      declare
+         Parser : S_Expressions.Parsers.Memory_Parser
+           := S_Expressions.Parsers.Create
+              (Decoder_Maps.Element (Cursor).all (Cookie));
+      begin
+         return Create (Parser);
+      end;
    end Decode;
 
 
