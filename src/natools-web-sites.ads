@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -26,6 +26,7 @@ with Natools.S_Expressions.Lockable;
 with Natools.S_Expressions.Printers.Pretty;
 with Natools.Web.ACL;
 with Natools.Web.Backends;
+with Natools.Web.Comment_Cookies;
 with Natools.Web.Containers;
 with Natools.Web.Exchanges;
 with Natools.Web.Filters.Stores;
@@ -63,6 +64,12 @@ package Natools.Web.Sites is
       Constructor : in Filters.Stores.Constructor);
       --  Register a filter constructor
 
+   procedure Register
+     (Object : in out Site;
+      Key : in Character;
+      Filter : in not null Comment_Cookies.Decoder);
+      --  Register a cookie decoder
+
    procedure Reload (Object : in out Site);
       --  Reload Object data from its original file
 
@@ -73,6 +80,12 @@ package Natools.Web.Sites is
      (Object : in out Site;
       Exchange : aliased in out Exchanges.Exchange);
       --  Look up internal data to provide a response in Exchange
+
+   procedure Set_Cookie_Encoder
+     (Object : in out Site;
+      Filter : in not null Comment_Cookies.Encoder;
+      Serialization : in Comment_Cookies.Serialization_Kind);
+      --  Set the encoder for comment cookies
 
 
    function Get_Backend (From : Site; Name : S_Expressions.Atom)
@@ -243,6 +256,7 @@ private
    type Constructors_In_Site is record
       ACL : ACL_Constructors.Map;
       Backend : Backend_Constructors.Map;
+      Codec_DB : Comment_Cookies.Codec_DB;
       Page : Page_Constructors.Map;
    end record;
 

@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -489,6 +489,15 @@ package body Natools.Web.Sites is
    end Register;
 
 
+   procedure Register
+     (Object : in out Site;
+      Key : in Character;
+      Filter : in not null Comment_Cookies.Decoder) is
+   begin
+      Comment_Cookies.Register (Object.Constructors.Codec_DB, Key, Filter);
+   end Register;
+
+
    procedure Reload (Object : in out Site) is
       Reader : S_Expressions.File_Readers.S_Reader
         := S_Expressions.File_Readers.Reader
@@ -638,6 +647,18 @@ package body Natools.Web.Sites is
          Error_Pages.Not_Found (Extended_Exchange);
       end if;
    end Respond;
+
+
+   procedure Set_Cookie_Encoder
+     (Object : in out Site;
+      Filter : in not null Comment_Cookies.Encoder;
+      Serialization : in Comment_Cookies.Serialization_Kind) is
+   begin
+      Comment_Cookies.Set_Encoder
+        (Object.Constructors.Codec_DB,
+         Filter,
+         Serialization);
+   end Set_Cookie_Encoder;
 
 
    procedure Set_Updater
