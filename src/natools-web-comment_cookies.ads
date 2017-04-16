@@ -27,6 +27,8 @@ private with Natools.Constant_Indefinite_Ordered_Maps;
 package Natools.Web.Comment_Cookies is
    pragma Preelaborate;
 
+   Cookie_Name : constant String := "c_info";
+
    type Comment_Info is private;
 
    Null_Info : constant Comment_Info;
