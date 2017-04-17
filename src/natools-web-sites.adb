@@ -412,18 +412,22 @@ package body Natools.Web.Sites is
 
 
 
-   ---------------------------
-   -- Site Public Interface --
-   ---------------------------
+   -------------------------------
+   -- Exchange Public Interface --
+   -------------------------------
 
-   procedure Queue_Update
-     (Object : in Site;
-      Update : in Updates.Site_Update'Class) is
+   function Comment_Info (Ex : in out Exchange)
+     return Comment_Cookies.Comment_Info is
    begin
-      if Object.Updater /= null then
-         Object.Updater.Queue (Update);
+      if not Ex.Comment_Info_Initialized then
+         Ex.Comment_Info := Comment_Cookies.Decode
+           (Ex.Site.Constructors.Codec_DB,
+            Ex.Cookie (Comment_Cookies.Cookie_Name));
+         Ex.Comment_Info_Initialized := True;
       end if;
-   end Queue_Update;
+
+      return Ex.Comment_Info;
+   end Comment_Info;
 
 
    function Identity (Ex : Exchange) return Containers.Identity is
@@ -440,6 +444,21 @@ package body Natools.Web.Sites is
 
       return Exchanges.Identity (Ex.Backend.all);
    end Identity;
+
+
+
+   ---------------------------
+   -- Site Public Interface --
+   ---------------------------
+
+   procedure Queue_Update
+     (Object : in Site;
+      Update : in Updates.Site_Update'Class) is
+   begin
+      if Object.Updater /= null then
+         Object.Updater.Queue (Update);
+      end if;
+   end Queue_Update;
 
 
    procedure Insert

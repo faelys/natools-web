@@ -144,6 +144,9 @@ package Natools.Web.Sites is
      is limited private
      with Implicit_Dereference => Backend;
 
+   function Comment_Info (Ex : in out Exchange)
+     return Comment_Cookies.Comment_Info;
+
    function Identity (Ex : Exchange) return Containers.Identity;
 
 
@@ -235,7 +238,10 @@ private
    type Exchange
      (Backend : not null access Exchanges.Exchange;
       Site : not null access Sites.Site)
-     is limited null record;
+   is limited record
+      Comment_Info_Initialized : Boolean := False;
+      Comment_Info : Comment_Cookies.Comment_Info;
+   end record;
 
    package ACL_Constructors is new Ada.Containers.Indefinite_Ordered_Maps
      (S_Expressions.Atom, ACL_Constructor, S_Expressions.Less_Than);
