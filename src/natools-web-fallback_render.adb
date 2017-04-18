@@ -15,10 +15,12 @@
 ------------------------------------------------------------------------------
 
 with Ada.Calendar;
+with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Templates.Dates;
 with Natools.Static_Maps.Web.Fallback_Render;
 with Natools.Web.ACL;
+with Natools.Web.Comment_Cookies;
 with Natools.Web.Escapes;
 with Natools.Web.Filters.Stores;
 with Natools.Web.Tags;
@@ -40,7 +42,21 @@ is
    package Commands renames Natools.Static_Maps.Web.Fallback_Render;
    use type S_Expressions.Events.Event;
 
+   procedure Render_Ref (Ref : in S_Expressions.Atom_Refs.Immutable_Reference);
    procedure Report_Unknown_Command;
+
+   procedure Render_Ref
+     (Ref : in S_Expressions.Atom_Refs.Immutable_Reference) is
+   begin
+      if not Ref.Is_Empty then
+         Escapes.Write
+           (Exchange,
+            S_Expressions.To_String (Ref.Query),
+            Escapes.HTML_Attribute);
+      elsif Re_Enter /= null then
+         Re_Enter (Exchange, Arguments);
+      end if;
+   end Render_Ref;
 
    procedure Report_Unknown_Command is
    begin
@@ -65,6 +81,18 @@ begin
            (Exchange,
             String_Tables.Create (Exchange.Cookie_Table),
             Arguments);
+
+      when Commands.Comment_Cookie_Filter =>
+         Render_Ref (Comment_Cookies.Filter (Sites.Comment_Info (Exchange)));
+
+      when Commands.Comment_Cookie_Link =>
+         Render_Ref (Comment_Cookies.Link (Sites.Comment_Info (Exchange)));
+
+      when Commands.Comment_Cookie_Mail =>
+         Render_Ref (Comment_Cookies.Mail (Sites.Comment_Info (Exchange)));
+
+      when Commands.Comment_Cookie_Name =>
+         Render_Ref (Comment_Cookies.Name (Sites.Comment_Info (Exchange)));
 
       when Commands.Element =>
          if Re_Enter = null then

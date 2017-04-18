@@ -6,6 +6,10 @@
      (Unknown,
       Current_Time,
       Cookies,
+      Comment_Cookie_Filter,
+      Comment_Cookie_Link,
+      Comment_Cookie_Mail,
+      Comment_Cookie_Name,
       Element,
       Element_Or_Template,
       Filter,
@@ -25,6 +29,10 @@
       (nodes
          (Current_Time   now today current-time current-date)
          (Cookies   cookies cookie-table)
+         (Comment_Cookie_Filter   comment-cookie-filter)
+         (Comment_Cookie_Link   comment-cookie-link)
+         (Comment_Cookie_Mail   comment-cookie-mail)
+         (Comment_Cookie_Name   comment-cookie-name)
          (Element   element)
          (Element_Or_Template   render element-or-template)
          (Filter   filter)
