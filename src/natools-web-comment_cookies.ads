@@ -96,7 +96,7 @@ package Natools.Web.Comment_Cookies is
 
 private
 
-   type Atom_Kind is (Name, Mail, Link, Filter);
+   type Atom_Kind is (Filter, Name, Mail, Link);
 
    type Ref_Array is array (Atom_Kind)
      of S_Expressions.Atom_Refs.Immutable_Reference;
