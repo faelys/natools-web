@@ -84,12 +84,31 @@ package body Natools.Web.Sites.Holders is
    end Register;
 
 
+   not overriding procedure Register
+     (Self : in out Holder;
+      Key : in Character;
+      Filter : in not null Comment_Cookies.Decoder) is
+   begin
+      Comment_Cookies.Register (Self.Constructors.Codec_DB, Key, Filter);
+   end Register;
+
+
    not overriding procedure Respond
      (Self : in Holder;
       Exchange : aliased in out Exchanges.Exchange) is
    begin
       Self.Ref.Update.Respond (Exchange);
    end Respond;
+
+
+   not overriding procedure Set_Cookie_Encoder
+     (Self : in out Holder;
+      Filter : in not null Comment_Cookies.Encoder;
+      Serialization : in Comment_Cookies.Serialization_Kind) is
+   begin
+      Comment_Cookies.Set_Encoder
+        (Self.Constructors.Codec_DB, Filter, Serialization);
+   end Set_Cookie_Encoder;
 
 
 

@@ -59,9 +59,19 @@ package Natools.Web.Sites.Holders is
       Name : in String;
       Constructor : in ACL_Constructor);
 
+   not overriding procedure Register
+     (Self : in out Holder;
+      Key : in Character;
+      Filter : in not null Comment_Cookies.Decoder);
+
    not overriding procedure Respond
      (Self : in Holder;
       Exchange : aliased in out Exchanges.Exchange);
+
+   not overriding procedure Set_Cookie_Encoder
+     (Self : in out Holder;
+      Filter : in not null Comment_Cookies.Encoder;
+      Serialization : in Comment_Cookies.Serialization_Kind);
 
 private
 
