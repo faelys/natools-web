@@ -24,6 +24,7 @@ with Common.Pages;
 with Common.Test_Maps;
 with Natools.Web.ACL.Sx_Backends;
 with Natools.Web.Backends.Filesystem;
+with Natools.Web.Comment_Cookies.Base_64;
 with Natools.Web.Escapes.Filters;
 with Natools.Web.Filters.Pass_Through;
 with Natools.Web.Filters.Text_Blocks;
@@ -70,6 +71,12 @@ begin
      ("text-block", Natools.Web.Filters.Text_Blocks.Create'Access);
    Common.Site.Register
      ("s-expr", Natools.Web.ACL.Sx_Backends.Create'Access);
+   Common.Site.Register
+     (Natools.Web.Comment_Cookies.Base_64.Key,
+      Natools.Web.Comment_Cookies.Base_64.Decoder'Access);
+   Common.Site.Set_Cookie_Encoder
+     (Natools.Web.Comment_Cookies.Base_64.Encoder'Access,
+      Natools.Web.Comment_Cookies.Positional);
 
    if Ada.Command_Line.Argument_Count >= 1 then
       Common.Site.Load (Ada.Command_Line.Argument (1));
