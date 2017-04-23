@@ -63,6 +63,9 @@ package Natools.Web.Exchanges is
      return Containers.Atom_Table_Refs.Immutable_Reference;
       --  Return all the cookies as a two-column table
 
+   function Has_Parameter (Object : Exchange; Name : String) return Boolean;
+      --  Return whether the parameter Name exists in the request
+
    procedure Iterate_Parameters
      (Object : in Exchange;
       Process : not null access procedure (Name, Value : String));

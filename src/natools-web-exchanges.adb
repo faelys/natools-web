@@ -162,6 +162,14 @@ package body Natools.Web.Exchanges is
    end Cookie_Table;
 
 
+   function Has_Parameter (Object : Exchange; Name : String) return Boolean is
+   begin
+      return AWS.Parameters.Exist
+        (AWS.Status.Parameters (Object.Request.all),
+         Name);
+   end Has_Parameter;
+
+
    procedure Iterate_Parameters
      (Object : in Exchange;
       Process : not null access procedure (Name, Value : String))
