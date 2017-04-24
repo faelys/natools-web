@@ -186,11 +186,20 @@ begin
 
       when Commands.Parameter =>
          if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
-            Escapes.Write
-              (Exchange,
-               Exchange.Parameter
-                 (S_Expressions.To_String (Arguments.Current_Atom)),
-               Escapes.HTML_Attribute);
+            declare
+               Parameter_Name : constant String
+                 := S_Expressions.To_String (Arguments.Current_Atom);
+            begin
+               if Exchange.Has_Parameter (Parameter_Name) then
+                  Escapes.Write
+                    (Exchange,
+                     Exchange.Parameter (Parameter_Name),
+                     Escapes.HTML_Attribute);
+               elsif Re_Enter /= null then
+                  Arguments.Next;
+                  Re_Enter (Exchange, Arguments);
+               end if;
+            end;
          end if;
 
       when Commands.Set_MIME_Type =>
