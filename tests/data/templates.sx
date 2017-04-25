@@ -62,13 +62,13 @@
 (comment-form "\
 <form class=\"mainform\" method=\"post\" action=\"" (parent (path)) "/comments\">
   <p><label>Name or nick:
-    <input name=\"c_name\" value=\"" (parameter c_name) "\" type=\"text\">
+    <input name=\"c_name\" value=\"" (parameter c_name (comment-cookie-name))"\" type=\"text\">
   </label></p>
   <p><label>E-mail address:
-    <input name=\"c_mail\" value=\"" (parameter c_mail) "\" type=\"text\">
+    <input name=\"c_mail\" value=\"" (parameter c_mail (comment-cookie-mail)) "\" type=\"text\">
   </label></p>
   <p><label>Web site:
-    <input name=\"c_link\" value=\"" (parameter c_link) "\" type=\"text\">
+    <input name=\"c_link\" value=\"" (parameter c_link (comment-cookie-link)) "\" type=\"text\">
   </label></p><!--
   <p><label>Very special field:
     <input name=\"address\" value=\"http://\" type=\"text\">
@@ -98,11 +98,11 @@
       (append-reason ", " "spammer name found"))
    (if (link (contains /dev/null))
       (reject ", " "/dev/null requested"))
-   (if (not (field-list-among c_date c_filter c_link c_mail c_name c_text
-            preview submit))
+   (if (not (field-list-among c_cookie c_date c_filter c_link c_mail c_name
+            c_text preview submit))
       (reject "+(, )unknown field encountered"))
    (if (and has-unknown-field
-         (field-list-among c_date c_filter c_link c_mail c_name c_text
+         (field-list-among c_cookie c_date c_filter c_link c_mail c_name c_text
             preview submit))
       (reject "+(, )forbidden field encountered"))
    (if (fields-equal c_name c_mail)

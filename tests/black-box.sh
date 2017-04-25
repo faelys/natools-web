@@ -177,6 +177,12 @@ chain /reload reload-redirect.html -F 'submit=Submit'
 chain_curl -F 'wait_version='$((BASE_VERSION + 3)) "${BASE_URL}/test"
 chain /fourth fourth-commented.html
 
+check /fifth fifth.html
+chain /fifth fifth-cookie.html \
+    -b 'c_info=0IiIiUmFuZG9tIFN0cmFuZ2VyIiIiaHR0cDovL2luc3RpbmN0aXZlLmV1Lw'
+chain /fifth fifth-cookie.html \
+    -b 'c_info=0KG5hbWUgIlJhbmRvbSBTdHJhbmdlciIpKGxpbmsgaHR0cDovL2luc3RpbmN0aXZlLmV1Lyk'
+
 BASE_VERSION=$(get_version)
 check /fifth fifth.html
 chain "/fifth?extra=no" fifth.html
