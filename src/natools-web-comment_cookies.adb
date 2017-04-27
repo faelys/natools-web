@@ -233,9 +233,10 @@ package body Natools.Web.Comment_Cookies is
       end if;
 
       declare
+         use type S_Expressions.Atom;
          Parser : S_Expressions.Parsers.Memory_Parser
            := S_Expressions.Parsers.Create
-              (Decoder_Maps.Element (Cursor).all (Cookie));
+              (Decoder_Maps.Element (Cursor).all (Cookie) & (1 => 0));
       begin
          Parser.Next;
          return Create (Parser);
