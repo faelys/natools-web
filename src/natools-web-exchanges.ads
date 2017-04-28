@@ -29,6 +29,7 @@ with Natools.S_Expressions.Atom_Refs;
 with Natools.Web.Containers;
 with Natools.Web.Filters;
 
+private with Ada.Containers.Indefinite_Ordered_Maps;
 private with AWS.Messages;
 private with Natools.S_Expressions.Atom_Buffers;
 
@@ -129,6 +130,12 @@ package Natools.Web.Exchanges is
       File_Name : in S_Expressions.Atom);
       --  Send File_Name as a response in Object
 
+   procedure Set_Cookie
+     (Object : in out Exchange;
+      Key : in String;
+      Value : in String);
+      --  Prepare a Set_Cookie header for the response
+
    procedure Set_MIME_Type
      (Object : in out Exchange;
       MIME_Type : in S_Expressions.Atom);
@@ -170,6 +177,9 @@ private
       type Kind is (Empty, Buffer, File);
    end Responses;
 
+   package String_Maps is new Ada.Containers.Indefinite_Ordered_Maps
+     (String, String);
+
    type Exchange (Request : access constant AWS.Status.Data)
      is limited new Ada.Streams.Root_Stream_Type with record
       Allow : Method_Set := (others => False);
@@ -181,6 +191,7 @@ private
       Status_Code : AWS.Messages.Status_Code := AWS.Messages.S200;
       Has_Identity : Boolean := False;
       Identity : Containers.Identity;
+      Set_Cookies : String_Maps.Map;
    end record;
 
    function Has_Response (Object : Exchange) return Boolean

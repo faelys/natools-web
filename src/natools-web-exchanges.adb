@@ -300,6 +300,15 @@ package body Natools.Web.Exchanges is
    end Send_File;
 
 
+   procedure Set_Cookie
+     (Object : in out Exchange;
+      Key : in String;
+      Value : in String) is
+   begin
+      Object.Set_Cookies.Include (Key, Value);
+   end Set_Cookie;
+
+
    procedure Set_MIME_Type
      (Object : in out Exchange;
       MIME_Type : in S_Expressions.Atom)
@@ -412,6 +421,13 @@ package body Natools.Web.Exchanges is
             AWS.Messages.Location_Token,
             S_Expressions.To_String (Object.Location.Query));
       end if;
+
+      for Cursor in Object.Set_Cookies.Iterate loop
+         AWS.Cookie.Set
+           (Result,
+            String_Maps.Key (Cursor),
+            String_Maps.Element (Cursor));
+      end loop;
 
       return Result;
    end Response;
