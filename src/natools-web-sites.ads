@@ -149,6 +149,10 @@ package Natools.Web.Sites is
 
    function Identity (Ex : Exchange) return Containers.Identity;
 
+   procedure Set_Comment_Cookie
+     (Ex : in out Exchange;
+      Info : in Comment_Cookies.Comment_Info);
+
 
    type Page is interface;
 

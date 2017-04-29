@@ -446,6 +446,16 @@ package body Natools.Web.Sites is
    end Identity;
 
 
+   procedure Set_Comment_Cookie
+     (Ex : in out Exchange;
+      Info : in Comment_Cookies.Comment_Info) is
+   begin
+      Ex.Set_Cookie
+        (Comment_Cookies.Cookie_Name,
+         Comment_Cookies.Encode (Ex.Site.Constructors.Codec_DB, Info));
+   end Set_Comment_Cookie;
+
+
 
    ---------------------------
    -- Site Public Interface --
