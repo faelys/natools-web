@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015-2016, Natacha Porté                                   --
+-- Copyright (c) 2015-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -39,6 +39,7 @@ with Natools.Static_Maps.Web.Comments;
 with Natools.Time_IO.RFC_3339;
 with Natools.Time_Keys;
 with Natools.Web.Backends;
+with Natools.Web.Comment_Cookies;
 with Natools.Web.Error_Pages;
 with Natools.Web.Escapes;
 with Natools.Web.Exchanges;
@@ -72,6 +73,7 @@ package body Natools.Web.Comments is
       Core : Comment_Data;
       Extra_Fields, Raw_Fields : String_Maps.Map;
       Has_Unknown_Field : Boolean := False;
+      Cookie_Save : Boolean := False;
       Action : Post_Action;
       Reason : S_Expressions.Atom_Refs.Immutable_Reference;
       Anchor : S_Expressions.Atom_Refs.Immutable_Reference;
@@ -1357,6 +1359,14 @@ package body Natools.Web.Comments is
                   Data.Has_Unknown_Field := True;
                end if;
 
+            when Cookie_Save =>
+               if Value = "yes" then
+                  Data.Cookie_Save := True;
+               else
+                  Log (Severities.Info, "Unexpected cookie_save value """
+                    & Value & '"');
+               end if;
+
             when Date =>
                if List.Flags (List_Flags.Allow_Date_Override) then
                   begin
@@ -1772,6 +1782,20 @@ package body Natools.Web.Comments is
                Exchange.Site.Set_Parameters (Printer);
                Write (Builder.Core, Printer);
             end Write_Comment;
+
+            if Builder.Cookie_Save then
+               Set_Cookie :
+               declare
+                  Info : constant Comment_Cookies.Comment_Info
+                    := Comment_Cookies.Create
+                       (Name => Builder.Core.Atoms (Comment_Atoms.Name),
+                        Mail => Builder.Core.Atoms (Comment_Atoms.Mail),
+                        Link => Builder.Core.Atoms (Comment_Atoms.Link),
+                        Filter => Builder.Core.Atoms (Comment_Atoms.Filter));
+               begin
+                  Sites.Set_Comment_Cookie (Exchange, Info);
+               end Set_Cookie;
+            end if;
 
             Error_Pages.See_Other
               (Exchange,

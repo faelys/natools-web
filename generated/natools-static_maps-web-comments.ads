@@ -1,4 +1,4 @@
---  Generated at 2016-07-04 19:19:16 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2017-04-30 21:14:26 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-comments-maps.sx
 
 package Natools.Static_Maps.Web.Comments is
@@ -21,7 +21,7 @@ package Natools.Static_Maps.Web.Comments is
       end Element;
 
       package Form is
-         type Enum is (Unknown, Date, Filter, Atom);
+         type Enum is (Unknown, Cookie_Save, Date, Filter, Atom);
       end Form;
 
       package Post_Action is
@@ -111,15 +111,16 @@ private
      := (Item.Element.Date,
          Item.Element.Flags);
 
-   Map_4_Key_0 : aliased constant String := "c_date";
-   Map_4_Key_1 : aliased constant String := "c_filter";
-   Map_4_Key_2 : aliased constant String := "c_name";
-   Map_4_Key_3 : aliased constant String := "c_note";
-   Map_4_Key_4 : aliased constant String := "c_mail";
-   Map_4_Key_5 : aliased constant String := "c_link";
-   Map_4_Key_6 : aliased constant String := "c_text";
-   Map_4_Key_7 : aliased constant String := "c_title";
-   Map_4_Keys : constant array (0 .. 7) of access constant String
+   Map_4_Key_0 : aliased constant String := "c_cookie";
+   Map_4_Key_1 : aliased constant String := "c_date";
+   Map_4_Key_2 : aliased constant String := "c_filter";
+   Map_4_Key_3 : aliased constant String := "c_name";
+   Map_4_Key_4 : aliased constant String := "c_note";
+   Map_4_Key_5 : aliased constant String := "c_mail";
+   Map_4_Key_6 : aliased constant String := "c_link";
+   Map_4_Key_7 : aliased constant String := "c_text";
+   Map_4_Key_8 : aliased constant String := "c_title";
+   Map_4_Keys : constant array (0 .. 8) of access constant String
      := (Map_4_Key_0'Access,
          Map_4_Key_1'Access,
          Map_4_Key_2'Access,
@@ -127,9 +128,11 @@ private
          Map_4_Key_4'Access,
          Map_4_Key_5'Access,
          Map_4_Key_6'Access,
-         Map_4_Key_7'Access);
-   Map_4_Elements : constant array (0 .. 7) of Item.Form.Enum
-     := (Item.Form.Date,
+         Map_4_Key_7'Access,
+         Map_4_Key_8'Access);
+   Map_4_Elements : constant array (0 .. 8) of Item.Form.Enum
+     := (Item.Form.Cookie_Save,
+         Item.Form.Date,
          Item.Form.Filter,
          Item.Form.Atom,
          Item.Form.Atom,

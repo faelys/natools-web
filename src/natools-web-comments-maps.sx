@@ -19,7 +19,7 @@
       end Element;
 
       package Form is
-         type Enum is (Unknown, Date, Filter, Atom);
+         type Enum is (Unknown, Cookie_Save, Date, Filter, Atom);
       end Form;
 
       package Post_Action is
@@ -79,6 +79,7 @@
       (function To_Item_Form)
       (not-found Item.Form.Unknown)
       (nodes
+         (Item.Form.Cookie_Save  c_cookie)
          (Item.Form.Date  c_date)
          (Item.Form.Filter  c_filter)
          (Item.Form.Atom  c_name c_note c_mail c_link c_text c_title)))
