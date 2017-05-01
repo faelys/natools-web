@@ -183,6 +183,7 @@ chain /fifth fifth-cookie.html \
 chain /fifth fifth-cookie.html \
     -b 'c_info=0KG5hbWUgIlJhbmRvbSBTdHJhbmdlciIpKGxpbmsgaHR0cDovL2luc3RpbmN0aXZlLmV1Lyk'
 
+rm -f cookie-jar.txt
 BASE_VERSION=$(get_version)
 check /fifth fifth.html
 chain "/fifth?extra=no" fifth.html
@@ -201,8 +202,16 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:12:00Z' \
     -F 'c_link=http://users.example.com/admin/' -F 'submit=Submit' \
     -F 'c_filter=pass-through' --form-string \
-    'c_text=<p>Administrator comment in <strong>raw</strong> HTML mode.</p>'
+    'c_text=<p>Administrator comment in <strong>raw</strong> HTML mode.</p>' \
+    -F 'c_cookie=yes' -c cookie-jar.txt
 chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"
+if test -z "${STOPPED}"; then
+	if ! test -f cookie-jar.txt; then
+		echo "Cookie jar not created"
+	elif ! grep -qF cGFzcy10aHJvdWdoIEFkbWluaXN0cmF0b3IgMDpodHRwOi8vdXNlcnMuZXhhbXBsZS5jb20vYWRtaW4v cookie-jar.txt; then
+		echo "Expected cookie value not found"
+	fi
+fi
 chain /fifth fifth-commented-2.html
 chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_date=2015-03-03T15:10:00Z' -F 'c_link=/dev/null' -F 'submit=Submit' \
