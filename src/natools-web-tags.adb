@@ -46,6 +46,7 @@ package body Natools.Web.Tags is
    type Tag_DB_Context is record
       DB : Tag_DB;
       Caller_Tags : Tag_List;
+      Optional : Boolean;
    end record;
 
 
@@ -935,13 +936,12 @@ package body Natools.Web.Tags is
       Tag : constant Tag_Contents
         := Get_Tag (Context.DB, Tag_Name, Context.Caller_Tags);
    begin
-      if Is_Empty (Tag) then
+      if not Is_Empty (Tag) then
+         Render (Exchange, Tag, Expression);
+      elsif not Context.Optional then
          Log (Severities.Error, "Unable to find tag """
            & S_Expressions.To_String (Tag_Name) & '"');
-         return;
       end if;
-
-      Render (Exchange, Tag, Expression);
    end Render_Tag;
 
 
@@ -1311,9 +1311,10 @@ package body Natools.Web.Tags is
      (Exchange : in out Sites.Exchange;
       DB : in Tag_DB;
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
-      Caller_Tags : in Tag_List := Empty_Tag_List)
+      Caller_Tags : in Tag_List := Empty_Tag_List;
+      Optional : in Boolean := False)
    is
-      Context : constant Tag_DB_Context := (DB, Caller_Tags);
+      Context : constant Tag_DB_Context := (DB, Caller_Tags, Optional);
    begin
       case Expression.Current_Event is
          when S_Expressions.Events.Add_Atom =>

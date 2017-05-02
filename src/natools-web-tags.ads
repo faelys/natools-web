@@ -87,7 +87,8 @@ package Natools.Web.Tags is
      (Exchange : in out Sites.Exchange;
       DB : in Tag_DB;
       Expression : in out S_Expressions.Lockable.Descriptor'Class;
-      Caller_Tags : in Tag_List := Empty_Tag_List);
+      Caller_Tags : in Tag_List := Empty_Tag_List;
+      Optional : in Boolean := False);
       --  Render Expression as 'tag_name tag_template' or a list of such expr
 
    procedure Render
