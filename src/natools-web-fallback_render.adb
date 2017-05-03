@@ -184,6 +184,10 @@ begin
          S_Expressions.Templates.Dates.Render
            (Exchange, Arguments, Exchange.Site.Load_Date);
 
+      when Commands.Optional_Tags =>
+         Tags.Render
+           (Exchange, Exchange.Site.Get_Tags, Arguments, Optional => True);
+
       when Commands.Parameter =>
          if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
             declare

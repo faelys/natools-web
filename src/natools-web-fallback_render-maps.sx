@@ -17,6 +17,7 @@
       If_Has_Not_Element,
       If_Parameter_Is,
       Load_Date,
+      Optional_Tags,
       Parameter,
       Set_MIME_Type,
       Tags,
@@ -40,6 +41,8 @@
          (If_Has_Not_Element   if-has-not-element)
          (If_Parameter_Is   if-parameter-is)
          (Load_Date   load-date)
+         (Optional_Tags   optional-pagelist optional-page-list
+                          optional-tag optional-tags)
          (Parameter   parameter)
          (Set_MIME_Type   mime-type)
          (Tags   pagelist page-list tag tags)
