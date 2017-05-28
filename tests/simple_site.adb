@@ -28,6 +28,7 @@ with Natools.Web.Comment_Cookies.Base_64;
 with Natools.Web.Escapes.Filters;
 with Natools.Web.Filters.Pass_Through;
 with Natools.Web.Filters.Text_Blocks;
+with Natools.Web.Filters.Text_Replacement;
 with Natools.Web.Reload_Pages;
 with Natools.Web.Simple_Pages;
 with Natools.Web.Tag_Pages;
@@ -69,6 +70,8 @@ begin
      ("pass-through", Natools.Web.Filters.Pass_Through.Create'Access);
    Common.Site.Register
      ("text-block", Natools.Web.Filters.Text_Blocks.Create'Access);
+   Common.Site.Register
+     ("text-replacement", Natools.Web.Filters.Text_Replacement.Create'Access);
    Common.Site.Register
      ("s-expr", Natools.Web.ACL.Sx_Backends.Create'Access);
    Common.Site.Register

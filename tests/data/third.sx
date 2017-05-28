@@ -1,6 +1,9 @@
 (elements
    (main-text
 (if-no-date published "<p>Data in the third page.</p>\n")
+(filter redden
+   "<p>Current color is blue, but broken bl"
+   "ue is unchanged.</p>\n")
 (date validated "<p>Validated on " (rfc-3339) "</p>\n")
 (tag-list pages (render (parent (parent (parent "<p>Parent of root is \"" (name) "\"</p>\n")))))
 (tags tags (all-descendants

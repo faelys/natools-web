@@ -55,4 +55,5 @@
    upper-case
    hexadecimal)
 (filters
+   (redden text-replacement blue red)
    (xml-escape html-escape "<>&"))
