@@ -170,6 +170,11 @@ package Natools.Web.Sites is
    type Site_Builder (<>) is limited private;
       --  Temporary representation of Site objects while they are being built
 
+   procedure Expire_At
+     (Builder : in out Site_Builder;
+      Time : in Ada.Calendar.Time);
+      --  Set the expiration time to Time if it's not already earlier
+
    function Get_Backend (From : Site_Builder; Name : S_Expressions.Atom)
      return Backends.Backend'Class;
       --  Return a backend from its name, or raise Constraint_Error
@@ -247,6 +252,13 @@ private
       Comment_Info : Comment_Cookies.Comment_Info;
    end record;
 
+   type Expiration_Time (Present : Boolean := False) is record
+      case Present is
+         when True => Time : Ada.Calendar.Time;
+         when False => null;
+      end case;
+   end record;
+
    package ACL_Constructors is new Ada.Containers.Indefinite_Ordered_Maps
      (S_Expressions.Atom, ACL_Constructor, S_Expressions.Less_Than);
 
@@ -276,6 +288,7 @@ private
       Backends : Backend_Maps.Updatable_Map;
       Constructors : aliased Constructors_In_Site;
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
+      Expire : Expiration_Time := (Present => False);
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
       Filters : Web.Filters.Stores.Store;
       Loaders : Page_Loaders.Constant_Map;
@@ -294,6 +307,7 @@ private
       ACL : Web.ACL.Backend_Refs.Reference;
       Backends : Backend_Maps.Unsafe_Maps.Map;
       Default_Template : S_Expressions.Atom_Refs.Immutable_Reference;
+      Expire : Expiration_Time := (Present => False);
       File_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
       File_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
       Filters : Web.Filters.Stores.Store;

@@ -371,6 +371,18 @@ package body Natools.Web.Sites is
    end Execute;
 
 
+   procedure Expire_At
+     (Builder : in out Site_Builder;
+      Time : in Ada.Calendar.Time)
+   is
+      use type Ada.Calendar.Time;
+   begin
+      if not Builder.Expire.Present or else Time < Builder.Expire.Time then
+         Builder.Expire := (Present => True, Time => Time);
+      end if;
+   end Expire_At;
+
+
    function Get_Backend (From : Site_Builder; Name : S_Expressions.Atom)
      return Backends.Backend'Class is
    begin
@@ -538,6 +550,7 @@ package body Natools.Web.Sites is
         := (Constructors => Object.Constructors'Access,
             Default_Template
               => S_Expressions.Atom_Refs.Null_Immutable_Reference,
+            Expire => (Present => False),
             File_Prefix => Empty_Atom,
             File_Suffix => Empty_Atom,
             Filters => Object.Filters.Duplicate,
@@ -554,6 +567,7 @@ package body Natools.Web.Sites is
       Object.ACL := Builder.ACL;
       Object.Backends := Backend_Maps.Create (Builder.Backends);
       Object.Default_Template := Builder.Default_Template;
+      Object.Expire := Builder.Expire;
       Object.Filters := Builder.Filters;
       Object.Loaders := Page_Loaders.Create (Builder.New_Loaders);
       Object.Named_Elements := Builder.Named_Elements;

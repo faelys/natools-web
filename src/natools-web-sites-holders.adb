@@ -175,6 +175,7 @@ package body Natools.Web.Sites.Holders is
                Backends => Old_Site.Backends,
                Constructors => Old_Site.Constructors,
                Default_Template => Old_Site.Default_Template,
+               Expire => Old_Site.Expire,
                File_Name => Old_Site.File_Name,
                Filters => Old_Site.Filters,
                Loaders => Old_Site.Loaders,
