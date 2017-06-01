@@ -331,10 +331,17 @@ package body Natools.Web.Simple_Pages is
          Get_Lifetime
            (Page, Publication, Has_Publication, Expiration, Has_Expiration);
 
-         if (Has_Publication and then Publication >= Now)
-           or else (Has_Expiration and then Expiration < Now)
-         then
+         if Has_Publication and then Publication >= Now then
+            Sites.Expire_At (Builder, Publication);
             return;
+         end if;
+
+         if Has_Expiration then
+            if Expiration < Now then
+               return;
+            else
+               Sites.Expire_At (Builder, Expiration);
+            end if;
          end if;
       end Time_Check;
 
