@@ -14,7 +14,36 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
+with Natools.Cron;
+
 package body Natools.Web.Sites.Holders is
+
+   type Cron_Callback is new Natools.Cron.Callback with record
+      Target : Site_Refs.Reference;
+   end record;
+
+   function Create (Target : Site_Refs.Reference)
+     return Natools.Cron.Callback'Class;
+
+   overriding procedure Run (Object : in out Cron_Callback);
+
+
+   ------------------------------
+   -- Local Helper Subprograms --
+   ------------------------------
+
+   function Create (Target : Site_Refs.Reference)
+     return Natools.Cron.Callback'Class is
+   begin
+      return Cron_Callback'(Target => Target);
+   end Create;
+
+
+   procedure Run (Object : in out Cron_Callback) is
+   begin
+      Updates.Reload (Object.Target.Query);
+   end Run;
+
 
 
    -----------------------------
@@ -151,6 +180,7 @@ package body Natools.Web.Sites.Holders is
 
    task body Worker_Task is
       Container : Update_Holders.Holder;
+      Cron_Entry : Natools.Cron.Cron_Entry;
    begin
       loop
          Parent.Queue.Next (Container);
@@ -166,6 +196,8 @@ package body Natools.Web.Sites.Holders is
 
             exit when Container.Is_Empty;
          end if;
+
+         Cron_Entry.Reset;
 
          declare
             Old_Site : constant Site_Refs.Accessor := Parent.Ref.Query;
@@ -188,9 +220,15 @@ package body Natools.Web.Sites.Holders is
                Updater => Old_Site.Updater);
             New_Ref : constant Site_Refs.Reference
               := Site_Refs.Create (New_Site);
+
+            use type Ada.Calendar.Time;
          begin
             Updates.Update (Container.Element, New_Site.all);
             Parent.Ref := New_Ref;
+
+            if New_Site.Expire.Present then
+               Cron_Entry.Set (New_Site.Expire.Time + 1.0, Create (New_Ref));
+            end if;
          end;
       end loop;
    end Worker_Task;
