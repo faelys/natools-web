@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015, Natacha Porté                                        --
+-- Copyright (c) 2015-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -15,6 +15,31 @@
 ------------------------------------------------------------------------------
 
 package body Natools.Web.Sites.Updates is
+
+   ------------------------------
+   -- Expiration Purger Object --
+   ------------------------------
+
+   procedure Purge_Expiration (Object : in Site) is
+   begin
+      Object.Queue_Update (Expiration_Purger'(null record));
+   end Purge_Expiration;
+
+
+   overriding procedure Update
+     (Self : in Expiration_Purger;
+      Object : in out Site)
+   is
+      pragma Unreferenced (Self);
+   begin
+      Object.Expire := (Present => False);
+   end Update;
+
+
+
+   ---------------------
+   -- Reloader Object --
+   ---------------------
 
    procedure Reload (Object : in Site) is
    begin

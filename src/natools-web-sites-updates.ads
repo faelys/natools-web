@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015, Natacha Porté                                        --
+-- Copyright (c) 2015-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -27,6 +27,17 @@ package Natools.Web.Sites.Updates is
       --  Actually perform the update
 
 
+   type Expiration_Purger is new Site_Update with private;
+
+   overriding procedure Update
+     (Self : in Expiration_Purger;
+      Object : in out Site);
+      --  Purge expiration data
+
+   procedure Purge_Expiration (Object : in Site);
+      --  Enqueue a purger in Object
+
+
    type Reloader is new Site_Update with private;
 
    overriding procedure Update (Self : in Reloader; Object : in out Site);
@@ -37,6 +48,8 @@ package Natools.Web.Sites.Updates is
 
 
 private
+
+   type Expiration_Purger is new Site_Update with null record;
 
    type Reloader is new Site_Update with null record;
 
