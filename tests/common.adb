@@ -109,6 +109,14 @@ package body Common is
    end Load;
 
 
+   not overriding procedure Purge (Self : in out Holder) is
+      package Holders renames Natools.Web.Sites.Holders;
+      Update : Natools.Web.Sites.Updates.Expiration_Purger;
+   begin
+      Holders.Queue (Holders.Holder (Self), Update);
+   end Purge;
+
+
 
    overriding procedure Update
      (Self : in Increment_Count;

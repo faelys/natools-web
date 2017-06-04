@@ -104,4 +104,5 @@ begin
    end if;
 
    AWS.Server.Shutdown (WS);
+   Common.Site.Purge;
 end Simple_Site;

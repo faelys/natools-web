@@ -36,6 +36,8 @@ package Common is
      (Self : in out Holder;
       File_Name : in String);
 
+   not overriding procedure Purge (Self : in out Holder);
+
 
    Site : Holder;
 
