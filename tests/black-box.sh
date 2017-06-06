@@ -233,6 +233,8 @@ chain /contact contact-1.html
 
 BASE_VERSION=$(get_version)
 STOPPED="${FIFTH_STOPPED}"
+chain_curl -F 'next_expire=5' "${BASE_URL}/test"
 chain /reload reload-redirect.html -F 'submit=Submit'
 chain_curl -F 'wait_version='$((BASE_VERSION + 1)) "${BASE_URL}/test"
 chain /fifth fifth-commented-2.html
+chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"

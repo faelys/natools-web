@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015, Natacha Porté                                        --
+-- Copyright (c) 2015-2017, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -14,9 +14,11 @@
 -- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.           --
 ------------------------------------------------------------------------------
 
-
+with Ada.Calendar;
 
 package body Common.Pages is
+
+   Expire_Next_Load : Duration := 0.0;
 
    procedure Append_Line
      (Exchange : in out Sites.Exchange;
@@ -57,8 +59,14 @@ package body Common.Pages is
       Path : in S_Expressions.Atom)
    is
       pragma Unreferenced (Object);
+      use type Ada.Calendar.Time;
    begin
       Sites.Insert (Builder, Path, Page'(null record));
+
+      if Expire_Next_Load > 0.0 then
+         Sites.Expire_At (Builder, Ada.Calendar.Clock + Expire_Next_Load);
+         Expire_Next_Load := 0.0;
+      end if;
    end Load;
 
 
@@ -122,6 +130,17 @@ package body Common.Pages is
          Version := Natural'Value (Exchange.Parameter ("wait_version"));
          Counter.Wait_Version (Version);
          Append_Line (Exchange, "Waited version:" & Natural'Image (Version));
+      exception
+         when Constraint_Error => null;
+      end;
+
+      declare
+         Amount : Duration;
+      begin
+         Amount := Duration'Value (Exchange.Parameter ("next_expire"));
+         Expire_Next_Load := Amount;
+         Append_Line (Exchange, "Expire next load after: "
+           & Duration'Image (Amount));
       exception
          when Constraint_Error => null;
       end;
