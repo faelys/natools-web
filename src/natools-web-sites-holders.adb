@@ -71,6 +71,7 @@ package body Natools.Web.Sites.Holders is
       New_Site.Updater := Self'Unchecked_Access;
       New_Site.Reset (File_Name);
       Self.Ref := New_Ref;
+      Self.Queue.Append (Update_Holders.Empty_Holder);
    end Load;
 
 
@@ -193,43 +194,55 @@ package body Natools.Web.Sites.Holders is
             or
                terminate;
             end select;
-
-            exit when Container.Is_Empty;
          end if;
 
          Cron_Entry.Reset;
 
-         declare
-            Old_Site : constant Site_Refs.Accessor := Parent.Ref.Query;
-            New_Site : constant Site_Refs.Data_Access := new Site'
-              (Load_Date => Old_Site.Load_Date,
-               ACL => Old_Site.ACL,
-               Backends => Old_Site.Backends,
-               Constructors => Old_Site.Constructors,
-               Default_Template => Old_Site.Default_Template,
-               Expire => Old_Site.Expire,
-               File_Name => Old_Site.File_Name,
-               Filters => Old_Site.Filters,
-               Loaders => Old_Site.Loaders,
-               Named_Elements => Old_Site.Named_Elements,
-               Pages => Old_Site.Pages,
-               Printer_Parameters => Old_Site.Printer_Parameters,
-               Static => Old_Site.Static,
-               Tags => Old_Site.Tags,
-               Templates => Old_Site.Templates,
-               Updater => Old_Site.Updater);
-            New_Ref : constant Site_Refs.Reference
-              := Site_Refs.Create (New_Site);
+         if not Container.Is_Empty then
+            declare
+               Old_Site : constant Site_Refs.Accessor := Parent.Ref.Query;
+               New_Site : constant Site_Refs.Data_Access := new Site'
+                 (Load_Date => Old_Site.Load_Date,
+                  ACL => Old_Site.ACL,
+                  Backends => Old_Site.Backends,
+                  Constructors => Old_Site.Constructors,
+                  Default_Template => Old_Site.Default_Template,
+                  Expire => Old_Site.Expire,
+                  File_Name => Old_Site.File_Name,
+                  Filters => Old_Site.Filters,
+                  Loaders => Old_Site.Loaders,
+                  Named_Elements => Old_Site.Named_Elements,
+                  Pages => Old_Site.Pages,
+                  Printer_Parameters => Old_Site.Printer_Parameters,
+                  Static => Old_Site.Static,
+                  Tags => Old_Site.Tags,
+                  Templates => Old_Site.Templates,
+                  Updater => Old_Site.Updater);
+               New_Ref : constant Site_Refs.Reference
+                 := Site_Refs.Create (New_Site);
 
-            use type Ada.Calendar.Time;
-         begin
-            Updates.Update (Container.Element, New_Site.all);
-            Parent.Ref := New_Ref;
+               use type Ada.Calendar.Time;
+            begin
+               Updates.Update (Container.Element, New_Site.all);
+               Parent.Ref := New_Ref;
 
-            if New_Site.Expire.Present then
-               Cron_Entry.Set (New_Site.Expire.Time + 1.0, Create (New_Ref));
-            end if;
-         end;
+               if New_Site.Expire.Present then
+                  Cron_Entry.Set
+                    (New_Site.Expire.Time + 1.0, Create (New_Ref));
+               end if;
+            end;
+         elsif not Parent.Ref.Is_Empty then
+            declare
+               Ref : constant Site_Refs.Reference := Parent.Ref;
+               Current_Site : constant Site_Refs.Accessor := Ref.Query;
+               use type Ada.Calendar.Time;
+            begin
+               if Current_Site.Expire.Present then
+                  Cron_Entry.Set
+                    (Current_Site.Expire.Time + 1.0, Create (Ref));
+               end if;
+            end;
+         end if;
       end loop;
    end Worker_Task;
 
