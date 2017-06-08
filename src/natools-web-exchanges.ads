@@ -67,6 +67,9 @@ package Natools.Web.Exchanges is
    function Has_Parameter (Object : Exchange; Name : String) return Boolean;
       --  Return whether the parameter Name exists in the request
 
+   function Header (Object : Exchange; Name : String) return String;
+      --  Access a specific header by name, return "" for non-existing headers
+
    procedure Iterate_Parameters
      (Object : in Exchange;
       Process : not null access procedure (Name, Value : String));

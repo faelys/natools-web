@@ -170,6 +170,14 @@ package body Natools.Web.Exchanges is
    end Has_Parameter;
 
 
+   function Header (Object : Exchange; Name : String) return String is
+   begin
+      return AWS.Headers.Get_Values
+        (AWS.Status.Header (Object.Request.all),
+         Name);
+   end Header;
+
+
    procedure Iterate_Parameters
      (Object : in Exchange;
       Process : not null access procedure (Name, Value : String))
