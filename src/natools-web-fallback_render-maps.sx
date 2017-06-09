@@ -15,6 +15,7 @@
       Filter,
       If_Has_Element,
       If_Has_Not_Element,
+      If_Header_Else,
       If_Parameter_Is,
       Load_Date,
       Optional_Tags,
@@ -39,6 +40,7 @@
          (Filter   filter)
          (If_Has_Element   if-has-element)
          (If_Has_Not_Element   if-has-not-element)
+         (If_Header_Else   if-header-else)
          (If_Parameter_Is   if-parameter-is)
          (Load_Date   load-date)
          (Optional_Tags   optional-pagelist optional-page-list

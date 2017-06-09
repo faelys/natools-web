@@ -6,15 +6,15 @@ package body Natools.Static_Maps.Web.Fallback_Render.Commands is
      (1, 4, 9, 13, 16);
 
    T1 : constant array (0 .. 4) of Unsigned_8 :=
-     (45, 7, 25, 10, 41);
+     (35, 14, 45, 40, 25);
 
    T2 : constant array (0 .. 4) of Unsigned_8 :=
-     (25, 20, 45, 58, 55);
+     (61, 39, 15, 15, 1);
 
-   G : constant array (0 .. 60) of Unsigned_8 :=
-     (0, 19, 0, 16, 0, 0, 0, 0, 21, 0, 0, 0, 0, 5, 5, 12, 18, 0, 23, 2, 29,
-      0, 21, 20, 0, 0, 10, 0, 16, 0, 0, 2, 0, 17, 0, 9, 22, 0, 0, 0, 2, 0,
-      14, 1, 3, 0, 3, 15, 0, 22, 17, 13, 0, 0, 6, 0, 7, 0, 0, 0, 0);
+   G : constant array (0 .. 62) of Unsigned_8 :=
+     (28, 0, 0, 5, 8, 23, 0, 0, 0, 24, 9, 0, 28, 23, 0, 26, 2, 19, 0, 0, 27,
+      22, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 11, 13, 12, 12, 7, 0, 7,
+      0, 0, 0, 0, 0, 0, 8, 4, 15, 0, 0, 0, 8, 0, 3, 11, 0, 9, 14, 25, 0);
 
    function Hash (S : String) return Natural is
       F : constant Natural := S'First - 1;
@@ -25,10 +25,10 @@ package body Natools.Static_Maps.Web.Fallback_Render.Commands is
       for K in P'Range loop
          exit when L < P (K);
          J  := Character'Pos (S (P (K) + F));
-         F1 := (F1 + Natural (T1 (K)) * J) mod 61;
-         F2 := (F2 + Natural (T2 (K)) * J) mod 61;
+         F1 := (F1 + Natural (T1 (K)) * J) mod 63;
+         F2 := (F2 + Natural (T2 (K)) * J) mod 63;
       end loop;
-      return (Natural (G (F1)) + Natural (G (F2))) mod 30;
+      return (Natural (G (F1)) + Natural (G (F2))) mod 31;
    end Hash;
 
 end Natools.Static_Maps.Web.Fallback_Render.Commands;

@@ -17,6 +17,8 @@
 with Ada.Calendar;
 with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Caches;
+with Natools.S_Expressions.Conditionals.Strings;
+with Natools.S_Expressions.Lockable;
 with Natools.S_Expressions.Templates.Dates;
 with Natools.Static_Maps.Web.Fallback_Render;
 with Natools.Web.ACL;
@@ -158,6 +160,99 @@ begin
          then
             Arguments.Next;
             Re_Enter (Exchange, Arguments);
+         end if;
+
+      when Commands.If_Header_Else =>
+         if Re_Enter = null then
+            Report_Unknown_Command;
+         elsif Arguments.Current_Event = S_Expressions.Events.Open_List then
+            declare
+               Lock : S_Expressions.Lockable.Lock_State;
+               Event : S_Expressions.Events.Event;
+               Condition : Boolean;
+            begin
+               Arguments.Next (Event);
+               if Event /= S_Expressions.Events.Add_Atom then
+                  return;
+               end if;
+
+               Arguments.Lock (Lock);
+
+               Evaluate_Condition :
+               declare
+                  Value : constant String := Exchange.Header
+                    (S_Expressions.To_String (Arguments.Current_Atom));
+               begin
+                  Arguments.Next;
+                  Condition := S_Expressions.Conditionals.Strings.Evaluate
+                    (Value, Arguments);
+                  Arguments.Unlock (Lock);
+               exception
+                  when others =>
+                     Arguments.Unlock (Lock, False);
+                     raise;
+               end Evaluate_Condition;
+
+               Arguments.Next (Event);
+
+               case Event is
+                  when S_Expressions.Events.Add_Atom =>
+                     if Condition then
+                        Exchange.Append (Arguments.Current_Atom);
+                     end if;
+
+                  when S_Expressions.Events.Open_List =>
+                     if Condition then
+                        Arguments.Lock (Lock);
+                        begin
+                           Arguments.Next;
+                           Re_Enter (Exchange, Arguments);
+                           Arguments.Unlock (Lock);
+                        exception
+                           when others =>
+                              Arguments.Unlock (Lock, False);
+                              raise;
+                        end;
+                     else
+                        Arguments.Close_Current_List;
+                     end if;
+
+                  when S_Expressions.Events.Close_List
+                    | S_Expressions.Events.End_Of_Input
+                    | S_Expressions.Events.Error
+                  =>
+                     return;
+               end case;
+
+               if Condition then
+                  return;
+               end if;
+
+               Arguments.Next (Event);
+
+               case Event is
+                  when S_Expressions.Events.Add_Atom =>
+                     Exchange.Append (Arguments.Current_Atom);
+
+                  when S_Expressions.Events.Open_List =>
+                     Arguments.Lock (Lock);
+                     begin
+                        Arguments.Next;
+                        Re_Enter (Exchange, Arguments);
+                        Arguments.Unlock (Lock);
+                     exception
+                        when others =>
+                           Arguments.Unlock (Lock, False);
+                           raise;
+                     end;
+
+                  when S_Expressions.Events.Close_List
+                    | S_Expressions.Events.End_Of_Input
+                    | S_Expressions.Events.Error
+                  =>
+                     return;
+               end case;
+            end;
          end if;
 
       when Commands.If_Parameter_Is =>
