@@ -92,6 +92,7 @@ get_version(){
 check /first first.html
 check /second second.html -b 'foo=bar; User-Token=glaglagla'
 check /third third.html
+chain /third third-secure.html -H "X-Forwarded-Proto: https"
 check /style.css ../data/static/style.css
 check /non-existant 404.html
 check /first 405.html -d ''
