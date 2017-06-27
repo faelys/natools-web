@@ -142,6 +142,24 @@ begin
             end;
          end if;
 
+      when Commands.If_Comment_Cookie_Filter_Is =>
+         if Re_Enter = null then
+            Report_Unknown_Command;
+         elsif Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+            declare
+               use type S_Expressions.Atom;
+               Ref : constant S_Expressions.Atom_Refs.Immutable_Reference
+                 := Comment_Cookies.Filter (Sites.Comment_Info (Exchange));
+            begin
+               if not Ref.Is_Empty
+                 and then Ref.Query = Arguments.Current_Atom
+               then
+                  Arguments.Next;
+                  Re_Enter (Exchange, Arguments);
+               end if;
+            end;
+         end if;
+
       when Commands.If_Has_Element =>
          if Re_Enter = null then
             Report_Unknown_Command;

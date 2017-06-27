@@ -13,6 +13,7 @@
       Element,
       Element_Or_Template,
       Filter,
+      If_Comment_Cookie_Filter_Is,
       If_Has_Element,
       If_Has_Not_Element,
       If_Header_Else,
@@ -38,6 +39,7 @@
          (Element   element)
          (Element_Or_Template   render element-or-template)
          (Filter   filter)
+         (If_Comment_Cookie_Filter_Is   if-comment-cookie-filter-is)
          (If_Has_Element   if-has-element)
          (If_Has_Not_Element   if-has-not-element)
          (If_Header_Else   if-header-else)
