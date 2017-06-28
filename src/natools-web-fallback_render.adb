@@ -44,8 +44,74 @@ is
    package Commands renames Natools.Static_Maps.Web.Fallback_Render;
    use type S_Expressions.Events.Event;
 
+   procedure Render_Then_Else (Condition : in Boolean);
    procedure Render_Ref (Ref : in S_Expressions.Atom_Refs.Immutable_Reference);
    procedure Report_Unknown_Command;
+
+   procedure Render_Then_Else (Condition : in Boolean) is
+      Lock : S_Expressions.Lockable.Lock_State;
+      Event : S_Expressions.Events.Event;
+   begin
+      Arguments.Next (Event);
+
+      case Event is
+         when S_Expressions.Events.Add_Atom =>
+            if Condition then
+               Exchange.Append (Arguments.Current_Atom);
+            end if;
+
+         when S_Expressions.Events.Open_List =>
+            if Condition then
+               Arguments.Lock (Lock);
+               begin
+                  Arguments.Next;
+                  Re_Enter (Exchange, Arguments);
+                  Arguments.Unlock (Lock);
+               exception
+                  when others =>
+                     Arguments.Unlock (Lock, False);
+                     raise;
+               end;
+            else
+               Arguments.Close_Current_List;
+            end if;
+
+         when S_Expressions.Events.Close_List
+           | S_Expressions.Events.End_Of_Input
+           | S_Expressions.Events.Error
+         =>
+            return;
+      end case;
+
+      if Condition then
+         return;
+      end if;
+
+      Arguments.Next (Event);
+
+      case Event is
+         when S_Expressions.Events.Add_Atom =>
+            Exchange.Append (Arguments.Current_Atom);
+
+         when S_Expressions.Events.Open_List =>
+            Arguments.Lock (Lock);
+            begin
+               Arguments.Next;
+               Re_Enter (Exchange, Arguments);
+               Arguments.Unlock (Lock);
+            exception
+               when others =>
+                  Arguments.Unlock (Lock, False);
+                  raise;
+            end;
+
+         when S_Expressions.Events.Close_List
+           | S_Expressions.Events.End_Of_Input
+           | S_Expressions.Events.Error
+         =>
+            return;
+      end case;
+   end Render_Then_Else;
 
    procedure Render_Ref
      (Ref : in S_Expressions.Atom_Refs.Immutable_Reference) is
@@ -211,65 +277,7 @@ begin
                      raise;
                end Evaluate_Condition;
 
-               Arguments.Next (Event);
-
-               case Event is
-                  when S_Expressions.Events.Add_Atom =>
-                     if Condition then
-                        Exchange.Append (Arguments.Current_Atom);
-                     end if;
-
-                  when S_Expressions.Events.Open_List =>
-                     if Condition then
-                        Arguments.Lock (Lock);
-                        begin
-                           Arguments.Next;
-                           Re_Enter (Exchange, Arguments);
-                           Arguments.Unlock (Lock);
-                        exception
-                           when others =>
-                              Arguments.Unlock (Lock, False);
-                              raise;
-                        end;
-                     else
-                        Arguments.Close_Current_List;
-                     end if;
-
-                  when S_Expressions.Events.Close_List
-                    | S_Expressions.Events.End_Of_Input
-                    | S_Expressions.Events.Error
-                  =>
-                     return;
-               end case;
-
-               if Condition then
-                  return;
-               end if;
-
-               Arguments.Next (Event);
-
-               case Event is
-                  when S_Expressions.Events.Add_Atom =>
-                     Exchange.Append (Arguments.Current_Atom);
-
-                  when S_Expressions.Events.Open_List =>
-                     Arguments.Lock (Lock);
-                     begin
-                        Arguments.Next;
-                        Re_Enter (Exchange, Arguments);
-                        Arguments.Unlock (Lock);
-                     exception
-                        when others =>
-                           Arguments.Unlock (Lock, False);
-                           raise;
-                     end;
-
-                  when S_Expressions.Events.Close_List
-                    | S_Expressions.Events.End_Of_Input
-                    | S_Expressions.Events.Error
-                  =>
-                     return;
-               end case;
+               Render_Then_Else (Condition);
             end;
          end if;
 
