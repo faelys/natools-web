@@ -1,4 +1,4 @@
---  Generated at 2017-07-01 20:48:29 +0000 by Natools.Static_Hash_Maps
+--  Generated at 2017-06-29 18:53:35 +0000 by Natools.Static_Hash_Maps
 --  from src/natools-web-fallback_render-maps.sx
 
 package Natools.Static_Maps.Web.Fallback_Render is
@@ -18,6 +18,7 @@ package Natools.Static_Maps.Web.Fallback_Render is
       If_Comment_Cookie_Filter_Is,
       If_Has_Element,
       If_Has_Not_Element,
+      If_Has_Parameter_Else,
       If_Header_Else,
       If_Parameter_Is,
       Load_Date,
@@ -49,22 +50,23 @@ private
    Map_1_Key_14 : aliased constant String := "if-comment-cookie-filter-is";
    Map_1_Key_15 : aliased constant String := "if-has-element";
    Map_1_Key_16 : aliased constant String := "if-has-not-element";
-   Map_1_Key_17 : aliased constant String := "if-header-else";
-   Map_1_Key_18 : aliased constant String := "if-parameter-is";
-   Map_1_Key_19 : aliased constant String := "load-date";
-   Map_1_Key_20 : aliased constant String := "optional-pagelist";
-   Map_1_Key_21 : aliased constant String := "optional-page-list";
-   Map_1_Key_22 : aliased constant String := "optional-tag";
-   Map_1_Key_23 : aliased constant String := "optional-tags";
-   Map_1_Key_24 : aliased constant String := "parameter";
-   Map_1_Key_25 : aliased constant String := "mime-type";
-   Map_1_Key_26 : aliased constant String := "pagelist";
-   Map_1_Key_27 : aliased constant String := "page-list";
-   Map_1_Key_28 : aliased constant String := "tag";
-   Map_1_Key_29 : aliased constant String := "tags";
-   Map_1_Key_30 : aliased constant String := "template";
-   Map_1_Key_31 : aliased constant String := "user";
-   Map_1_Keys : constant array (0 .. 31) of access constant String
+   Map_1_Key_17 : aliased constant String := "if-has-parameter-else";
+   Map_1_Key_18 : aliased constant String := "if-header-else";
+   Map_1_Key_19 : aliased constant String := "if-parameter-is";
+   Map_1_Key_20 : aliased constant String := "load-date";
+   Map_1_Key_21 : aliased constant String := "optional-pagelist";
+   Map_1_Key_22 : aliased constant String := "optional-page-list";
+   Map_1_Key_23 : aliased constant String := "optional-tag";
+   Map_1_Key_24 : aliased constant String := "optional-tags";
+   Map_1_Key_25 : aliased constant String := "parameter";
+   Map_1_Key_26 : aliased constant String := "mime-type";
+   Map_1_Key_27 : aliased constant String := "pagelist";
+   Map_1_Key_28 : aliased constant String := "page-list";
+   Map_1_Key_29 : aliased constant String := "tag";
+   Map_1_Key_30 : aliased constant String := "tags";
+   Map_1_Key_31 : aliased constant String := "template";
+   Map_1_Key_32 : aliased constant String := "user";
+   Map_1_Keys : constant array (0 .. 32) of access constant String
      := (Map_1_Key_0'Access,
          Map_1_Key_1'Access,
          Map_1_Key_2'Access,
@@ -96,8 +98,9 @@ private
          Map_1_Key_28'Access,
          Map_1_Key_29'Access,
          Map_1_Key_30'Access,
-         Map_1_Key_31'Access);
-   Map_1_Elements : constant array (0 .. 31) of Command
+         Map_1_Key_31'Access,
+         Map_1_Key_32'Access);
+   Map_1_Elements : constant array (0 .. 32) of Command
      := (Current_Time,
          Current_Time,
          Current_Time,
@@ -115,6 +118,7 @@ private
          If_Comment_Cookie_Filter_Is,
          If_Has_Element,
          If_Has_Not_Element,
+         If_Has_Parameter_Else,
          If_Header_Else,
          If_Parameter_Is,
          Load_Date,

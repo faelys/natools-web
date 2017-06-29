@@ -246,6 +246,15 @@ begin
             Re_Enter (Exchange, Arguments);
          end if;
 
+      when Commands.If_Has_Parameter_Else =>
+         if Re_Enter = null then
+            Report_Unknown_Command;
+         elsif Arguments.Current_Event = S_Expressions.Events.Add_Atom then
+            Render_Then_Else
+              (Exchange.Has_Parameter
+                 (S_Expressions.To_String (Arguments.Current_Atom)));
+         end if;
+
       when Commands.If_Header_Else =>
          if Re_Enter = null then
             Report_Unknown_Command;
