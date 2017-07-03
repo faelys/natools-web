@@ -16,6 +16,7 @@
 
 with Natools.S_Expressions.Atom_Buffers;
 with Natools.S_Expressions.Atom_Ref_Constructors;
+with Natools.S_Expressions.Encodings;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Parsers;
 with Natools.S_Expressions.Printers.Pretty;
@@ -29,11 +30,11 @@ package body Natools.Web.Comment_Cookies is
          Tab_Stop      => <>,
          Indentation   => 0,
          Indent        => <>,
-         Quoted        => S_Expressions.Printers.Pretty.No_Quoted,
+         Quoted        => S_Expressions.Printers.Pretty.When_Shorter,
          Token         => S_Expressions.Printers.Pretty.Extended_Token,
-         Hex_Casing    => <>,
-         Quoted_Escape => <>,
-         Char_Encoding => <>,
+         Hex_Casing    => S_Expressions.Encodings.Lower,
+         Quoted_Escape => S_Expressions.Printers.Pretty.Hex_Escape,
+         Char_Encoding => S_Expressions.Printers.Pretty.Latin,
          Fallback      => S_Expressions.Printers.Pretty.Verbatim,
          Newline       => S_Expressions.Printers.Pretty.LF);
 
