@@ -209,7 +209,7 @@ chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"
 if test -z "${STOPPED}"; then
 	if ! test -f cookie-jar.txt; then
 		echo "Cookie jar not created"
-	elif ! grep -qF cGFzcy10aHJvdWdoIEFkbWluaXN0cmF0b3IgMDpodHRwOi8vdXNlcnMuZXhhbXBsZS5jb20vYWRtaW4v cookie-jar.txt; then
+	elif ! grep -qF cGFzcy10aHJvdWdoIEFkbWluaXN0cmF0b3IgIiJodHRwOi8vdXNlcnMuZXhhbXBsZS5jb20vYWRtaW4v cookie-jar.txt; then
 		echo "Expected cookie value not found"
 	fi
 fi
