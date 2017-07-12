@@ -55,5 +55,7 @@
    upper-case
    hexadecimal)
 (filters
+   (identity-1 text-replacement)
+   (identity-2 text-replacement third)
    (redden text-replacement blue red)
    (xml-escape html-escape "<>&"))

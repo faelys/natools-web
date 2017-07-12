@@ -1,12 +1,12 @@
 (elements
    (main-text
 (if-no-date published
-   "<p>"
+   (filter identity-1 "<p>")
    (if-header-else
       (X-forwarded-proto (case-insensitive (is hTTps)))
       "Secure data"
       ("Data"))
-   " in the third page.</p>\n")
+   (filter identity-2 " in the third page.</p>\n"))
 (filter redden
    "<p>Current color is blue, but broken bl"
    "ue is unchanged.</p>\n")
