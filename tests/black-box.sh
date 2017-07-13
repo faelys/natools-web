@@ -121,6 +121,15 @@ check /second/comments second-404.html -F 'c_mail=' \
 chain /second second.html -b 'foo=bar; User-Token=glaglagla'
 
 BASE_VERSION=$(get_version)
+check /reload 405.html
+check /reload/extra reload-extra-404.html -F 'submit=Submit'
+NEW_VERSION=$(get_version)
+if test "${BASE_VERSION}" != "${NEW_VERSION}"; then
+	echo "Reload calls expected to be erroneous changed version" \
+	    " from ${BASE_VERISON} to ${NEW_VERSION}"
+fi
+
+BASE_VERSION=$(get_version)
 check /fourth fourth.html
 chain /fourth/comments 405.html
 chain /fourth fourth.html
