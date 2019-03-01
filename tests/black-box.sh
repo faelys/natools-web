@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (c) 2014-2017, Natacha Porté
+# Copyright (c) 2014-2019, Natacha Porté
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -134,7 +134,7 @@ check /fourth fourth.html
 chain /fourth/comments 405.html
 chain /fourth fourth.html
 chain /fourth/comments fourth-preview.html -F 'c_mail=' \
-    -F 'c_name=  ' \
+    --form-string 'c_name=  ' \
     -F 'c_link=http://instinctive.eu/"' -F 'preview=Preview' \
     -F 'c_text=Preview comment that should not be written anywhere.'
 chain /fourth fourth.html
