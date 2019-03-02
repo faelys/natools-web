@@ -110,7 +110,7 @@ package body Natools.Web.Containers is
             if Time_IO.RFC_3339.Is_Valid (Image) then
                Time_IO.RFC_3339.Value (Image, Item.Time, Item.Offset);
                Map.Include (Name, Item);
-            else
+            elsif Image'Length > 0 then
                Log (Severities.Warning, "Ignoring invalid date named """
                  & S_Expressions.To_String (Name) & '"');
             end if;
