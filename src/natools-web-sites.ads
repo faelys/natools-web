@@ -140,7 +140,7 @@ package Natools.Web.Sites is
 
    type Exchange
      (Backend : not null access Exchanges.Exchange;
-      Site : not null access Sites.Site)
+      Site : not null access constant Sites.Site)
      is limited private
      with Implicit_Dereference => Backend;
 
@@ -246,7 +246,7 @@ private
 
    type Exchange
      (Backend : not null access Exchanges.Exchange;
-      Site : not null access Sites.Site)
+      Site : not null access constant Sites.Site)
    is limited record
       Comment_Info_Initialized : Boolean := False;
       Comment_Info : Comment_Cookies.Comment_Info;
