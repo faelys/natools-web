@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -472,19 +472,23 @@ package body Natools.Web.Tags is
       end loop Process_Implicit;
 
       for Cursor in Explicit.Iterate loop
-         Add_Entry
-           (Container,
-            Atom_Maps.Key (Cursor),
-            Atom_Maps.Element (Cursor),
-            Element);
+         if Atom_Maps.Element (Cursor)'Length > 0 then
+            Add_Entry
+              (Container,
+               Atom_Maps.Key (Cursor),
+               Atom_Maps.Element (Cursor),
+               Element);
+         end if;
       end loop;
 
       for Cursor in Implicit.Iterate loop
-         Add_Entry
-           (Container,
-            Atom_Maps.Key (Cursor),
-            Atom_Maps.Element (Cursor),
-            Element);
+         if Atom_Maps.Element (Cursor)'Length > 0 then
+            Add_Entry
+              (Container,
+               Atom_Maps.Key (Cursor),
+               Atom_Maps.Element (Cursor),
+               Element);
+         end if;
       end loop;
    end Generic_Register;
 
