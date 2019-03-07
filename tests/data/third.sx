@@ -27,13 +27,19 @@
       "</td>\n  </tr>\n")
    (separator " ")
    (suffix "</table>\n")))
+(tags fragment (all-descendants
+   (prefix "<p>Fragments: ")
+   (template (name (2 -1)) " (" (element-count) ")")
+   (separator ", ")
+   (suffix "</p>\n")))
 (optional-tag non-existent-tag (all-descendants
    (template "<p>Found leaf <code>" (name (first last))
       "</code> of non-existent tag.</p>\n")))
 (render page-comments))
    (title "Third Page"))
 (tags (3 group/2 pages/news tags/topic1/other-subtopic tags/topic3
-      reverse/1 reverse/2))
+      reverse/1 reverse/2 fragment/deep/deeper/bottom)
+   ("" fragment fragment/deep fragment/deep/deeper))
 (dates
    (validated "2015-02-01T01:02:03+04:00")
    ("!expire" "2100-01-01T00:00:00Z"))
