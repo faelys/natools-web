@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015-2017, Natacha Porté                                   --
+-- Copyright (c) 2015-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -89,7 +89,9 @@ private
 
    protected type Update_Queue (Parent : not null access Holder) is
       entry Append (Update : in Update_Holders.Holder);
-      procedure Next (Update : out Update_Holders.Holder);
+      procedure Next
+        (Update : out Update_Holders.Holder;
+         Has_Update : out Boolean);
    private
       Task_Waiting : Boolean := False;
       List : Update_Lists.List;

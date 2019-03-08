@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015-2017, Natacha Porté                                   --
+-- Copyright (c) 2015-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -159,14 +159,18 @@ package body Natools.Web.Sites.Holders is
       end Append;
 
 
-      procedure Next (Update : out Update_Holders.Holder) is
+      procedure Next
+        (Update : out Update_Holders.Holder;
+         Has_Update : out Boolean) is
       begin
          if List.Is_Empty then
             Task_Waiting := True;
             Update := Update_Holders.Empty_Holder;
+            Has_Update := False;
          else
             pragma Assert (not Task_Waiting);
             Update := List.First_Element;
+            Has_Update := True;
             List.Delete_First;
          end if;
       end Next;
@@ -182,11 +186,12 @@ package body Natools.Web.Sites.Holders is
    task body Worker_Task is
       Container : Update_Holders.Holder;
       Cron_Entry : Natools.Cron.Cron_Entry;
+      Has_Update : Boolean;
    begin
       loop
-         Parent.Queue.Next (Container);
+         Parent.Queue.Next (Container, Has_Update);
 
-         if Container.Is_Empty then
+         if not Has_Update then
             select
                accept Run (Update : in Update_Holders.Holder) do
                   Container := Update;
