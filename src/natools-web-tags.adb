@@ -461,12 +461,13 @@ package body Natools.Web.Tags is
 
                Last := Last - 1;
 
-               if not Explicit.Contains (Tag (Tag'First .. Last)) then
-                  Insert_Or_Log
-                    (Implicit,
-                     Tag (Tag'First .. Last), Key,
-                     "implicit", Severities.Warning);
-               end if;
+               exit Insert_Pairs
+                 when Explicit.Contains (Tag (Tag'First .. Last));
+
+               Insert_Or_Log
+                 (Implicit,
+                  Tag (Tag'First .. Last), Key,
+                  "implicit", Severities.Warning);
             end loop Insert_Pairs;
          end;
       end loop Process_Implicit;
