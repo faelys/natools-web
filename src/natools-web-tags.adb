@@ -172,6 +172,13 @@ package body Natools.Web.Tags is
    function Parent (Tag : Tag_Contents) return Tag_Contents;
       --  Return the parent tag of Tag
 
+   procedure Remove_Entry
+     (DB : in out Tag_DB;
+      Tag : in S_Expressions.Atom;
+      Key : in S_Expressions.Atom;
+      Element : in Visible'Class);
+      --  Inefficiently remove an entry from an already built database
+
    procedure Render_Components
      (Exchange : in out Sites.Exchange;
       Name : in Processed_Name;
@@ -1305,11 +1312,63 @@ package body Natools.Web.Tags is
 
    procedure Hot_Register is new Generic_Register (Tag_DB);
 
+   procedure Hot_Unregister is new Generic_Register
+     (Container_Type => Tag_DB,
+      Add_Entry => Remove_Entry);
+
    procedure Live_Register
      (DB : in out Tag_DB;
       Keys : in Tag_List;
       Element : in Visible'Class)
      renames Hot_Register;
+
+   procedure Live_Unregister
+     (DB : in out Tag_DB;
+      Keys : in Tag_List;
+      Element : in Visible'Class)
+     renames Hot_Unregister;
+
+
+   procedure Remove_Entry
+     (DB : in out Tag_DB;
+      Tag : in S_Expressions.Atom;
+      Key : in S_Expressions.Atom;
+      Element : in Visible'Class)
+   is
+      Map_Position : constant Tag_Maps.Cursor := DB.Internal.Find (Tag);
+   begin
+      if Tag_Maps.Has_Element (Map_Position) then
+         declare
+            Old_Map : constant Page_Maps.Constant_Map
+              := Tag_Maps.Element (Map_Position);
+            Page_Position : constant Page_Maps.Cursor := Old_Map.Find (Key);
+         begin
+            if Page_Maps.Has_Element (Page_Position) then
+               if Page_Maps.Element (Page_Position) = Element then
+                  DB.Internal := DB.Internal.Replace_Element
+                    (Map_Position, Old_Map.Delete (Page_Position));
+               else
+                  Log (Severities.Info,
+                    "Not removing mismatched element """
+                    & S_Expressions.To_String (Key)
+                    & """ for removal from tag """
+                    & S_Expressions.To_String (Tag) & '"');
+               end if;
+            else
+               Log (Severities.Warning,
+                 "Unable to find element """
+                 & S_Expressions.To_String (Key)
+                 & """ for removal from tag """
+                 & S_Expressions.To_String (Tag) & '"');
+            end if;
+         end;
+      else
+         Log (Severities.Warning,
+           "Cannot remove from inexistent tag map """
+           & S_Expressions.To_String (Tag) & '"');
+      end if;
+
+   end Remove_Entry;
 
 
    procedure Render

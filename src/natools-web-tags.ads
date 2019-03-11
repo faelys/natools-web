@@ -83,6 +83,12 @@ package Natools.Web.Tags is
       Element : in Visible'Class);
       --  Inefficiently register Element with the given Keys into DB
 
+   procedure Live_Unregister
+     (DB : in out Tag_DB;
+      Keys : in Tag_List;
+      Element : in Visible'Class);
+      --  Inefficiently unregister Element with the given Keys from DB
+
    procedure Render
      (Exchange : in out Sites.Exchange;
       DB : in Tag_DB;
