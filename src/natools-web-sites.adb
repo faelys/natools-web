@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2017, Natacha Porté                                   --
+-- Copyright (c) 2014-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -584,6 +584,15 @@ package body Natools.Web.Sites is
 
       Object.Load_Date := Ada.Calendar.Clock;
    end Reload;
+
+
+   procedure Remove
+     (Object : in out Site;
+      Tags : in Web.Tags.Tag_List;
+      Visible : in Web.Tags.Visible'Class) is
+   begin
+      Web.Tags.Live_Unregister (Object.Tags, Tags, Visible);
+   end Remove;
 
 
    procedure Reset (Object : in out Site; File_Name : in String) is
