@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015, Natacha Porté                                        --
+-- Copyright (c) 2015-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -183,6 +183,17 @@ private
 
    overriding procedure Update
      (Self : in Comment_Inserter;
+      Site : in out Sites.Site);
+
+
+   type Comment_Remover is new Sites.Updates.Site_Update with record
+      Container : Container_Refs.Reference;
+      Id : S_Expressions.Atom_Refs.Immutable_Reference;
+      Tags : Containers.Atom_Array_Refs.Immutable_Reference;
+   end record;
+
+   overriding procedure Update
+     (Self : in Comment_Remover;
       Site : in out Sites.Site);
 
 

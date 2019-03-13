@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015-2017, Natacha Porté                                   --
+-- Copyright (c) 2015-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -1910,9 +1910,9 @@ package body Natools.Web.Comments is
 
 
 
-   ------------------
-   -- Site Updater --
-   ------------------
+   -------------------
+   -- Site Updaters --
+   -------------------
 
    overriding procedure Update
      (Self : in Comment_Inserter;
@@ -1923,6 +1923,18 @@ package body Natools.Web.Comments is
       Site.Insert
         (Tags.Create (Self.Tags.Query, Self.New_Item.Id),
          Comment_Ref'(Self.Container, Self.New_Item.Id));
+   end Update;
+
+
+   overriding procedure Update
+     (Self : in Comment_Remover;
+      Site : in out Sites.Site) is
+   begin
+      pragma Assert (not Self.Tags.Is_Empty);
+
+      Site.Remove
+        (Tags.Create (Self.Tags.Query, Self.Id),
+         Comment_Ref'(Self.Container, Self.Id));
    end Update;
 
 end Natools.Web.Comments;
