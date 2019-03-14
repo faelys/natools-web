@@ -1874,6 +1874,26 @@ package body Natools.Web.Comments is
       end Insert;
 
 
+      procedure Ignore
+        (Id : in S_Expressions.Atom;
+         Ref : out S_Expressions.Atom_Refs.Immutable_Reference)
+      is
+         Position : constant Comment_Maps.Cursor := Map.Find (Id);
+      begin
+         if Comment_Maps.Has_Element (Position) then
+            Ref := Comment_Maps.Element (Position).Id;
+            Map := Comment_Maps.Delete (Map, Position);
+            Update_Ranks (Map);
+         else
+            Ref := S_Expressions.Atom_Refs.Null_Immutable_Reference;
+            Log (Severities.Error,
+              "Unknown comment id """
+               & S_Expressions.To_String (Id)
+               & """ to ignore");
+         end if;
+      end Ignore;
+
+
       procedure Orphan is
       begin
          Set_Parent (Map, null);

@@ -131,6 +131,10 @@ private
 
       procedure Insert (Data : in Comment_Data);
 
+      procedure Ignore
+        (Id : in S_Expressions.Atom;
+         Ref : out S_Expressions.Atom_Refs.Immutable_Reference);
+
       procedure Orphan;
 
       function Find (Id : S_Expressions.Atom_Refs.Immutable_Reference)
