@@ -84,6 +84,7 @@ package body Natools.Web.Comments is
    Invalid_Condition : exception;
 
 
+   Ignore_Button : constant String := "ignore";
    Preview_Button : constant String := "preview";
    Preview_Id_Ref : S_Expressions.Atom_Refs.Immutable_Reference;
    Submit_Button : constant String := "submit";
@@ -1735,6 +1736,43 @@ package body Natools.Web.Comments is
          if not Tags."=" (List.Parent, null) then
             Render_Default (Exchange, List.Parent.all);
          end if;
+         return;
+      elsif Exchange.Parameter (Ignore_Button) /= "" then
+         declare
+            Req_Id : constant S_Expressions.Atom
+              := S_Expressions.To_Atom (Exchange.Parameter ("id"));
+            Ref : S_Expressions.Atom_Refs.Immutable_Reference;
+         begin
+            List.Comments.Update.Ignore (Req_Id, Ref);
+            if not Ref.Is_Empty then
+               Update_Stored_Comment :
+               declare
+                  Backend : Backends.Backend'Class
+                    := Exchange.Site.Get_Backend (List.Backend_Name.Query);
+                  Stream : aliased Ada.Streams.Root_Stream_Type'Class
+                    := Backend.Append
+                       (List.Backend_Path.Query,
+                        Ref.Query);
+                  Printer : S_Expressions.Printers.Pretty.Stream_Printer
+                    (Stream'Access);
+               begin
+                  Exchange.Site.Set_Parameters (Printer);
+                  Printer.Open_List;
+                  Printer.Append_String ("flags");
+                  Printer.Append_Atom
+                    (Comment_Flag_IO.Image (Comment_Flags.Ignored));
+                  Printer.Close_List;
+               end Update_Stored_Comment;
+
+               if not List.Tags.Is_Empty then
+                  Exchange.Site.Queue_Update (Comment_Remover'
+                    (Container => List.Comments,
+                     Id => Ref,
+                     Tags => List.Tags));
+               end if;
+            end if;
+         end;
+         Error_Pages.See_Other (Exchange, Redirect_Location);
          return;
       elsif Exchange.Parameter (Submit_Button) = "" then
          return;
