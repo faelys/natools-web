@@ -9,7 +9,7 @@
 (static-paths data/maintenance data/static)
 (template-file data/templates.sx)
 (simple-pages index comments comment-feed first second third fourth fifth
-   list-test contact expired unpublished)
+   list-test contact expired unpublished comment-ids)
 (tag-page tags)
 (test-page test)
 (named-elements

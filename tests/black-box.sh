@@ -229,6 +229,10 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_text=Spam comment with wrong filter'
 chain_last_spam spam-wrong-filter.sx
 chain /fifth fifth-commented-2.html
+LAST_ID=$(curl -s "${BASE_URL}/comment-ids" | tail -n 1)
+chain /fifth/comments fifth-303.html -F 'ignore=Ignore' -F "id=${LAST_ID}"
+chain_curl -F 'wait_version='$((BASE_VERSION + 3)) "${BASE_URL}/test"
+chain /fifth fifth-commented.html
 FIFTH_STOPPED="${STOPPED}"
 
 BASE_VERSION=$(get_version)
@@ -246,5 +250,5 @@ STOPPED="${FIFTH_STOPPED}"
 chain_curl -F 'next_expire=5' "${BASE_URL}/test"
 chain /reload reload-redirect.html -F 'submit=Submit'
 chain_curl -F 'wait_version='$((BASE_VERSION + 1)) "${BASE_URL}/test"
-chain /fifth fifth-commented-2.html
+chain /fifth fifth-commented.html
 chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"
