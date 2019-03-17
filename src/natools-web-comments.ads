@@ -84,7 +84,8 @@ private
    end Comment_Flags;
 
    package List_Flags is
-      type Enum is (Ignore_By_Default, Allow_Date_Override, Closed);
+      type Enum is
+        (Ignore_By_Default, Allow_Date_Override, Closed, Allow_Ignore);
       type Set is array (Enum) of Boolean with Pack;
    end List_Flags;
 

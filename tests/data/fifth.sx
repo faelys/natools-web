@@ -8,7 +8,7 @@
 (tags (5 pages/news))
 (comments
    (default-text-filter html-escape)
-   (flags ignore-by-default allow-date-override)
+   (flags ignore-by-default allow-date-override allow-ignore)
    (filter comment-filter)
    (backend comments 5)
    (tags comments)

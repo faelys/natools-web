@@ -1737,7 +1737,9 @@ package body Natools.Web.Comments is
             Render_Default (Exchange, List.Parent.all);
          end if;
          return;
-      elsif Exchange.Parameter (Ignore_Button) /= "" then
+      elsif Exchange.Parameter (Ignore_Button) /= ""
+        and then List.Flags (List_Flags.Allow_Ignore)
+      then
          declare
             Req_Id : constant S_Expressions.Atom
               := S_Expressions.To_Atom (Exchange.Parameter ("id"));
