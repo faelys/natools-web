@@ -108,6 +108,9 @@ check /list-test list-test.html
 check /expired expired.html
 check /unpublished unpublished.html
 
+check /first/comments first-comments-404.html -F 'ignore=Ignore' -F 'id=VV118'
+chain /first first.html
+
 check /first/comments first-spam.html -F 'c_mail=' \
     --form-string 'c_name=<i>Nobody</i>' \
     -F 'c_link=http://instinctive.eu/"' -F 'submit=Submit' \
