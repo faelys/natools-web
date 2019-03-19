@@ -1744,6 +1744,7 @@ package body Natools.Web.Comments is
             Req_Id : constant S_Expressions.Atom
               := S_Expressions.To_Atom (Exchange.Parameter ("id"));
             Ref : S_Expressions.Atom_Refs.Immutable_Reference;
+            Ids : Id_Lists.List;
          begin
             List.Comments.Update.Ignore (Req_Id, Ref);
             if not Ref.Is_Empty then
@@ -1767,9 +1768,10 @@ package body Natools.Web.Comments is
                end Update_Stored_Comment;
 
                if not List.Tags.Is_Empty then
+                  Ids.Append (Ref);
                   Exchange.Site.Queue_Update (Comment_Remover'
                     (Container => List.Comments,
-                     Id => Ref,
+                     Ids => Ids,
                      Tags => List.Tags));
                end if;
             end if;
@@ -1992,9 +1994,11 @@ package body Natools.Web.Comments is
    begin
       pragma Assert (not Self.Tags.Is_Empty);
 
-      Site.Remove
-        (Tags.Create (Self.Tags.Query, Self.Id),
-         Comment_Ref'(Self.Container, Self.Id));
+      for Id of Self.Ids loop
+         Site.Remove
+           (Tags.Create (Self.Tags.Query, Id),
+            Comment_Ref'(Self.Container, Id));
+      end loop;
    end Update;
 
 end Natools.Web.Comments;

@@ -26,6 +26,7 @@ with Natools.Web.Sites;
 with Natools.Web.Tags;
 
 private with Ada.Calendar.Time_Zones;
+private with Ada.Containers.Doubly_Linked_Lists;
 private with Ada.Finalization;
 private with Natools.Constant_Indefinite_Ordered_Maps;
 private with Natools.References;
@@ -191,9 +192,13 @@ private
       Site : in out Sites.Site);
 
 
+   package Id_Lists is new Ada.Containers.Doubly_Linked_Lists
+     (S_Expressions.Atom_Refs.Immutable_Reference,
+      S_Expressions.Atom_Refs."=");
+
    type Comment_Remover is new Sites.Updates.Site_Update with record
       Container : Container_Refs.Reference;
-      Id : S_Expressions.Atom_Refs.Immutable_Reference;
+      Ids : Id_Lists.List;
       Tags : Containers.Atom_Array_Refs.Immutable_Reference;
    end record;
 
