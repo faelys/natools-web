@@ -1741,13 +1741,26 @@ package body Natools.Web.Comments is
         and then List.Flags (List_Flags.Allow_Ignore)
       then
          declare
-            Req_Id : constant S_Expressions.Atom
-              := S_Expressions.To_Atom (Exchange.Parameter ("id"));
-            Ref : S_Expressions.Atom_Refs.Immutable_Reference;
+            procedure Process (Name, Value : in String);
+
             Ids : Id_Lists.List;
-         begin
-            List.Comments.Update.Ignore (Req_Id, Ref);
-            if not Ref.Is_Empty then
+
+            procedure Process (Name, Value : in String) is
+               Ref : S_Expressions.Atom_Refs.Immutable_Reference;
+            begin
+               if Name /= "id" then
+                  return;
+               end if;
+
+               List.Comments.Update.Ignore
+                 (S_Expressions.To_Atom (Value), Ref);
+
+               if Ref.Is_Empty then
+                  return;
+               end if;
+
+               Ids.Append (Ref);
+
                Update_Stored_Comment :
                declare
                   Backend : Backends.Backend'Class
@@ -1766,14 +1779,15 @@ package body Natools.Web.Comments is
                     (Comment_Flag_IO.Image (Comment_Flags.Ignored));
                   Printer.Close_List;
                end Update_Stored_Comment;
+            end Process;
+         begin
+            Exchange.Iterate_Parameters (Process'Access);
 
-               if not List.Tags.Is_Empty then
-                  Ids.Append (Ref);
-                  Exchange.Site.Queue_Update (Comment_Remover'
-                    (Container => List.Comments,
-                     Ids => Ids,
-                     Tags => List.Tags));
-               end if;
+            if not List.Tags.Is_Empty and then not Ids.Is_Empty then
+               Exchange.Site.Queue_Update (Comment_Remover'
+                 (Container => List.Comments,
+                  Ids => Ids,
+                  Tags => List.Tags));
             end if;
          end;
          Error_Pages.See_Other (Exchange, Redirect_Location);
