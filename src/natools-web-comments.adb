@@ -1864,7 +1864,7 @@ package body Natools.Web.Comments is
                if not List.Tags.Is_Empty then
                   Exchange.Site.Queue_Update (Comment_Inserter'
                     (Container => List.Comments,
-                     New_Item => Builder.Core,
+                     Id => Builder.Core.Id,
                      Tags => List.Tags));
                end if;
             end if;
@@ -1997,8 +1997,8 @@ package body Natools.Web.Comments is
       pragma Assert (not Self.Tags.Is_Empty);
 
       Site.Insert
-        (Tags.Create (Self.Tags.Query, Self.New_Item.Id),
-         Comment_Ref'(Self.Container, Self.New_Item.Id));
+        (Tags.Create (Self.Tags.Query, Self.Id),
+         Comment_Ref'(Self.Container, Self.Id));
    end Update;
 
 

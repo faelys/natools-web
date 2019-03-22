@@ -183,7 +183,7 @@ private
 
    type Comment_Inserter is new Sites.Updates.Site_Update with record
       Container : Container_Refs.Reference;
-      New_Item : Comment_Data;
+      Id : S_Expressions.Atom_Refs.Immutable_Reference;
       Tags : Containers.Atom_Array_Refs.Immutable_Reference;
    end record;
 
