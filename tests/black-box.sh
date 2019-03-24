@@ -248,6 +248,18 @@ chain /contact/comments contact-303.html \
     -F 'c_text=Full comment in test'
 chain_curl -F 'wait_version='$((BASE_VERSION + 1)) "${BASE_URL}/test"
 chain /contact contact-1.html
+chain /contact/comments contact-303.html \
+    -b 'User-Token=hello' -F 'c_mail=test@localhost' -F 'c_name=Test' \
+    -F 'c_note=Comment with all atoms and user' -F 'c_title=Test' \
+    -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_text=Full comment in test (2)'
+chain /contact/comments contact-303.html \
+    -b 'User-Token=hi' -F 'c_mail=user@localhost' -F 'c_name=Normal' \
+    -F 'c_note=Comment with all atoms and user' -F 'c_title=Test' \
+    -F 'c_link=http://instinctive.eu/' -F 'submit=Submit' \
+    -F 'c_text=Full comment in test (3)'
+chain_curl -F 'wait_version='$((BASE_VERSION + 3)) "${BASE_URL}/test"
+chain /contact contact-3.html
 
 BASE_VERSION=$(get_version)
 STOPPED="${FIFTH_STOPPED}"
