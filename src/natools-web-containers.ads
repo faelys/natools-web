@@ -135,6 +135,9 @@ package Natools.Web.Containers is
       Value : in String)
      return Boolean;
 
+   function Elements (Set : in Atom_Set)
+     return Atom_Array_Refs.Immutable_Reference;
+
 
    type Identity is record
       User : S_Expressions.Atom_Refs.Immutable_Reference;
@@ -148,6 +151,10 @@ private
    type Atom_Set is record
       Elements : Atom_Array_Refs.Immutable_Reference;
    end record;
+
+   function Elements (Set : in Atom_Set)
+     return Atom_Array_Refs.Immutable_Reference
+     is (Set.Elements);
 
    Null_Atom_Set : constant Atom_Set
      := (Elements => Atom_Array_Refs.Null_Immutable_Reference);
