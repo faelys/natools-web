@@ -88,6 +88,12 @@ package body Natools.Web.Comments is
    Preview_Button : constant String := "preview";
    Preview_Id_Ref : S_Expressions.Atom_Refs.Immutable_Reference;
    Submit_Button : constant String := "submit";
+   Auto_Class_Prefix : constant S_Expressions.Atom
+     := (1 => Character'Pos ('c'),  2 => Character'Pos ('o'),
+         3 => Character'Pos ('m'),  4 => Character'Pos ('m'),
+         5 => Character'Pos ('c'),  6 => Character'Pos ('l'),
+         7 => Character'Pos ('a'),  8 => Character'Pos ('s'),
+         9 => Character'Pos ('s'), 10 => Character'Pos ('-'));
 
 
    procedure Append
@@ -119,6 +125,10 @@ package body Natools.Web.Comments is
       Name : in S_Expressions.Atom)
      return Boolean;
       --  Evaluate a condition on a comment builder without argument
+
+   function Get_Class (Exchange : in Sites.Exchange)
+      return S_Expressions.Atom_Refs.Immutable_Reference;
+      --  Look for comment class in Exchange
 
    function Get_Safe_Filter
      (Site : in Sites.Site;
@@ -265,6 +275,38 @@ package body Natools.Web.Comments is
    ------------------------------
    -- Local Helper Subprograms --
    ------------------------------
+
+   function Get_Class (Exchange : in Sites.Exchange)
+      return S_Expressions.Atom_Refs.Immutable_Reference
+   is
+      Groups : constant Containers.Atom_Array_Refs.Immutable_Reference
+        := Containers.Elements (Sites.Identity (Exchange).Groups);
+   begin
+      if not Groups.Is_Empty then
+         for Ref of Groups.Query loop
+            if not Ref.Is_Empty then
+               declare
+                  use type S_Expressions.Atom;
+                  use type S_Expressions.Offset;
+                  Contents : constant S_Expressions.Atom := Ref.Query;
+               begin
+                  if Contents'Length > Auto_Class_Prefix'Length
+                    and then Contents (Contents'First
+                            .. Contents'First + Auto_Class_Prefix'Length - 1)
+                       = Auto_Class_Prefix
+                  then
+                     return Create (Contents
+                       (Contents'First + Auto_Class_Prefix'Length
+                        .. Contents'Last));
+                  end if;
+               end;
+            end if;
+         end loop;
+      end if;
+
+      return S_Expressions.Atom_Refs.Null_Immutable_Reference;
+   end Get_Class;
+
 
    function Image (Name : Comment_Atoms.Enum) return String is
    begin
@@ -1404,6 +1446,7 @@ package body Natools.Web.Comments is
          end case;
       end Process;
    begin
+      Data.Core.Atoms (Comment_Atoms.Class) := Get_Class (Exchange);
       Exchange.Iterate_Parameters (Process'Access);
    end Process_Form;
 
