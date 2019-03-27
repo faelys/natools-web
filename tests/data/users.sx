@@ -1,6 +1,6 @@
 (test-user
    (tokens glaglagla hello)
-   (groups admin))
+   (groups admin commclass-special))
 (normal
    (tokens hi)
    (groups user bar))
