@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2017, Natacha Porté                                   --
+-- Copyright (c) 2014-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -311,9 +311,26 @@ package body Natools.Web.Exchanges is
    procedure Set_Cookie
      (Object : in out Exchange;
       Key : in String;
-      Value : in String) is
+      Value : in String;
+      Comment : in String := "";
+      Domain : in String := "";
+      Max_Age : in Duration := 10.0 * 365.0 * 86400.0;
+      Path : in String := "/";
+      Secure : in Boolean := False;
+      HTTP_Only : in Boolean := False) is
    begin
-      Object.Set_Cookies.Include (Key, Value);
+      Object.Set_Cookies.Include (Key,
+        (Value_Length => Value'Length,
+         Comment_Length => Comment'Length,
+         Domain_Length => Domain'Length,
+         Path_Length => Path'Length,
+         Value => Value,
+         Comment => Comment,
+         Domain => Domain,
+         Max_Age => Max_Age,
+         Path => Path,
+         Secure => Secure,
+         HTTP_Only => HTTP_Only));
    end Set_Cookie;
 
 
@@ -431,10 +448,33 @@ package body Natools.Web.Exchanges is
       end if;
 
       for Cursor in Object.Set_Cookies.Iterate loop
-         AWS.Cookie.Set
-           (Result,
-            String_Maps.Key (Cursor),
-            String_Maps.Element (Cursor));
+         declare
+            Element : constant Cookie_Data := Cookie_Maps.Element (Cursor);
+         begin
+            --  For newer AWS with HttpOnly support:
+--          AWS.Cookie.Set
+--            (Content => Result,
+--             Key => Cookie_Maps.Key (Cursor),
+--             Value => Element.Value,
+--             Comment => Element.Comment,
+--             Domain => Element.Domain,
+--             Max_Age => Element.Max_Age,
+--             Path => Element.Path,
+--             Secure => Element.Secure,
+--             HTTP_Only => Element.HTTP_Only);
+            --  Otherwise, inject HttpOnly after the always-added Path
+            AWS.Cookie.Set
+              (Content => Result,
+               Key => Cookie_Maps.Key (Cursor),
+               Value => Element.Value,
+               Comment => Element.Comment,
+               Domain => Element.Domain,
+               Max_Age => Element.Max_Age,
+               Path => (if Element.HTTP_Only
+                        then Element.Path & "; HttpOnly"
+                        else Element.Path),
+               Secure => Element.Secure);
+         end;
       end loop;
 
       return Result;
