@@ -295,7 +295,9 @@ package body Natools.Web.Cookie_Setters is
          Set_Cookie
            (Object,
             Exchange,
-            Arguments,
+            Arguments
+              (Arguments'First
+               .. (if Separator = 0 then Arguments'Last else Separator - 1)),
             "");
       else
          Set_Cookie
