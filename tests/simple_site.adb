@@ -25,6 +25,7 @@ with Common.Test_Maps;
 with Natools.Web.ACL.Sx_Backends;
 with Natools.Web.Backends.Filesystem;
 with Natools.Web.Comment_Cookies.Base_64;
+with Natools.Web.Cookie_Setters;
 with Natools.Web.Escapes.Filters;
 with Natools.Web.Filters.Pass_Through;
 with Natools.Web.Filters.Text_Blocks;
@@ -55,6 +56,8 @@ begin
       Natools.Web.Log := Common.Syslog_Log'Access;
    end if;
 
+   Common.Site.Register
+     ("cookie-setter", Natools.Web.Cookie_Setters.Create'Access);
    Common.Site.Register
      ("reload-page", Natools.Web.Reload_Pages.Create'Access);
    Common.Site.Register

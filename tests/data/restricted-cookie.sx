@@ -1,0 +1,3 @@
+(redirect-target "/")
+(allowed-names foo bar baz)
+(max-age 3)

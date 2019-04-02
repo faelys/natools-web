@@ -3,11 +3,13 @@
 (default-template html)
 (users s-expr data/users.sx)
 (reload-pages ("/" /reload))
+(cookie-setter ("/elsewhere" /free-cookie))
 (file-prefix data/)
 (file-suffix .sx)
 (path-prefix /)
 (static-paths data/maintenance data/static)
 (template-file data/templates.sx)
+(cookie-setter restricted-cookie forced-cookie)
 (simple-pages index comments comment-feed first second third fourth fifth
    list-test contact expired unpublished comment-ids)
 (tag-page tags)

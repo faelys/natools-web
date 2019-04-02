@@ -1,0 +1,4 @@
+(redirect-target "/")
+(force-name User-Token)
+(max-length 10)
+(http-only)
