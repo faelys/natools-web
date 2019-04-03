@@ -123,6 +123,26 @@ check /second/comments second-404.html -F 'c_mail=' \
     -F 'c_text=Valid comment sent to a closed comment list'
 chain /second second.html -b 'foo=bar; User-Token=glaglagla'
 
+rm -f free-cookie-jar.txt
+check /fourth fourth.html
+chain /restricted-cookie/foo/bar reload-redirect.html \
+    -b free-cookie-jar.txt -c free-cookie-jar.txt
+chain /restricted-cookie/forbidden/bar reload-redirect.html \
+    -b free-cookie-jar.txt -c free-cookie-jar.txt
+chain /forced-cookie/glaglagla reload-redirect.html \
+    -b free-cookie-jar.txt -c free-cookie-jar.txt
+chain /free-cookie/Anything/quux contact-303.html \
+    -b free-cookie-jar.txt -c free-cookie-jar.txt
+chain /fourth fourth-cookied.html -b free-cookie-jar.txt -c free-cookie-jar.txt
+chain /restricted-cookie/foo/ reload-redirect.html \
+    -b free-cookie-jar.txt -c free-cookie-jar.txt
+chain /forced-cookie/ reload-redirect.html \
+    -b free-cookie-jar.txt -c free-cookie-jar.txt
+chain /free-cookie/Anything contact-303.html \
+    -b free-cookie-jar.txt -c free-cookie-jar.txt
+# Expiration is checked later, to avoid race conditions
+# chain /fourth fourth.html -b free-cookie-jar.txt -c free-cookie-jar.txt
+
 BASE_VERSION=$(get_version)
 check /reload 405.html
 check /reload/extra reload-extra-404.html -F 'submit=Submit'
@@ -189,6 +209,10 @@ chain /fourth fourth-commented.html
 chain /reload reload-redirect.html -F 'submit=Submit'
 chain_curl -F 'wait_version='$((BASE_VERSION + 3)) "${BASE_URL}/test"
 chain /fourth fourth-commented.html
+
+# Checking expiration from earlier cookie squenence
+chain /fourth fourth-commented.html \
+    -b free-cookie-jar.txt -c free-cookie-jar.txt
 
 check /fifth fifth.html
 chain /fifth fifth-cookie.html \
