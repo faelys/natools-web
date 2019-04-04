@@ -211,6 +211,12 @@ package Natools.Web.Sites is
      is abstract;
       --  Create pages and register them in Builder
 
+   type Transient_Page_Loader is interface and Page_Loader;
+
+   function Can_Be_Stored (Object : in Transient_Page_Loader) return Boolean
+     is abstract;
+      --  Return whether the object can be stored in a cache
+
 
    type Page_Constructor is not null access function
      (File_Name : in S_Expressions.Atom)

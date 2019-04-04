@@ -219,7 +219,12 @@ package body Natools.Web.Sites is
       Loader : Page_Loader'Class := Get_Loader (File);
    begin
       Load (Loader, Builder, Path);
-      Builder.New_Loaders.Insert (File, Loader);
+
+      if Loader not in Transient_Page_Loader'Class
+        or else Can_Be_Stored (Transient_Page_Loader'Class (Loader))
+      then
+         Builder.New_Loaders.Insert (File, Loader);
+      end if;
    end Add_Page;
 
 
