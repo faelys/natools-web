@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2015, Natacha Porté                                        --
+-- Copyright (c) 2015-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -38,7 +38,10 @@ package Natools.Web.Reload_Pages is
       Extra_Path : in S_Expressions.Atom);
 
 
-   type Loader is new Sites.Page_Loader with private;
+   type Loader is new Sites.Transient_Page_Loader with private;
+
+   overriding function Can_Be_Stored (Object : in Loader) return Boolean
+     is (False);
 
    overriding procedure Load
      (Object : in out Loader;
@@ -55,7 +58,7 @@ private
       Target : S_Expressions.Atom_Refs.Immutable_Reference;
    end record;
 
-   type Loader is new Sites.Page_Loader with record
+   type Loader is new Sites.Transient_Page_Loader with record
       Target : S_Expressions.Atom_Refs.Immutable_Reference;
    end record;
 
