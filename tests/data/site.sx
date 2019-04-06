@@ -2,7 +2,7 @@
    (comments directory data/comments/))
 (default-template html)
 (users s-expr data/users.sx)
-(reload-pages ("/" /reload))
+(reload-pages ("/" /reload) ("/" /second-reload))
 (cookie-setter ("/elsewhere" /free-cookie))
 (file-prefix data/)
 (file-suffix .sx)
