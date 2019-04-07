@@ -36,7 +36,9 @@ package Natools.Web.Cookie_Setters is
 
 
 
-   type Loader is new Sites.Page_Loader with private;
+   type Loader is new Sites.Transient_Page_Loader with private;
+
+   overriding function Can_Be_Stored (Object : in Loader) return Boolean;
 
    overriding procedure Load
      (Object : in out Loader;
@@ -77,8 +79,9 @@ private
          then "/" else S_Expressions.To_String (Object.Path.Query));
 
 
-   type Loader is new Sites.Page_Loader with record
+   type Loader is new Sites.Transient_Page_Loader with record
       File_Name : S_Expressions.Atom_Refs.Immutable_Reference;
+      File_Found : Boolean := False;
    end record;
 
 end Natools.Web.Cookie_Setters;

@@ -219,11 +219,18 @@ package body Natools.Web.Cookie_Setters is
    -- Public Interface --
    ----------------------
 
+   overriding function Can_Be_Stored (Object : in Loader) return Boolean is
+   begin
+      return Object.File_Found;
+   end Can_Be_Stored;
+
+
    function Create (File : in S_Expressions.Atom)
      return Sites.Page_Loader'Class is
    begin
-      return Loader'(File_Name
-        => S_Expressions.Atom_Ref_Constructors.Create (File));
+      return Loader'
+        (File_Name => S_Expressions.Atom_Ref_Constructors.Create (File),
+         File_Found => False);
    end Create;
 
 
@@ -232,7 +239,6 @@ package body Natools.Web.Cookie_Setters is
       Builder : in out Sites.Site_Builder;
       Path : in S_Expressions.Atom)
    is
-      pragma Unmodified (Object);
       Page : Setter;
    begin
       declare
@@ -246,6 +252,8 @@ package body Natools.Web.Cookie_Setters is
             Update_Setter (Reader, Page, Meaningless_Value);
          end;
 
+         Object.File_Found := True;
+
          if Page.Redirect_Target.Is_Empty then
             Log (Severities.Error,
                  "Cookie setter file """ & File_Name
@@ -257,6 +265,7 @@ package body Natools.Web.Cookie_Setters is
             Log (Severities.Warning,
                  "Unable to open cookie setter file """ & File_Name
                  & """, using it as a rediction target");
+            Object.File_Found := False;
             Page.Redirect_Target := Object.File_Name;
       end;
 
