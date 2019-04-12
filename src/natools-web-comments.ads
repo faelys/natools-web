@@ -47,6 +47,9 @@ package Natools.Web.Comments is
 
    type Comment_List is tagged private;
 
+   function Is_Null (Object : in Comment_List) return Boolean;
+      --  Return whether the list is usable (even if empty)
+
    procedure Load
      (Object : in out Comment_List;
       Builder : in out Sites.Site_Builder;
@@ -179,6 +182,9 @@ private
    end record;
 
    overriding procedure Finalize (Object : in out Comment_List);
+
+   function Is_Null (Object : in Comment_List) return Boolean
+     is (Object.Backend_Name.Is_Empty or else Object.Backend_Path.Is_Empty);
 
 
    type Comment_Inserter is new Sites.Updates.Site_Update with record
