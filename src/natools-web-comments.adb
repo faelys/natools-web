@@ -1924,6 +1924,23 @@ package body Natools.Web.Comments is
    end Set;
 
 
+   procedure Set
+     (List : out Comment_List;
+      Template : in out S_Expressions.Lockable.Descriptor'Class;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Path_Override : in S_Expressions.Atom_Refs.Immutable_Reference
+        := S_Expressions.Atom_Refs.Null_Immutable_Reference) is
+   begin
+      List := Empty_List;
+      Update (Template, List, Meaningless_Value);
+      Update (Expression, List, Meaningless_Value);
+
+      if not Path_Override.Is_Empty then
+         List.Backend_Path := Path_Override;
+      end if;
+   end Set;
+
+
    procedure Set_Parent
      (Container : in out Comment_Maps.Updatable_Map;
       Parent : in Tags.Visible_Access) is

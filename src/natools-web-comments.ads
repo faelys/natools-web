@@ -75,6 +75,14 @@ package Natools.Web.Comments is
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
       --  (Re)initialize List using data from Expression
 
+   procedure Set
+     (List : out Comment_List;
+      Template : in out S_Expressions.Lockable.Descriptor'Class;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Path_Override : in S_Expressions.Atom_Refs.Immutable_Reference
+        := S_Expressions.Atom_Refs.Null_Immutable_Reference);
+      --  (Re)initialize List using data from Template overriden by Expression
+
 private
 
    package Comment_Atoms is
