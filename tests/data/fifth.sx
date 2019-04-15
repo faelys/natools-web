@@ -10,6 +10,6 @@
    (default-text-filter html-escape)
    (flags ignore-by-default allow-date-override allow-ignore)
    (filter comment-filter)
-   (backend comments 5)
+   (backend transient-comments 5)
    (tags comments)
    (text-filters pass-through))

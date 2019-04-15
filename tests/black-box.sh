@@ -23,7 +23,10 @@ fi
 
 BASE_URL=${1%/}
 EXPECTED_DIR=${2:-$(dirname "$0")/expected}
-: ${SPAM_LOG:=${EXPECTED_DIR}/../data/comments/spam.sx}
+: ${TRANSIENT_DIR:=${EXPECTED_DIR}/../transient-data}
+: ${SPAM_LOG:=${TRANSIENT_DIR}/comments/spam.sx}
+: ${COOKIE_JAR_1:=${TRANSIENT_DIR}/free-cookie-jar.txt}
+: ${COOKIE_JAR_2:=${TRANSIENT_DIR}/cookie-jar.txt}
 
 test -e "${SPAM_LOG}" || touch "${SPAM_LOG}"
 
@@ -123,25 +126,26 @@ check /second/comments second-404.html -F 'c_mail=' \
     -F 'c_text=Valid comment sent to a closed comment list'
 chain /second second.html -b 'foo=bar; User-Token=glaglagla'
 
-rm -f free-cookie-jar.txt
+rm -f "${COOKIE_JAR_1}"
 check /fourth fourth.html
 chain /restricted-cookie/foo/bar reload-redirect.html \
-    -b free-cookie-jar.txt -c free-cookie-jar.txt
+    -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
 chain /restricted-cookie/forbidden/bar reload-redirect.html \
-    -b free-cookie-jar.txt -c free-cookie-jar.txt
+    -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
 chain /forced-cookie/glaglagla reload-redirect.html \
-    -b free-cookie-jar.txt -c free-cookie-jar.txt
+    -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
 chain /free-cookie/Anything/quux contact-303.html \
-    -b free-cookie-jar.txt -c free-cookie-jar.txt
-chain /fourth fourth-cookied.html -b free-cookie-jar.txt -c free-cookie-jar.txt
+    -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
+chain /fourth fourth-cookied.html \
+    -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
 chain /restricted-cookie/foo/ reload-redirect.html \
-    -b free-cookie-jar.txt -c free-cookie-jar.txt
+    -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
 chain /forced-cookie/ reload-redirect.html \
-    -b free-cookie-jar.txt -c free-cookie-jar.txt
+    -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
 chain /free-cookie/Anything contact-303.html \
-    -b free-cookie-jar.txt -c free-cookie-jar.txt
+    -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
 # Expiration is checked later, to avoid race conditions
-# chain /fourth fourth.html -b free-cookie-jar.txt -c free-cookie-jar.txt
+# chain /fourth fourth.html #   -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
 
 BASE_VERSION=$(get_version)
 check /reload 405.html
@@ -211,8 +215,7 @@ chain_curl -F 'wait_version='$((BASE_VERSION + 3)) "${BASE_URL}/test"
 chain /fourth fourth-commented.html
 
 # Checking expiration from earlier cookie squenence
-chain /fourth fourth-commented.html \
-    -b free-cookie-jar.txt -c free-cookie-jar.txt
+chain /fourth fourth-commented.html -b "${COOKIE_JAR_1}" -c "${COOKIE_JAR_1}"
 
 check /fifth fifth.html
 chain /fifth fifth-cookie.html \
@@ -220,7 +223,7 @@ chain /fifth fifth-cookie.html \
 chain /fifth fifth-cookie.html \
     -b 'c_info=0KG5hbWUgIlJhbmRvbSBTdHJhbmdlciIpKGxpbmsgaHR0cDovL2luc3RpbmN0aXZlLmV1Lyk'
 
-rm -f cookie-jar.txt
+rm -f "${COOKIE_JAR_2}"
 BASE_VERSION=$(get_version)
 check /fifth fifth.html
 chain "/fifth?extra=no" fifth.html
@@ -241,12 +244,12 @@ chain /fifth/comments fifth-303.html -F 'c_mail=' -F 'c_name=Administrator' \
     -F 'c_link=http://users.example.com/admin/' -F 'submit=Submit' \
     -F 'c_filter=pass-through' --form-string \
     'c_text=<p>Administrator comment in <strong>raw</strong> HTML mode.</p>' \
-    -F 'c_cookie=yes' -c cookie-jar.txt
+    -F 'c_cookie=yes' -c "${COOKIE_JAR_2}"
 chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"
 if test -z "${STOPPED}"; then
-	if ! test -f cookie-jar.txt; then
+	if ! test -f "${COOKIE_JAR_2}"; then
 		echo "Cookie jar not created"
-	elif ! grep -qF cGFzcy10aHJvdWdoIEFkbWluaXN0cmF0b3IgIiJodHRwOi8vdXNlcnMuZXhhbXBsZS5jb20vYWRtaW4v cookie-jar.txt; then
+	elif ! grep -qF cGFzcy10aHJvdWdoIEFkbWluaXN0cmF0b3IgIiJodHRwOi8vdXNlcnMuZXhhbXBsZS5jb20vYWRtaW4v "${COOKIE_JAR_2}"; then
 		echo "Expected cookie value not found"
 	fi
 fi

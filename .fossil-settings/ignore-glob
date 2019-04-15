@@ -1,3 +1,4 @@
 bin/*
 coverage/*
 obj/*
+tests/transient-data/*

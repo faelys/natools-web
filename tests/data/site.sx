@@ -1,5 +1,6 @@
 (backends
-   (comments directory data/comments/))
+   (comments directory data/comments/)
+   (transient-comments directory transient-data/comments/))
 (default-template html)
 (users s-expr data/users.sx)
 (reload-pages ("/" /reload) ("/" /second-reload))

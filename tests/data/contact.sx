@@ -25,6 +25,6 @@
          "</td>\n  </tr>\n")
       (suffix "</table>\n")))))
 (comments
-   (backend comments contact)
+   (backend transient-comments contact)
    (filter comment-filter-blind)
    (tags comments))

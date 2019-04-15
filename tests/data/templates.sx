@@ -108,7 +108,7 @@
    (if (fields-equal c_name c_mail)
       (reject ", " "name and mail are equal"))
    (if (not (action-is save-comment))
-      (log data/comments/spam.sx)))
+      (log transient-data/comments/spam.sx)))
 
 (comment-filter-bad ((used to test exception handling))
    reject

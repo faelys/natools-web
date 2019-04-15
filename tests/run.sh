@@ -25,11 +25,11 @@ if ! test -x "${TARGET_BIN}"; then
 	exit 1
 fi
 
-rm -rf data/comments/4 data/comments/5 data/comments/contact
-: >|data/comments/spam.sx
+rm -rf transient-data
+mkdir -p transient-data/comments
 
 touch running
-${TARGET_BIN} data/site.sx running >server.log &
+${TARGET_BIN} data/site.sx running >transient-data/server.log &
 TARGET_PID=$!
 sleep 1
 sh black-box.sh "${2:-http://localhost:8888/}" \
