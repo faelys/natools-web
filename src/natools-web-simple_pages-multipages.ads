@@ -18,11 +18,12 @@
 -- Natools.Web.Simple_Pages.Multipages extends the Simple_Pages idea by     --
 -- gathering several related pages into a single file, with common elements --
 -- and comment parameters.                                                  --
--- The first block contains the defaults, and each of the following blocks  --
--- describes a page, and unlike the Simple_Pages the first atom is not      --
+-- Each list in the input file describes a page or default values used for  --
+-- subsequent pages, and unlike the Simple_Pages the first atom is not      --
 -- ignored, but allows to override the path rendered in                     --
 -- templates ("Web_Path") and/or the path under which the simple page is    --
 -- registered ("Key_Path"), according to the following syntax:              --
+--  * an empty atom is followed by the defaults,                            --
 --  * an atom with a leading '+' has both Web_Path and Key_Path as the      --
 --    root multipage path followed by the suffix after '+',                 --
 --  * an atom with a leading '-' has the Web_Path overridden by the suffix  --
