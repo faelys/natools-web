@@ -1,0 +1,36 @@
+(""
+   (elements
+      (main-text
+         "<p>This is a multipage element, titled \""
+         (element title)
+         "\".</p>\n"
+         (element multipage-text "")
+         (render page-comments)))
+   (comment-list
+      (tags comments)
+      (backend transient-comments))
+   (comment-path-prefix multipage/))
+("+"
+   (elements
+      (title "Multipage index")
+      (main-text
+         "<p>This is a multipage index.</p>\n"
+         (tags pages/fragments (all-elements (template
+            "<h2>" (element title) "</h2>\n"
+            (element multipage-text "")))))))
+("##part1"
+   (elements
+      (title "Part one"))
+   (tags (p1 pages/fragments)))
+("##part2"
+   (elements
+      (title "Part two"))
+   (tags (p2 pages/fragments)))
+("+/subpage1"
+   (elements
+      (title "Subpage one"))
+   (tags (s1 pages/fragments)))
+("+/subpage2"
+   (elements
+      (title "Subpage two"))
+   (tags (s2 pages/fragments)))

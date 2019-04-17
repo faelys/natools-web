@@ -11,6 +11,7 @@
 (static-paths data/maintenance data/static)
 (template-file data/templates.sx)
 (cookie-setter restricted-cookie forced-cookie)
+(multipage multipage)
 (simple-pages index comments comment-feed first second third fourth fifth
    list-test contact expired unpublished comment-ids)
 (tag-page tags)

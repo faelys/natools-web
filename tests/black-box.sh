@@ -307,3 +307,7 @@ chain /fifth/comments fifth-303.html -F 'ignore=Ignore' \
     -F "id=$(curl -s "${BASE_URL}/comment-ids" | tail -n 1)"
 chain_curl -F 'wait_version='$((BASE_VERSION + 4)) "${BASE_URL}/test"
 chain /fifth fifth.html
+
+check /multipage multipage.html
+chain /multipage/subpage1 multipage-subpage1.html
+chain /multipage/subpage2 multipage-subpage2.html
