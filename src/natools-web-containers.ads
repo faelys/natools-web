@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2017, Natacha Porté                                   --
+-- Copyright (c) 2014-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -69,6 +69,13 @@ package Natools.Web.Containers is
       Expression_Map_List : in out S_Expressions.Lockable.Descriptor'Class);
       --  (Re)initialize expression map database with the given list
 
+
+   type Optional_Expression (Is_Empty : Boolean := True) is record
+      case Is_Empty is
+         when True  => null;
+         when False => Value : S_Expressions.Caches.Cursor;
+      end case;
+   end record;
 
 
    package Unsafe_Atom_Lists is
