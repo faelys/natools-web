@@ -105,11 +105,10 @@ package Natools.Web.Sites is
    function Get_Tags (Object : Site) return Tags.Tag_DB;
       --  Return the whole tag database
 
-   procedure Get_Template
+   function Get_Template
      (Object : in Site;
-      Name : in S_Expressions.Atom;
-      Template : out S_Expressions.Caches.Cursor;
-      Found : out Boolean);
+      Name : in S_Expressions.Atom)
+     return Containers.Optional_Expression;
       --  Retrieve a template from its name
 
    function Get_Template

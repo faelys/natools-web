@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -19,6 +19,7 @@ with Natools.S_Expressions.Caches;
 with Natools.S_Expressions.Lockable;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.Static_Maps.Web.Error_Pages;
+with Natools.Web.Containers;
 with Natools.Web.Fallback_Render;
 
 package body Natools.Web.Error_Pages is
@@ -133,27 +134,21 @@ package body Natools.Web.Error_Pages is
       Context : in Error_Context)
    is
       use type S_Expressions.Atom;
-      Template : S_Expressions.Caches.Cursor;
-      Found : Boolean;
+      Expression : Containers.Optional_Expression;
    begin
-      Exchange.Site.Get_Template
-        (S_Expressions.To_Atom ("error-page-") & Context.Code,
-         Template,
-         Found);
+      Expression := Exchange.Site.Get_Template
+        (S_Expressions.To_Atom ("error-page-") & Context.Code);
 
-      if not Found then
-         Exchange.Site.Get_Template
-           (S_Expressions.To_Atom ("error-page"),
-            Template,
-            Found);
-
-         if not Found then
-            Default_Page (Exchange, Context);
-            return;
-         end if;
+      if Expression.Is_Empty then
+         Expression := Exchange.Site.Get_Template
+           (S_Expressions.To_Atom ("error-page"));
       end if;
 
-      Render (Template, Exchange, Context);
+      if Expression.Is_Empty then
+         Default_Page (Exchange, Context);
+      else
+         Render (Expression.Value, Exchange, Context);
+      end if;
    end Main_Render;
 
 

@@ -752,19 +752,21 @@ package body Natools.Web.Sites is
    end Get_Tags;
 
 
-   procedure Get_Template
+   function Get_Template
      (Object : in Site;
-      Name : in S_Expressions.Atom;
-      Template : out S_Expressions.Caches.Cursor;
-      Found : out Boolean)
+      Name : in S_Expressions.Atom)
+     return Containers.Optional_Expression
    is
       Cursor : constant Containers.Expression_Maps.Cursor
         := Object.Templates.Find (Name);
+      Found : constant Boolean
+        := Containers.Expression_Maps.Has_Element (Cursor);
    begin
-      Found := Containers.Expression_Maps.Has_Element (Cursor);
-
       if Found then
-         Template := Containers.Expression_Maps.Element (Cursor);
+         return (Is_Empty => False,
+                 Value => Containers.Expression_Maps.Element (Cursor));
+      else
+         return (Is_Empty => True);
       end if;
    end Get_Template;
 

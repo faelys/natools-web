@@ -1139,20 +1139,17 @@ package body Natools.Web.Comments is
       Site : in Sites.Site;
       Filter_Name : in S_Expressions.Atom_Refs.Immutable_Reference)
    is
-      Expression : S_Expressions.Caches.Cursor;
-      Found : Boolean;
+      Expression : Containers.Optional_Expression;
    begin
       if Filter_Name.Is_Empty then
          return;
       end if;
 
-      Site.Get_Template (Filter_Name.Query, Expression, Found);
+      Expression := Site.Get_Template (Filter_Name.Query);
 
-      if not Found then
-         return;
+      if not Expression.Is_Empty then
+         Parse (Expression.Value, Builder, Site);
       end if;
-
-      Parse (Expression, Builder, Site);
    end Process_Actions;
 
 
