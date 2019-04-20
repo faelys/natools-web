@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2017, Natacha Porté                                   --
+-- Copyright (c) 2014-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -34,6 +34,25 @@ private with Natools.Web.Comments;
 private with Natools.Web.String_Tables;
 
 package Natools.Web.Simple_Pages is
+
+   type Page_Template is private;
+
+   procedure Set_Comments
+     (Object : in out Page_Template;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
+   procedure Set_Comment_Path_Prefix
+     (Object : in out Page_Template;
+      Prefix : in S_Expressions.Atom);
+
+   procedure Set_Comment_Path_Suffix
+     (Object : in out Page_Template;
+      Suffix : in S_Expressions.Atom);
+
+   procedure Set_Elements
+     (Object : in out Page_Template;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
 
    type Page_Ref is new Tags.Visible and Sites.Page with private;
 
@@ -83,6 +102,14 @@ package Natools.Web.Simple_Pages is
    procedure Register_Loader (Site : in out Sites.Site);
 
 private
+
+   type Page_Template is record
+      Comments : Containers.Optional_Expression;
+      Comment_Path_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
+      Comment_Path_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
+      Elements : Containers.Expression_Maps.Constant_Map;
+      Name : S_Expressions.Atom_Refs.Immutable_Reference;
+   end record;
 
    type Page_Data is new Tags.Visible with record
       Self : Tags.Visible_Access;

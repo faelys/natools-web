@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2017, Natacha Porté                                   --
+-- Copyright (c) 2014-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -237,6 +237,55 @@ package body Natools.Web.Simple_Pages is
          Element := Containers.Expression_Maps.Element (Cursor);
       end if;
    end Get_Element;
+
+
+
+   -----------------------------
+   -- Page_Template Interface --
+   -----------------------------
+
+   procedure Set_Comments
+     (Object : in out Page_Template;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+   begin
+      Object.Comments
+        := (Is_Empty => False,
+            Value => S_Expressions.Caches.Conditional_Move (Expression));
+   end Set_Comments;
+
+
+   procedure Set_Comment_Path_Prefix
+     (Object : in out Page_Template;
+      Prefix : in S_Expressions.Atom) is
+   begin
+      if Prefix'Length > 0 then
+         Object.Comment_Path_Prefix
+           := S_Expressions.Atom_Ref_Constructors.Create (Prefix);
+      else
+         Object.Comment_Path_Prefix.Reset;
+      end if;
+   end Set_Comment_Path_Prefix;
+
+
+   procedure Set_Comment_Path_Suffix
+     (Object : in out Page_Template;
+      Suffix : in S_Expressions.Atom) is
+   begin
+      if Suffix'Length > 0 then
+         Object.Comment_Path_Suffix
+           := S_Expressions.Atom_Ref_Constructors.Create (Suffix);
+      else
+         Object.Comment_Path_Suffix.Reset;
+      end if;
+   end Set_Comment_Path_Suffix;
+
+
+   procedure Set_Elements
+     (Object : in out Page_Template;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+   begin
+      Containers.Set_Expressions (Object.Elements, Expression);
+   end Set_Elements;
 
 
 
