@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2017, Natacha Porté                                   --
+-- Copyright (c) 2014-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -160,6 +160,17 @@ package body Natools.Web.Containers is
    --------------------
    -- Map Interfaces --
    --------------------
+
+   procedure Add_Expressions
+     (Map : in out Expression_Maps.Constant_Map;
+      Expression_List : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      New_Map : Expression_Maps.Unsafe_Maps.Map := Map.To_Unsafe_Map;
+   begin
+      Map_Reader (Expression_List, New_Map, Meaningless_Value);
+      Map.Replace (New_Map);
+   end Add_Expressions;
+
 
    procedure Set_Dates
      (Map : in out Date_Maps.Constant_Map;

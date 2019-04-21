@@ -52,6 +52,11 @@ package Natools.Web.Containers is
       S_Expressions.Less_Than,
       S_Expressions.Caches."=");
 
+   procedure Add_Expressions
+     (Map : in out Expression_Maps.Constant_Map;
+      Expression_List : in out S_Expressions.Lockable.Descriptor'Class);
+      --  Add expressions from the given list to a database
+
    procedure Set_Expressions
      (Map : in out Expression_Maps.Constant_Map;
       Expression_List : in out S_Expressions.Lockable.Descriptor'Class);
