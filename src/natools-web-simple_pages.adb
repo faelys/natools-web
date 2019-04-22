@@ -36,9 +36,13 @@ package body Natools.Web.Simple_Pages is
       Page : in Page_Data;
       Data : in S_Expressions.Atom);
 
+   function Comment_Path_Override
+     (Template : in Page_Template)
+     return S_Expressions.Atom_Refs.Immutable_Reference;
+
    procedure Execute
      (Data : in out Page_Data;
-      Context : in Meaningless_Type;
+      Context : in Page_Template;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
 
@@ -50,7 +54,7 @@ package body Natools.Web.Simple_Pages is
 
 
    procedure Read_Page is new S_Expressions.Interpreter_Loop
-     (Page_Data, Meaningless_Type, Execute);
+     (Page_Data, Page_Template, Execute);
 
    procedure Render_Page is new S_Expressions.Interpreter_Loop
      (Sites.Exchange, Page_Data, Render, Append);
@@ -62,11 +66,10 @@ package body Natools.Web.Simple_Pages is
 
    procedure Execute
      (Data : in out Page_Data;
-      Context : in Meaningless_Type;
+      Context : in Page_Template;
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class)
    is
-      pragma Unreferenced (Context);
       package Components renames Natools.Static_Maps.Web.Simple_Pages;
    begin
       case Components.To_Component (S_Expressions.To_String (Name)) is
@@ -75,13 +78,25 @@ package body Natools.Web.Simple_Pages is
               & S_Expressions.To_String (Name) & '"');
 
          when Components.Comment_List =>
-            Data.Comment_List.Set (Arguments);
+            if Context.Comments.Is_Empty then
+               Data.Comment_List.Set (Arguments);
+            else
+               declare
+                  Template : S_Expressions.Caches.Cursor
+                    := Context.Comments.Value;
+               begin
+                  Data.Comment_List.Set
+                    (Template,
+                     Arguments,
+                     Comment_Path_Override (Context));
+               end;
+            end if;
 
          when Components.Dates =>
             Containers.Set_Dates (Data.Dates, Arguments);
 
          when Components.Elements =>
-            Containers.Set_Expressions (Data.Elements, Arguments);
+            Containers.Add_Expressions (Data.Elements, Arguments);
 
          when Components.Maps =>
             Data.Maps := String_Tables.Create (Arguments);
@@ -244,6 +259,27 @@ package body Natools.Web.Simple_Pages is
    -- Page_Template Interface --
    -----------------------------
 
+   function Comment_Path_Override
+     (Template : in Page_Template)
+     return S_Expressions.Atom_Refs.Immutable_Reference
+   is
+      use type S_Expressions.Atom;
+   begin
+      if Template.Comment_Path_Prefix.Is_Empty
+        or else Template.Name.Is_Empty
+      then
+         return S_Expressions.Atom_Refs.Null_Immutable_Reference;
+      else
+         return S_Expressions.Atom_Ref_Constructors.Create
+           (Template.Comment_Path_Prefix.Query
+            & Template.Name.Query
+            & (if Template.Comment_Path_Suffix.Is_Empty
+               then S_Expressions.Null_Atom
+               else Template.Comment_Path_Suffix.Query));
+      end if;
+   end Comment_Path_Override;
+
+
    procedure Set_Comments
      (Object : in out Page_Template;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
@@ -294,31 +330,47 @@ package body Natools.Web.Simple_Pages is
    ----------------------
 
    function Create
-     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Template : in Page_Template := Default_Template;
+      Name : in S_Expressions.Atom := S_Expressions.Null_Atom)
      return Page_Ref
    is
       Page : constant Data_Refs.Data_Access := new Page_Data;
       Result : constant Page_Ref := (Ref => Data_Refs.Create (Page));
+      Actual_Template : Page_Template := Template;
    begin
+      Actual_Template.Name
+        := (if Name'Length > 0
+            then S_Expressions.Atom_Ref_Constructors.Create (Name)
+            else S_Expressions.Atom_Refs.Null_Immutable_Reference);
       Page.Self := Tags.Visible_Access (Page);
-      Read_Page (Expression, Page.all, Meaningless_Value);
+      Page.Elements := Template.Elements;
+      Read_Page (Expression, Page.all, Actual_Template);
       return Result;
    end Create;
 
 
    function Create
-     (File_Path, Web_Path : in S_Expressions.Atom_Refs.Immutable_Reference)
+     (File_Path, Web_Path : in S_Expressions.Atom_Refs.Immutable_Reference;
+      Template : in Page_Template := Default_Template;
+      Name : in S_Expressions.Atom := S_Expressions.Null_Atom)
      return Page_Ref
    is
       Page : constant Data_Refs.Data_Access := new Page_Data'
         (File_Path => File_Path,
          Web_Path => Web_Path,
+         Elements => Template.Elements,
          Tags => <>,
          Self => null,
-         Comment_List | Elements | Dates | Maps => <>);
+         Comment_List | Dates | Maps => <>);
       Result : constant Page_Ref := (Ref => Data_Refs.Create (Page));
+      Actual_Template : Page_Template := Template;
    begin
       Page.Self := Tags.Visible_Access (Page);
+      Actual_Template.Name
+        := (if Name'Length > 0
+            then S_Expressions.Atom_Ref_Constructors.Create (Name)
+            else S_Expressions.Atom_Refs.Null_Immutable_Reference);
 
       Create_Page :
       declare
@@ -326,7 +378,7 @@ package body Natools.Web.Simple_Pages is
            := Natools.S_Expressions.File_Readers.Reader
               (S_Expressions.To_String (File_Path.Query));
       begin
-         Read_Page (Reader, Page.all, Meaningless_Value);
+         Read_Page (Reader, Page.all, Actual_Template);
       end Create_Page;
 
       return Result;

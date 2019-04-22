@@ -53,15 +53,21 @@ package Natools.Web.Simple_Pages is
      (Object : in out Page_Template;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
 
+   Default_Template : constant Page_Template;
+
 
    type Page_Ref is new Tags.Visible and Sites.Page with private;
 
    function Create
-     (File_Path, Web_Path : in S_Expressions.Atom_Refs.Immutable_Reference)
+     (File_Path, Web_Path : in S_Expressions.Atom_Refs.Immutable_Reference;
+      Template : in Page_Template := Default_Template;
+      Name : in S_Expressions.Atom := S_Expressions.Null_Atom)
      return Page_Ref;
 
    function Create
-     (Expression : in out S_Expressions.Lockable.Descriptor'Class)
+     (Expression : in out S_Expressions.Lockable.Descriptor'Class;
+      Template : in Page_Template := Default_Template;
+      Name : in S_Expressions.Atom := S_Expressions.Null_Atom)
      return Page_Ref;
 
    procedure Get_Lifetime
@@ -110,6 +116,8 @@ private
       Elements : Containers.Expression_Maps.Constant_Map;
       Name : S_Expressions.Atom_Refs.Immutable_Reference;
    end record;
+
+   Default_Template : constant Page_Template := (others => <>);
 
    type Page_Data is new Tags.Visible with record
       Self : Tags.Visible_Access;
