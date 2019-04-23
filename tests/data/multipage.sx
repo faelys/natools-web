@@ -21,16 +21,20 @@
 ("##part1"
    (elements
       (title "Part one"))
-   (tags (p1 pages/fragments)))
+   (tags (p1 pages/fragments))
+   (comments))
 ("##part2"
    (elements
       (title "Part two"))
-   (tags (p2 pages/fragments)))
+   (tags (p2 pages/fragments))
+   (comments))
 ("+/subpage1"
    (elements
       (title "Subpage one"))
-   (tags (s1 pages/fragments)))
+   (tags (s1 pages/fragments))
+   (comments))
 ("+/subpage2"
    (elements
       (title "Subpage two"))
-   (tags (s2 pages/fragments)))
+   (tags (s2 pages/fragments))
+   (comments))

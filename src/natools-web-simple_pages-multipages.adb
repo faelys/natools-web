@@ -18,8 +18,6 @@ with Natools.S_Expressions.Atom_Ref_Constructors;
 with Natools.S_Expressions.Enumeration_IO;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
-with Natools.S_Expressions.Special_Descriptors;
-with Natools.Web.Containers;
 
 package body Natools.Web.Simple_Pages.Multipages is
 
@@ -42,19 +40,8 @@ package body Natools.Web.Simple_Pages.Multipages is
       Root_Path : in S_Expressions.Atom;
       Path_Spec : in S_Expressions.Atom);
 
-   function Comment_Path
-     (Defaults : in Default_Data;
-      Spec : in S_Expressions.Atom)
-     return S_Expressions.Atom_Refs.Immutable_Reference
-     with Pre => not Defaults.Comment_Path_Prefix.Is_Empty
-                 and then Spec'Length >= 1;
-
    function Key_Path (Path, Spec : S_Expressions.Atom)
      return S_Expressions.Atom;
-
-   procedure Merge_Elements
-     (Mutator : in Data_Refs.Mutator;
-      Elements : Containers.Expression_Maps.Constant_Map);
 
    procedure Update
      (Defaults : in out Default_Data;
@@ -82,32 +69,17 @@ package body Natools.Web.Simple_Pages.Multipages is
       Root_Path : in S_Expressions.Atom;
       Path_Spec : in S_Expressions.Atom)
    is
-      Comment_Path_Override : S_Expressions.Atom_Refs.Immutable_Reference;
-      Page : constant Page_Ref := Create (Expression);
+      use type S_Expressions.Offset;
+      Name : constant S_Expressions.Atom
+        := (if Path_Spec (Path_Spec'First) in
+              Character'Pos ('+') | Character'Pos ('-') | Character'Pos ('#')
+            then Path_Spec (Path_Spec'First + 1 .. Path_Spec'Last)
+            else Path_Spec);
+      Page : constant Page_Ref := Create (Expression, Defaults.Template, Name);
    begin
-      if not Defaults.Comment_Path_Prefix.Is_Empty then
-         Comment_Path_Override := Comment_Path (Defaults, Path_Spec);
-      end if;
-
       declare
          Mutator : constant Data_Refs.Mutator := Page.Ref.Update;
       begin
-         if not Defaults.Elements.Is_Empty then
-            Merge_Elements (Mutator, Defaults.Elements);
-         end if;
-
-         if Mutator.Comment_List.Is_Null then
-            declare
-               package Sx renames Natools.S_Expressions;
-               Template : Sx.Caches.Cursor := Defaults.Comment_List;
-               Empty : Sx.Special_Descriptors.Constant_Descriptor
-                 (Sx.Events.End_Of_Input);
-            begin
-               Mutator.Comment_List.Set
-                 (Template, Empty, Comment_Path_Override);
-            end;
-         end if;
-
          Mutator.File_Path := Defaults.File_Path;
          Mutator.Web_Path := Web_Path (Root_Path, Path_Spec);
       end;
@@ -133,56 +105,6 @@ package body Natools.Web.Simple_Pages.Multipages is
    end Key_Path;
 
 
-   function Comment_Path
-     (Defaults : in Default_Data;
-      Spec : in S_Expressions.Atom)
-     return S_Expressions.Atom_Refs.Immutable_Reference
-   is
-      use type S_Expressions.Atom;
-      use type S_Expressions.Offset;
-
-      Prefix : constant S_Expressions.Atom
-        := Defaults.Comment_Path_Prefix.Query;
-      Suffix : constant S_Expressions.Atom
-        := (if Defaults.Comment_Path_Suffix.Is_Empty
-            then S_Expressions.Null_Atom
-            else Defaults.Comment_Path_Suffix.Query);
-   begin
-      case Spec (Spec'First) is
-         when Character'Pos ('+')
-            | Character'Pos ('-')
-            | Character'Pos ('#')
-         =>
-            return S_Expressions.Atom_Ref_Constructors.Create
-              (Prefix & Spec (Spec'First + 1 .. Spec'Last) & Suffix);
-         when others =>
-            return S_Expressions.Atom_Ref_Constructors.Create
-              (Prefix & Spec & Suffix);
-      end case;
-   end Comment_Path;
-
-
-   procedure Merge_Elements
-     (Mutator : in Data_Refs.Mutator;
-      Elements : Containers.Expression_Maps.Constant_Map)
-   is
-      Unsafe_Map : Containers.Expression_Maps.Unsafe_Maps.Map
-        := Containers.Expression_Maps.To_Unsafe_Map (Mutator.Elements);
-      Unused_Position : Containers.Expression_Maps.Unsafe_Maps.Cursor;
-      Unused_Inserted : Boolean;
-   begin
-      for Cursor in Elements.Iterate loop
-         Unsafe_Map.Insert
-           (Containers.Expression_Maps.Key (Cursor),
-            Containers.Expression_Maps.Element (Cursor),
-            Unused_Position,
-            Unused_Inserted);
-      end loop;
-
-      Mutator.Elements := Containers.Expression_Maps.Create (Unsafe_Map);
-   end Merge_Elements;
-
-
    procedure Update
      (Defaults : in out Default_Data;
       Context : in Meaningless_Type;
@@ -198,29 +120,24 @@ package body Natools.Web.Simple_Pages.Multipages is
               & S_Expressions.To_String (Name) & '"');
 
          when Components.Comment_List =>
-            Defaults.Comment_List
-              := S_Expressions.Caches.Conditional_Move (Arguments);
+            Set_Comments (Defaults.Template, Arguments);
 
          when Components.Comment_Path_Prefix =>
-            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
-               Defaults.Comment_Path_Prefix
-                 := S_Expressions.Atom_Ref_Constructors.Create
-                    (Arguments.Current_Atom);
-            else
-               Defaults.Comment_Path_Prefix.Reset;
-            end if;
+            Set_Comment_Path_Prefix
+              (Defaults.Template,
+               (if Arguments.Current_Event = S_Expressions.Events.Add_Atom
+               then Arguments.Current_Atom
+               else S_Expressions.Null_Atom));
 
          when Components.Comment_Path_Suffix =>
-            if Arguments.Current_Event = S_Expressions.Events.Add_Atom then
-               Defaults.Comment_Path_Suffix
-                 := S_Expressions.Atom_Ref_Constructors.Create
-                    (Arguments.Current_Atom);
-            else
-               Defaults.Comment_Path_Suffix.Reset;
-            end if;
+            Set_Comment_Path_Suffix
+              (Defaults.Template,
+               (if Arguments.Current_Event = S_Expressions.Events.Add_Atom
+               then Arguments.Current_Atom
+               else S_Expressions.Null_Atom));
 
          when Components.Elements =>
-            Containers.Set_Expressions (Defaults.Elements, Arguments);
+            Set_Elements (Defaults.Template, Arguments);
       end case;
    end Update;
 

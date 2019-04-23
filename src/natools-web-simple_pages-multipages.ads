@@ -65,10 +65,7 @@ private
 
    type Default_Data is record
       File_Path : S_Expressions.Atom_Refs.Immutable_Reference;
-      Elements : Containers.Expression_Maps.Constant_Map;
-      Comment_List : S_Expressions.Caches.Cursor;
-      Comment_Path_Prefix : S_Expressions.Atom_Refs.Immutable_Reference;
-      Comment_Path_Suffix : S_Expressions.Atom_Refs.Immutable_Reference;
+      Template : Page_Template;
    end record;
 
 end Natools.Web.Simple_Pages.Multipages;
