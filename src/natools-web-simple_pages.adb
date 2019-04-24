@@ -37,7 +37,8 @@ package body Natools.Web.Simple_Pages is
       Data : in S_Expressions.Atom);
 
    function Comment_Path_Override
-     (Template : in Page_Template)
+     (Template : in Page_Template;
+      Override : in S_Expressions.Lockable.Descriptor'Class)
      return S_Expressions.Atom_Refs.Immutable_Reference;
 
    procedure Execute
@@ -88,7 +89,7 @@ package body Natools.Web.Simple_Pages is
                   Data.Comment_List.Set
                     (Template,
                      Arguments,
-                     Comment_Path_Override (Context));
+                     Comment_Path_Override (Context, Arguments));
                end;
             end if;
 
@@ -260,19 +261,27 @@ package body Natools.Web.Simple_Pages is
    -----------------------------
 
    function Comment_Path_Override
-     (Template : in Page_Template)
+     (Template : in Page_Template;
+      Override : in S_Expressions.Lockable.Descriptor'Class)
      return S_Expressions.Atom_Refs.Immutable_Reference
    is
       use type S_Expressions.Atom;
+      use type S_Expressions.Events.Event;
+      Name_Override : constant Boolean
+        := Override.Current_Event = S_Expressions.Events.Add_Atom;
+      Name : constant S_Expressions.Atom
+        := (if Name_Override then Override.Current_Atom
+            elsif not Template.Name.Is_Empty then Template.Name.Query
+            else S_Expressions.Null_Atom);
    begin
       if Template.Comment_Path_Prefix.Is_Empty
-        or else Template.Name.Is_Empty
+        or else (not Name_Override and then Template.Name.Is_Empty)
       then
          return S_Expressions.Atom_Refs.Null_Immutable_Reference;
       else
          return S_Expressions.Atom_Ref_Constructors.Create
            (Template.Comment_Path_Prefix.Query
-            & Template.Name.Query
+            & Name
             & (if Template.Comment_Path_Suffix.Is_Empty
                then S_Expressions.Null_Atom
                else Template.Comment_Path_Suffix.Query));
