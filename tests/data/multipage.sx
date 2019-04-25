@@ -8,8 +8,9 @@
          (render page-comments)))
    (comment-list
       (tags comments)
+      (filter comment-filter)
       (backend transient-comments))
-   (comment-path-prefix multipage/))
+   (comment-path-prefix multipage))
 ("+"
    (elements
       (title "Multipage index")
@@ -21,13 +22,11 @@
 ("##part1"
    (elements
       (title "Part one"))
-   (tags (p1 pages/fragments))
-   (comments))
+   (tags (p1 pages/fragments)))
 ("##part2"
    (elements
       (title "Part two"))
-   (tags (p2 pages/fragments))
-   (comments))
+   (tags (p2 pages/fragments)))
 ("+/subpage1"
    (elements
       (title "Subpage one"))
@@ -37,4 +36,4 @@
    (elements
       (title "Subpage two"))
    (tags (s2 pages/fragments))
-   (comments))
+   (comments -002))

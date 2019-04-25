@@ -308,6 +308,24 @@ chain /fifth/comments fifth-303.html -F 'ignore=Ignore' \
 chain_curl -F 'wait_version='$((BASE_VERSION + 4)) "${BASE_URL}/test"
 chain /fifth fifth.html
 
+BASE_VERSION=$(get_version)
 check /multipage multipage.html
 chain /multipage/subpage1 multipage-subpage1.html
 chain /multipage/subpage2 multipage-subpage2.html
+chain /multipage/subpage1/comments multipage-subpage1-303.html \
+    -F 'c_name=Test' -F 'c_mail=' -F 'c_link=' -F 'submit=Submit' \
+    -F 'c_text=Comment in the first subpage'
+chain /multipage/subpage2/comments multipage-subpage2-303.html \
+    -F 'c_name=Test' -F 'c_mail=' -F 'c_link=' -F 'submit=Submit' \
+    -F 'c_text=Comment in the second subpage'
+chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"
+if test -z "${STOPPED}"; then
+	if ! test -f "${TRANSIENT_DIR}/comments/multipage/subpage1"/*; then
+		echo "Comment in first subpage of multipage not found"
+		false
+	fi
+	if ! test -f "${TRANSIENT_DIR}/comments/multipage-002"/*; then
+		echo "Comment in second subpage of multipage not found"
+		false
+	fi
+fi
