@@ -15,6 +15,7 @@
 ------------------------------------------------------------------------------
 
 with Natools.S_Expressions.Atom_Ref_Constructors;
+with Natools.S_Expressions.Enumeration_IO;
 with Natools.S_Expressions.File_Readers;
 with Natools.S_Expressions.Interpreter_Loop;
 with Natools.S_Expressions.Templates.Dates;
@@ -24,6 +25,17 @@ with Natools.Web.Exchanges;
 with Natools.Web.Fallback_Render;
 
 package body Natools.Web.Simple_Pages is
+
+   package Template_Components is
+      type Enum is
+        (Unknown,
+         Comment_List,
+         Comment_Path_Prefix,
+         Comment_Path_Suffix,
+         Comments,
+         Elements);
+      package IO is new Natools.S_Expressions.Enumeration_IO.Typed_IO (Enum);
+   end Template_Components;
 
    Expiration_Date_Key : constant S_Expressions.Atom
      := S_Expressions.To_Atom ("!expire");
@@ -53,12 +65,21 @@ package body Natools.Web.Simple_Pages is
       Name : in S_Expressions.Atom;
       Arguments : in out S_Expressions.Lockable.Descriptor'Class);
 
+   procedure Set_Component
+     (Object : in out Page_Template;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class);
+
 
    procedure Read_Page is new S_Expressions.Interpreter_Loop
      (Page_Data, Page_Template, Execute);
 
    procedure Render_Page is new S_Expressions.Interpreter_Loop
      (Sites.Exchange, Page_Data, Render, Append);
+
+   procedure Update_Template is new S_Expressions.Interpreter_Loop
+     (Page_Template, Meaningless_Type, Set_Component);
 
 
    ---------------------------
@@ -325,12 +346,77 @@ package body Natools.Web.Simple_Pages is
    end Set_Comment_Path_Suffix;
 
 
+   procedure Set_Component
+     (Object : in out Page_Template;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class;
+      Known_Component : out Boolean)
+   is
+      use type S_Expressions.Events.Event;
+   begin
+      Known_Component := True;
+
+      case Template_Components.IO.Value (Name, Template_Components.Unknown) is
+         when Template_Components.Unknown =>
+            Known_Component := False;
+
+         when Template_Components.Comment_List
+            | Template_Components.Comments
+         =>
+            Set_Comments (Object, Arguments);
+
+         when Template_Components.Comment_Path_Prefix =>
+            Set_Comment_Path_Prefix
+              (Object,
+               (if Arguments.Current_Event = S_Expressions.Events.Add_Atom
+               then Arguments.Current_Atom
+               else S_Expressions.Null_Atom));
+
+         when Template_Components.Comment_Path_Suffix =>
+            Set_Comment_Path_Suffix
+              (Object,
+               (if Arguments.Current_Event = S_Expressions.Events.Add_Atom
+               then Arguments.Current_Atom
+               else S_Expressions.Null_Atom));
+
+         when Template_Components.Elements =>
+            Set_Elements (Object, Arguments);
+      end case;
+   end Set_Component;
+
+
+   procedure Set_Component
+     (Object : in out Page_Template;
+      Context : in Meaningless_Type;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
+   is
+      pragma Unreferenced (Context);
+      Known_Component : Boolean;
+   begin
+      Set_Component (Object, Name, Arguments, Known_Component);
+
+      if not Known_Component then
+         Log (Severities.Error, "Unknown simple page template component """
+           & S_Expressions.To_String (Name) & '"');
+      end if;
+   end Set_Component;
+
+
    procedure Set_Elements
      (Object : in out Page_Template;
       Expression : in out S_Expressions.Lockable.Descriptor'Class) is
    begin
       Containers.Set_Expressions (Object.Elements, Expression);
    end Set_Elements;
+
+
+   procedure Update
+     (Object : in out Page_Template;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class) is
+   begin
+      Update_Template (Expression, Object, Meaningless_Value);
+   end Update;
 
 
 

@@ -53,6 +53,16 @@ package Natools.Web.Simple_Pages is
      (Object : in out Page_Template;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
 
+   procedure Set_Component
+     (Object : in out Page_Template;
+      Name : in S_Expressions.Atom;
+      Arguments : in out S_Expressions.Lockable.Descriptor'Class;
+      Known_Component : out Boolean);
+
+   procedure Update
+     (Object : in out Page_Template;
+      Expression : in out S_Expressions.Lockable.Descriptor'Class);
+
    Default_Template : constant Page_Template;
 
 
