@@ -15,23 +15,9 @@
 ------------------------------------------------------------------------------
 
 with Natools.S_Expressions.Atom_Ref_Constructors;
-with Natools.S_Expressions.Enumeration_IO;
 with Natools.S_Expressions.File_Readers;
-with Natools.S_Expressions.Interpreter_Loop;
 
 package body Natools.Web.Simple_Pages.Multipages is
-
-   package Components is
-      type Enum is
-        (Error,
-         Comment_List,
-         Comment_Path_Prefix,
-         Comment_Path_Suffix,
-         Elements);
-   end Components;
-
-   package Component_IO is new S_Expressions.Enumeration_IO.Typed_IO
-     (Components.Enum);
 
    procedure Build_And_Register
      (Builder : in out Sites.Site_Builder;
@@ -43,18 +29,8 @@ package body Natools.Web.Simple_Pages.Multipages is
    function Key_Path (Path, Spec : S_Expressions.Atom)
      return S_Expressions.Atom;
 
-   procedure Update
-     (Defaults : in out Default_Data;
-      Context : in Meaningless_Type;
-      Name : in S_Expressions.Atom;
-      Arguments : in out S_Expressions.Lockable.Descriptor'Class);
-
    function Web_Path (Path, Spec : S_Expressions.Atom)
      return S_Expressions.Atom_Refs.Immutable_Reference;
-
-
-   procedure Update_Defaults is new S_Expressions.Interpreter_Loop
-     (Default_Data, Meaningless_Type, Update);
 
 
 
@@ -103,43 +79,6 @@ package body Natools.Web.Simple_Pages.Multipages is
             return Spec;
       end case;
    end Key_Path;
-
-
-   procedure Update
-     (Defaults : in out Default_Data;
-      Context : in Meaningless_Type;
-      Name : in S_Expressions.Atom;
-      Arguments : in out S_Expressions.Lockable.Descriptor'Class)
-   is
-      pragma Unreferenced (Context);
-      use type S_Expressions.Events.Event;
-   begin
-      case Component_IO.Value (Name, Components.Error) is
-         when Components.Error =>
-            Log (Severities.Error, "Unknown multipage default component """
-              & S_Expressions.To_String (Name) & '"');
-
-         when Components.Comment_List =>
-            Set_Comments (Defaults.Template, Arguments);
-
-         when Components.Comment_Path_Prefix =>
-            Set_Comment_Path_Prefix
-              (Defaults.Template,
-               (if Arguments.Current_Event = S_Expressions.Events.Add_Atom
-               then Arguments.Current_Atom
-               else S_Expressions.Null_Atom));
-
-         when Components.Comment_Path_Suffix =>
-            Set_Comment_Path_Suffix
-              (Defaults.Template,
-               (if Arguments.Current_Event = S_Expressions.Events.Add_Atom
-               then Arguments.Current_Atom
-               else S_Expressions.Null_Atom));
-
-         when Components.Elements =>
-            Set_Elements (Defaults.Template, Arguments);
-      end case;
-   end Update;
 
 
    function Web_Path (Path, Spec : S_Expressions.Atom)
@@ -198,7 +137,7 @@ package body Natools.Web.Simple_Pages.Multipages is
                Path_Spec : constant S_Expressions.Atom := Reader.Current_Atom;
             begin
                if Path_Spec'Length = 0 then
-                  Update_Defaults (Reader, Defaults, Meaningless_Value);
+                  Update (Defaults.Template, Reader);
                else
                   Build_And_Register
                     (Builder, Reader, Defaults, Path, Path_Spec);
