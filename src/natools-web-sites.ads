@@ -40,6 +40,8 @@ private with Natools.S_Expressions.Atom_Refs;
 
 package Natools.Web.Sites is
 
+   type Page is interface;
+
    type Site is tagged limited private;
 
    procedure Queue_Update
@@ -51,6 +53,12 @@ package Natools.Web.Sites is
      (Object : in out Site;
       Updater : in Updaters.Updater_Access);
       --  Register an updater to handle updates for Object
+
+   procedure Insert
+     (Object : in out Site;
+      Path : in S_Expressions.Atom;
+      New_Page : in Page'Class);
+      --  Inefficiently add to Object a new page with the given web path
 
    procedure Insert
      (Object : in out Site;
@@ -159,7 +167,7 @@ package Natools.Web.Sites is
       Info : in Comment_Cookies.Comment_Info);
 
 
-   type Page is interface;
+   --  type Page is interface;
 
    procedure Respond
      (Object : in out Page;

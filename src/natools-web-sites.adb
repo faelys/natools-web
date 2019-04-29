@@ -490,6 +490,15 @@ package body Natools.Web.Sites is
 
    procedure Insert
      (Object : in out Site;
+      Path : in S_Expressions.Atom;
+      New_Page : in Page'Class) is
+   begin
+      Object.Pages := Page_Maps.Insert (Object.Pages, Path, New_Page);
+   end Insert;
+
+
+   procedure Insert
+     (Object : in out Site;
       Tags : in Web.Tags.Tag_List;
       Visible : in Web.Tags.Visible'Class) is
    begin
