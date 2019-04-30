@@ -1193,6 +1193,33 @@ package body Natools.Web.Tags is
    end Previous;
 
 
+   procedure Print
+     (List : in Tag_List;
+      Printer : in out S_Expressions.Printers.Printer'Class)
+   is
+      Previous_Key : S_Expressions.Atom_Refs.Immutable_Reference;
+   begin
+      for Descr of List.Internal.Query loop
+         if Previous_Key.Is_Empty
+           or else Previous_Key.Query.Data.all /= Descr.Key.Query.Data.all
+         then
+            if not Previous_Key.Is_Empty then
+               Printer.Close_List;
+            end if;
+            Printer.Open_List;
+            Printer.Append_Atom (Descr.Key.Query);
+            Previous_Key := Descr.Key;
+         end if;
+
+         Printer.Append_Atom (Descr.Tag.Query);
+      end loop;
+
+      if not Previous_Key.Is_Empty then
+         Printer.Close_List;
+      end if;
+   end Print;
+
+
    procedure Render
      (Exchange : in out Sites.Exchange;
       Position : in Tag_List_Cursor;

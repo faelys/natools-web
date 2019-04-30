@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2014-2015, Natacha Porté                                   --
+-- Copyright (c) 2014-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -22,6 +22,7 @@
 with Natools.Constant_Indefinite_Ordered_Maps;
 with Natools.S_Expressions.Atom_Refs;
 with Natools.S_Expressions.Lockable;
+with Natools.S_Expressions.Printers;
 with Natools.Web.Containers;
 
 limited with Natools.Web.Sites;
@@ -62,6 +63,11 @@ package Natools.Web.Tags is
      (List : in out Tag_List;
       Expression : in out S_Expressions.Lockable.Descriptor'Class);
       --  Read Expression to extract tags to append to List
+
+   procedure Print
+     (List : in Tag_List;
+      Printer : in out S_Expressions.Printers.Printer'Class);
+      --  Serialize the tag list into the given printer
 
 
    type Tag_DB_Builder is private;
