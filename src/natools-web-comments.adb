@@ -1611,6 +1611,78 @@ package body Natools.Web.Comments is
    end Finalize;
 
 
+   procedure Live_Load
+     (Object : in out Comment_List;
+      Site : in Sites.Site;
+      Parent : in Tags.Visible_Access := null;
+      Parent_Path : in S_Expressions.Atom_Refs.Immutable_Reference
+        := S_Expressions.Atom_Refs.Null_Immutable_Reference) is
+   begin
+      if Object.Backend_Name.Is_Empty or else Object.Backend_Path.Is_Empty then
+         return;
+      end if;
+
+      Object.Parent_Path := Parent_Path;
+
+      declare
+         procedure Process (Name : in S_Expressions.Atom);
+
+         Backend : constant Backends.Backend'Class
+           := Site.Get_Backend (Object.Backend_Name.Query);
+         Directory : constant S_Expressions.Atom_Refs.Accessor
+           := Object.Backend_Path.Query;
+         Map : Comment_Maps.Unsafe_Maps.Map;
+
+         procedure Process (Name : in S_Expressions.Atom) is
+            Input_Stream : aliased Ada.Streams.Root_Stream_Type'Class
+              := Backend.Read (Directory, Name);
+            Reader : S_Expressions.Parsers.Stream_Parser (Input_Stream'Access);
+            Comment : Comment_Data;
+            Position : Comment_Maps.Unsafe_Maps.Cursor;
+            Inserted : Boolean;
+         begin
+            Reader.Next;
+            Update (Reader, Comment, Meaningless_Value);
+
+            if not Comment.Flags (Comment_Flags.Ignored) then
+               Comment.Id := Create (Name);
+               Comment.Parent := Parent;
+               Preprocess (Comment, Object, Site);
+
+               Map.Insert (Name, Comment, Position, Inserted);
+
+               if not Inserted then
+                  Log (Severities.Error, "Duplicate comment id """
+                    & S_Expressions.To_String (Name) & '"');
+               end if;
+            end if;
+         end Process;
+      begin
+         Backend.Iterate (Directory, Process'Access);
+         Object.Comments := Container_Refs.Create (new Comment_Container);
+         Object.Comments.Update.Initialize (Map, Parent);
+         Object.Parent := Parent;
+      end;
+
+
+      if not Object.Tags.Is_Empty then
+         declare
+            C : Comment_Maps.Cursor := Object.Comments.Query.First;
+            Id : S_Expressions.Atom_Refs.Immutable_Reference;
+         begin
+            while Comment_Maps.Has_Element (C) loop
+               Id := Comment_Maps.Element (C).Id;
+               Site.Queue_Update (Comment_Inserter'
+                 (Container => Object.Comments,
+                  Id => Id,
+                  Tags => Object.Tags));
+               Comment_Maps.Next (C);
+            end loop;
+         end;
+      end if;
+   end Live_Load;
+
+
    procedure Load
      (Object : in out Comment_List;
       Builder : in out Sites.Site_Builder;

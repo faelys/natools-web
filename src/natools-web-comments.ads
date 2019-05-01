@@ -50,6 +50,14 @@ package Natools.Web.Comments is
    function Is_Null (Object : in Comment_List) return Boolean;
       --  Return whether the list is usable (even if empty)
 
+   procedure Live_Load
+     (Object : in out Comment_List;
+      Site : in Sites.Site;
+      Parent : in Tags.Visible_Access := null;
+      Parent_Path : in S_Expressions.Atom_Refs.Immutable_Reference
+        := S_Expressions.Atom_Refs.Null_Immutable_Reference);
+      --  Load comment list from Site back-end and register all comments
+
    procedure Load
      (Object : in out Comment_List;
       Builder : in out Sites.Site_Builder;
