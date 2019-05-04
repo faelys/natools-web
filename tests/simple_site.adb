@@ -33,6 +33,7 @@ with Natools.Web.Filters.Text_Replacement;
 with Natools.Web.Reload_Pages;
 with Natools.Web.Simple_Pages;
 with Natools.Web.Simple_Pages.Multipages;
+with Natools.Web.Simple_Pages.Dynamic_Multipages;
 with Natools.Web.Tag_Pages;
 with Syslog.Guess.App_Name;
 with Syslog.Guess.Hostname;
@@ -59,6 +60,9 @@ begin
 
    Common.Site.Register
      ("cookie-setter", Natools.Web.Cookie_Setters.Create'Access);
+   Common.Site.Register
+     ("dynamic-multipage",
+      Natools.Web.Simple_Pages.Dynamic_Multipages.Create'Access);
    Common.Site.Register
      ("multipage", Natools.Web.Simple_Pages.Multipages.Create'Access);
    Common.Site.Register

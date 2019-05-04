@@ -329,3 +329,26 @@ if test -z "${STOPPED}"; then
 		false
 	fi
 fi
+
+BASE_VERSION=$(get_version)
+check /dynamic-multipage dynamic-multipage.html
+chain /dynamic-multipage/subpage1 dynamic-multipage-subpage1.html
+chain /dynamic-multipage/subpage2 dynamic-multipage-subpage2.html
+chain /dynamic-multipage/subpage1/comments dynamic-multipage-subpage1-303.html\
+    -F 'c_name=Test' -F 'c_mail=' -F 'c_link=' -F 'submit=Submit' \
+    -F 'c_text=Comment in the first subpage'
+chain /dynamic-multipage/subpage2/comments dynamic-multipage-subpage2-303.html\
+    -F 'c_name=Test' -F 'c_mail=' -F 'c_link=' -F 'submit=Submit' \
+    -F 'c_text=Comment in the second subpage'
+chain_curl -F 'wait_version='$((BASE_VERSION + 2)) "${BASE_URL}/test"
+if test -z "${STOPPED}"; then
+	if ! test -f "${TRANSIENT_DIR}/comments/dynamic-multipage/subpage1"/*
+	then
+		echo "Comment in first subpage of dynamic multipage not found"
+		false
+	fi
+	if ! test -f "${TRANSIENT_DIR}/comments/dynamic-multipage-002"/*; then
+		echo "Comment in second subpage of dynamic multipage not found"
+		false
+	fi
+fi

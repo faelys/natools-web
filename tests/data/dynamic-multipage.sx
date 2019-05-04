@@ -1,0 +1,39 @@
+(""
+   (elements
+      (main-text
+         "<p>This is a dynamic multipage element, titled \""
+         (element title)
+         "\".</p>\n"
+         (element multipage-text "")
+         (render page-comments)))
+   (comment-list
+      (tags comments)
+      (filter comment-filter)
+      (backend transient-comments))
+   (comment-path-prefix dynamic-multipage))
+("+"
+   (elements
+      (title "Multipage index")
+      (main-text
+         "<p>This is a dynamic multipage index.</p>\n"
+         (tags pages/dyn-fragments (all-elements (template
+            "<h2>" (element title) "</h2>\n"
+            (element multipage-text "")))))))
+("##part1"
+   (elements
+      (title "Part one"))
+   (tags (dp1 pages/dyn-fragments)))
+("##part2"
+   (elements
+      (title "Part two"))
+   (tags (dp2 pages/dyn-fragments)))
+("+/subpage1"
+   (elements
+      (title "Subpage one"))
+   (tags (ds1 pages/dyn-fragments))
+   (comments))
+("+/subpage2"
+   (elements
+      (title "Subpage two"))
+   (tags (ds2 pages/dyn-fragments))
+   (comments -002))
