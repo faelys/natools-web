@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2017, Natacha Porté                                        --
+-- Copyright (c) 2017-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -139,5 +139,37 @@ package body Natools.Web.ACL.Sx_Backends is
 
       return Backend'(Map => Token_Maps.Create (Map));
    end Create;
+
+
+   procedure Register
+     (Id : in S_Expressions.Octet;
+      Fn : in Hash_Function)
+   is
+      use type S_Expressions.Octet;
+   begin
+      if Fn = null then
+         null;
+      elsif Hash_Function_DB.Is_Empty then
+         Hash_Function_DB.Replace (new Hash_Function_Array'(Id => Fn));
+      elsif Id in Hash_Function_DB.Query.Data.all'Range then
+         Hash_Function_DB.Update.Data.all (Id) := Fn;
+      else
+         declare
+            New_First : constant S_Expressions.Octet
+              := S_Expressions.Octet'Min
+                 (Id, Hash_Function_DB.Query.Data.all'First);
+            New_Last : constant S_Expressions.Octet
+              := S_Expressions.Octet'Max
+                 (Id, Hash_Function_DB.Query.Data.all'Last);
+            New_Data : constant Hash_Function_Array_Refs.Data_Access
+              := new Hash_Function_Array'(New_First .. New_Last => null);
+         begin
+            New_Data (Hash_Function_DB.Query.Data.all'First
+                  ..  Hash_Function_DB.Query.Data.all'Last)
+              := Hash_Function_DB.Query.Data.all;
+            Hash_Function_DB.Replace (New_Data);
+         end;
+      end if;
+   end Register;
 
 end Natools.Web.ACL.Sx_Backends;

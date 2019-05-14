@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------------
--- Copyright (c) 2017, Natacha Porté                                        --
+-- Copyright (c) 2017-2019, Natacha Porté                                   --
 --                                                                          --
 -- Permission to use, copy, modify, and distribute this software for any    --
 -- purpose with or without fee is hereby granted, provided that the above   --
@@ -20,6 +20,8 @@
 ------------------------------------------------------------------------------
 
 private with Natools.Constant_Indefinite_Ordered_Maps;
+private with Natools.References;
+private with Natools.Storage_Pools;
 
 package Natools.Web.ACL.Sx_Backends is
 
@@ -33,6 +35,15 @@ package Natools.Web.ACL.Sx_Backends is
      (Arguments : in out S_Expressions.Lockable.Descriptor'Class)
      return ACL.Backend'Class;
 
+
+   type Hash_Function is access function
+     (Message : in S_Expressions.Atom)
+     return S_Expressions.Atom;
+
+   procedure Register
+     (Id : in S_Expressions.Octet;
+      Fn : in Hash_Function);
+
 private
 
    package Token_Maps is new Constant_Indefinite_Ordered_Maps
@@ -42,5 +53,15 @@ private
    type Backend is new ACL.Backend with record
       Map : Token_Maps.Constant_Map;
    end record;
+
+   type Hash_Function_Array is array
+     (S_Expressions.Octet range <>) of Hash_Function;
+
+   package Hash_Function_Array_Refs is new References
+     (Hash_Function_Array,
+      Storage_Pools.Access_In_Default_Pool'Storage_Pool,
+      Storage_Pools.Access_In_Default_Pool'Storage_Pool);
+
+   Hash_Function_DB : Hash_Function_Array_Refs.Reference;
 
 end Natools.Web.ACL.Sx_Backends;
