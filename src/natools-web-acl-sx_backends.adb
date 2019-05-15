@@ -142,10 +142,8 @@ package body Natools.Web.ACL.Sx_Backends is
 
 
    procedure Register
-     (Id : in S_Expressions.Octet;
-      Fn : in Hash_Function)
-   is
-      use type S_Expressions.Octet;
+     (Id : in Character;
+      Fn : in Hash_Function) is
    begin
       if Fn = null then
          null;
@@ -155,12 +153,10 @@ package body Natools.Web.ACL.Sx_Backends is
          Hash_Function_DB.Update.Data.all (Id) := Fn;
       else
          declare
-            New_First : constant S_Expressions.Octet
-              := S_Expressions.Octet'Min
-                 (Id, Hash_Function_DB.Query.Data.all'First);
-            New_Last : constant S_Expressions.Octet
-              := S_Expressions.Octet'Max
-                 (Id, Hash_Function_DB.Query.Data.all'Last);
+            New_First : constant Hash_Id
+              := Hash_Id'Min (Id, Hash_Function_DB.Query.Data.all'First);
+            New_Last : constant Hash_Id
+              := Hash_Id'Max (Id, Hash_Function_DB.Query.Data.all'Last);
             New_Data : constant Hash_Function_Array_Refs.Data_Access
               := new Hash_Function_Array'(New_First .. New_Last => null);
          begin

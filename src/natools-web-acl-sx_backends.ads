@@ -41,10 +41,12 @@ package Natools.Web.ACL.Sx_Backends is
      return S_Expressions.Atom;
 
    procedure Register
-     (Id : in S_Expressions.Octet;
+     (Id : in Character;
       Fn : in Hash_Function);
 
 private
+
+   subtype Hash_Id is Character;
 
    package Token_Maps is new Constant_Indefinite_Ordered_Maps
      (S_Expressions.Atom,      Containers.Identity,
@@ -54,8 +56,7 @@ private
       Map : Token_Maps.Constant_Map;
    end record;
 
-   type Hash_Function_Array is array
-     (S_Expressions.Octet range <>) of Hash_Function;
+   type Hash_Function_Array is array (Hash_Id range <>) of Hash_Function;
 
    package Hash_Function_Array_Refs is new References
      (Hash_Function_Array,
