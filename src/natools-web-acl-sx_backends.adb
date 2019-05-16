@@ -24,10 +24,14 @@ package body Natools.Web.ACL.Sx_Backends is
       Tokens, Groups : Containers.Unsafe_Atom_Lists.List;
    end record;
 
+   type Backend_Builder is record
+      Map : Token_Maps.Unsafe_Maps.Map;
+   end record;
+
    Cookie_Name : constant String := "User-Token";
 
    procedure Process_User
-     (Builder : in out Token_Maps.Unsafe_Maps.Map;
+     (Builder : in out Backend_Builder;
       Context : in Meaningless_Type;
       Name : in S_Expressions.Atom;
       Arguments : in out Natools.S_Expressions.Lockable.Descriptor'Class);
@@ -40,7 +44,7 @@ package body Natools.Web.ACL.Sx_Backends is
 
 
    procedure Read_DB is new S_Expressions.Interpreter_Loop
-     (Token_Maps.Unsafe_Maps.Map, Meaningless_Type, Process_User);
+     (Backend_Builder, Meaningless_Type, Process_User);
 
    procedure Read_User is new S_Expressions.Interpreter_Loop
      (User_Builder, Meaningless_Type, Process_User_Element);
@@ -51,7 +55,7 @@ package body Natools.Web.ACL.Sx_Backends is
    --------------------------
 
    procedure Process_User
-     (Builder : in out Token_Maps.Unsafe_Maps.Map;
+     (Builder : in out Backend_Builder;
       Context : in Meaningless_Type;
       Name : in S_Expressions.Atom;
       Arguments : in out Natools.S_Expressions.Lockable.Descriptor'Class)
@@ -67,7 +71,7 @@ package body Natools.Web.ACL.Sx_Backends is
          Groups => Containers.Create (User.Groups));
 
       for Token of User.Tokens loop
-         Builder.Include (Token, Identity);
+         Builder.Map.Include (Token, Identity);
       end loop;
    end Process_User;
 
@@ -117,11 +121,11 @@ package body Natools.Web.ACL.Sx_Backends is
      (Arguments : in out S_Expressions.Lockable.Descriptor'Class)
      return ACL.Backend'Class
    is
-      Map : Token_Maps.Unsafe_Maps.Map;
+      Builder : Backend_Builder;
    begin
       case Arguments.Current_Event is
          when S_Expressions.Events.Open_List =>
-            Read_DB (Arguments, Map, Meaningless_Value);
+            Read_DB (Arguments, Builder, Meaningless_Value);
 
          when S_Expressions.Events.Add_Atom =>
             declare
@@ -129,7 +133,7 @@ package body Natools.Web.ACL.Sx_Backends is
                  := S_Expressions.File_Readers.Reader
                     (S_Expressions.To_String (Arguments.Current_Atom));
             begin
-               Read_DB (Reader, Map, Meaningless_Value);
+               Read_DB (Reader, Builder, Meaningless_Value);
             end;
 
          when others =>
@@ -137,7 +141,7 @@ package body Natools.Web.ACL.Sx_Backends is
               & " starting with " & Arguments.Current_Event'Img);
       end case;
 
-      return Backend'(Map => Token_Maps.Create (Map));
+      return Backend'(Map => Token_Maps.Create (Builder.Map));
    end Create;
 
 
