@@ -141,7 +141,8 @@ package body Natools.Web.ACL.Sx_Backends is
               & " starting with " & Arguments.Current_Event'Img);
       end case;
 
-      return Backend'(Map => Token_Maps.Create (Builder.Map));
+      return Backend'(Map => Token_Maps.Create (Builder.Map),
+                      Hashed => <>);
    end Create;
 
 

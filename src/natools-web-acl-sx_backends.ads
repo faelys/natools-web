@@ -52,9 +52,19 @@ private
      (S_Expressions.Atom,      Containers.Identity,
       S_Expressions.Less_Than, Containers."=");
 
+   type Hashed_Token_Array is array (Hash_Id range <>)
+     of Token_Maps.Constant_Map;
+
+   package Hashed_Token_Array_Refs is new References
+     (Hashed_Token_Array,
+      Storage_Pools.Access_In_Default_Pool'Storage_Pool,
+      Storage_Pools.Access_In_Default_Pool'Storage_Pool);
+
    type Backend is new ACL.Backend with record
       Map : Token_Maps.Constant_Map;
+      Hashed : Hashed_Token_Array_Refs.Immutable_Reference;
    end record;
+
 
    type Hash_Function_Array is array (Hash_Id range <>) of Hash_Function;
 
