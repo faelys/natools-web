@@ -29,6 +29,7 @@ package body Natools.Web.ACL.Sx_Backends is
    end record;
 
    Cookie_Name : constant String := "User-Token";
+   Hash_Mark : constant Character := '$';
 
    procedure Process_User
      (Builder : in out Backend_Builder;
@@ -104,13 +105,39 @@ package body Natools.Web.ACL.Sx_Backends is
      (Self : in Backend;
       Exchange : in out Exchanges.Exchange)
    is
-      Cursor : constant Token_Maps.Cursor
-        := Self.Map.Find (S_Expressions.To_Atom
-           (Exchange.Cookie (Cookie_Name)));
+      Cookie : constant String := Exchange.Cookie (Cookie_Name);
       Identity : Containers.Identity;
    begin
-      if Token_Maps.Has_Element (Cursor) then
-         Identity := Token_Maps.Element (Cursor);
+      if Cookie'Length > 3
+        and then Cookie (Cookie'First) = Hash_Mark
+        and then Cookie (Cookie'First + 2) = Hash_Mark
+        and then not Self.Hashed.Is_Empty
+        and then Cookie (Cookie'First + 1) in Self.Hashed.Query.Data.all'Range
+      then
+         declare
+            Token : constant S_Expressions.Atom
+              := S_Expressions.To_Atom
+                 (Cookie (Cookie'First + 3 .. Cookie'Last));
+            Hash : constant S_Expressions.Atom
+              := Hash_Function_DB.Query.Data (Cookie (Cookie'First + 1)).all
+                 (Token);
+            Cursor : constant Token_Maps.Cursor
+              := Self.Hashed.Query.Data (Cookie (Cookie'First + 1)).Find
+                 (Hash);
+         begin
+            if Token_Maps.Has_Element (Cursor) then
+               Identity := Token_Maps.Element (Cursor);
+            end if;
+         end;
+      else
+         declare
+            Cursor : constant Token_Maps.Cursor
+              := Self.Map.Find (S_Expressions.To_Atom (Cookie));
+         begin
+            if Token_Maps.Has_Element (Cursor) then
+               Identity := Token_Maps.Element (Cursor);
+            end if;
+         end;
       end if;
 
       Exchange.Set_Identity (Identity);
