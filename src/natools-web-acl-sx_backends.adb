@@ -20,11 +20,11 @@ with Natools.S_Expressions.Interpreter_Loop;
 
 package body Natools.Web.ACL.Sx_Backends is
 
-   type User_Builder is record
+   type User_Builder (Hash_Id_First, Hash_Id_Last : Hash_Id) is record
       Tokens, Groups : Containers.Unsafe_Atom_Lists.List;
    end record;
 
-   type Backend_Builder is record
+   type Backend_Builder (Hash_Id_First, Hash_Id_Last : Hash_Id) is record
       Map : Token_Maps.Unsafe_Maps.Map;
    end record;
 
@@ -62,7 +62,7 @@ package body Natools.Web.ACL.Sx_Backends is
       Arguments : in out Natools.S_Expressions.Lockable.Descriptor'Class)
    is
       pragma Unreferenced (Context);
-      User : User_Builder;
+      User : User_Builder (Builder.Hash_Id_First, Builder.Hash_Id_Last);
       Identity : Containers.Identity;
    begin
       Read_User (Arguments, User, Meaningless_Value);
@@ -148,7 +148,15 @@ package body Natools.Web.ACL.Sx_Backends is
      (Arguments : in out S_Expressions.Lockable.Descriptor'Class)
      return ACL.Backend'Class
    is
-      Builder : Backend_Builder;
+      Hash_Id_First : constant Hash_Id
+        := (if Hash_Function_DB.Is_Empty
+            then Hash_Id'Last
+            else Hash_Function_DB.Query.Data.all'First);
+      Hash_Id_Last : constant Hash_Id
+        := (if Hash_Function_DB.Is_Empty
+            then Hash_Id'First
+            else Hash_Function_DB.Query.Data.all'Last);
+      Builder : Backend_Builder (Hash_Id_First, Hash_Id_Last);
    begin
       case Arguments.Current_Event is
          when S_Expressions.Events.Open_List =>
