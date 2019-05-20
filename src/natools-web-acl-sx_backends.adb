@@ -20,8 +20,12 @@ with Natools.S_Expressions.Interpreter_Loop;
 
 package body Natools.Web.ACL.Sx_Backends is
 
+   type Hashed_Token_List_Array is array (Hash_Id range <>)
+     of Containers.Unsafe_Atom_Lists.List;
+
    type User_Builder (Hash_Id_First, Hash_Id_Last : Hash_Id) is record
       Tokens, Groups : Containers.Unsafe_Atom_Lists.List;
+      Hashed : Hashed_Token_List_Array (Hash_Id_First .. Hash_Id_Last);
    end record;
 
    type Backend_Builder (Hash_Id_First, Hash_Id_Last : Hash_Id) is record
@@ -90,6 +94,25 @@ package body Natools.Web.ACL.Sx_Backends is
          Containers.Append_Atoms (Builder.Tokens, Arguments);
       elsif S_Name = "groups" or else S_Name = "group" then
          Containers.Append_Atoms (Builder.Groups, Arguments);
+      elsif (S_Name'Length = 8
+           or else (S_Name'Length = 9 and then S_Name (S_Name'Last) = 's'))
+        and then S_Name (S_Name'First) = Hash_Mark
+        and then S_Name (S_Name'First + 2 .. S_Name'First + 7)
+           = Hash_Mark & "token"
+        and then not Hash_Function_DB.Is_Empty
+      then
+         declare
+            Id : constant Character := S_Name (S_Name'First + 1);
+            Acc : constant Hash_Function_Array_Refs.Accessor
+              := Hash_Function_DB.Query;
+         begin
+            if Id in Acc.Data.all'Range and then Acc.Data (Id) /= null then
+               Containers.Append_Atoms (Builder.Hashed (Id), Arguments);
+            else
+               Log (Severities.Error, "Unknown hash function id"
+                 & Character'Image (Id));
+            end if;
+         end;
       else
          Log (Severities.Error, "Unknown user element """ & S_Name & '"');
       end if;
