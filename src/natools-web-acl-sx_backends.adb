@@ -23,6 +23,9 @@ package body Natools.Web.ACL.Sx_Backends is
    type Hashed_Token_List_Array is array (Hash_Id range <>)
      of Containers.Unsafe_Atom_Lists.List;
 
+   type Hashed_Token_Map_Array is array (Hash_Id range <>)
+     of Token_Maps.Unsafe_Maps.Map;
+
    type User_Builder (Hash_Id_First, Hash_Id_Last : Hash_Id) is record
       Tokens, Groups : Containers.Unsafe_Atom_Lists.List;
       Hashed : Hashed_Token_List_Array (Hash_Id_First .. Hash_Id_Last);
@@ -30,6 +33,7 @@ package body Natools.Web.ACL.Sx_Backends is
 
    type Backend_Builder (Hash_Id_First, Hash_Id_Last : Hash_Id) is record
       Map : Token_Maps.Unsafe_Maps.Map;
+      Hashed : Hashed_Token_Map_Array (Hash_Id_First .. Hash_Id_Last);
    end record;
 
    Cookie_Name : constant String := "User-Token";
@@ -77,6 +81,12 @@ package body Natools.Web.ACL.Sx_Backends is
 
       for Token of User.Tokens loop
          Builder.Map.Include (Token, Identity);
+      end loop;
+
+      for Id in User.Hashed'Range loop
+         for Hashed_Token of User.Hashed (Id) loop
+            Builder.Hashed (Id).Include (Hashed_Token, Identity);
+         end loop;
       end loop;
    end Process_User;
 
