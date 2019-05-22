@@ -209,8 +209,42 @@ package body Natools.Web.ACL.Sx_Backends is
               & " starting with " & Arguments.Current_Event'Img);
       end case;
 
-      return Backend'(Map => Token_Maps.Create (Builder.Map),
-                      Hashed => <>);
+      return Result : Backend
+        := (Map => Token_Maps.Create (Builder.Map),
+            Hashed => <>)
+      do
+         declare
+            Min : Hash_Id := Hash_Id'Last;
+            Max : Hash_Id := Hash_Id'First;
+         begin
+            for Id in Builder.Hashed'Range loop
+               if not Builder.Hashed (Id).Is_Empty then
+                  --  Hash_Id'Min seems broken, using a basic `if` instead
+                  if Id < Min then
+                     Min := Id;
+                  end if;
+
+                  if Id > Max then
+                     Max := Id;
+                  end if;
+               end if;
+            end loop;
+
+            if Min <= Max then
+               declare
+                  Data : constant Hashed_Token_Array_Refs.Data_Access
+                    := new Hashed_Token_Array (Min .. Max);
+               begin
+                  Result.Hashed := Hashed_Token_Array_Refs.Create (Data);
+                  for Id in Min .. Max loop
+                     if not Builder.Hashed (Id).Is_Empty then
+                        Data (Id) := Token_Maps.Create (Builder.Hashed (Id));
+                     end if;
+                  end loop;
+               end;
+            end if;
+         end;
+      end return;
    end Create;
 
 
@@ -233,6 +267,11 @@ package body Natools.Web.ACL.Sx_Backends is
             New_Data : constant Hash_Function_Array_Refs.Data_Access
               := new Hash_Function_Array'(New_First .. New_Last => null);
          begin
+            Log (Severities.Info,
+              "Adding " & Id'Img & " to "
+              & Hash_Function_DB.Query.Data.all'First'Img & " .. "
+              & Hash_Function_DB.Query.Data.all'Last'Img & " -> "
+              & New_First'Img & " .. " & New_Last'Img);
             New_Data (Hash_Function_DB.Query.Data.all'First
                   ..  Hash_Function_DB.Query.Data.all'Last)
               := Hash_Function_DB.Query.Data.all;
