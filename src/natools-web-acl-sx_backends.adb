@@ -267,14 +267,10 @@ package body Natools.Web.ACL.Sx_Backends is
             New_Data : constant Hash_Function_Array_Refs.Data_Access
               := new Hash_Function_Array'(New_First .. New_Last => null);
          begin
-            Log (Severities.Info,
-              "Adding " & Id'Img & " to "
-              & Hash_Function_DB.Query.Data.all'First'Img & " .. "
-              & Hash_Function_DB.Query.Data.all'Last'Img & " -> "
-              & New_First'Img & " .. " & New_Last'Img);
             New_Data (Hash_Function_DB.Query.Data.all'First
                   ..  Hash_Function_DB.Query.Data.all'Last)
               := Hash_Function_DB.Query.Data.all;
+            New_Data (Id) := Fn;
             Hash_Function_DB.Replace (New_Data);
          end;
       end if;
