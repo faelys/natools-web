@@ -1,5 +1,6 @@
 (test-user
    (tokens glaglagla hello)
+   ("$2$token" #73f196f271334a64a4ea5cd4f004eda64b3bb9ad5e1203e7c174e0127dfffb9f#)
    (groups admin commclass-special))
 (normal
    (tokens hi)

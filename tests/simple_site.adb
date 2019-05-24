@@ -58,6 +58,8 @@ begin
       Natools.Web.Log := Common.Syslog_Log'Access;
    end if;
 
+   Natools.Web.ACL.Sx_Backends.Register ('2', Common.SHA256_Digest'Access);
+
    Common.Site.Register
      ("cookie-setter", Natools.Web.Cookie_Setters.Create'Access);
    Common.Site.Register

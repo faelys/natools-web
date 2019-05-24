@@ -21,10 +21,17 @@
 
 with AWS.Response;
 with AWS.Status;
+with Natools.S_Expressions;
 with Natools.Web.Sites.Holders;
 with Natools.Web.Sites.Updates;
 
+private with GNAT.SHA256;
+
 package Common is
+
+   function SHA256_Digest (Message : in Natools.S_Expressions.Atom)
+     return Natools.S_Expressions.Atom;
+
 
    type Holder is new Natools.Web.Sites.Holders.Holder with null record;
 
@@ -70,5 +77,9 @@ private
    overriding procedure Update
      (Self : in Increment_Count;
       Object : in out Natools.Web.Sites.Site);
+
+   function SHA256_Digest (Message : in Natools.S_Expressions.Atom)
+     return Natools.S_Expressions.Atom
+     is (GNAT.SHA256.Digest (Message));
 
 end Common;
